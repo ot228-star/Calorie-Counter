@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Calorie Counter",
+    "slug": "calorie-counter",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["android"],
+    "android": {
+      "package": "com.ot228star.caloriecounter"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+# Node / Expo
+node_modules/
+app/node_modules/
+app/.expo/
+app/.expo-shared/
+app/dist/
+
+# Env files
+.env
+.env.*
+!.env.example
+app/.env
+app/.env.*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.cursor/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
