@@ -1,3 +1,5 @@
+import { getSupabaseConfig } from "../lib/env";
+
 type AnalyticsEventName =
   | "onboarding_completed"
   | "manual_meal_saved"
@@ -6,24 +8,24 @@ type AnalyticsEventName =
   | "estimate_edited"
   | "meal_saved";
 
-const supabaseUrl = (globalThis as any).process?.env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = (globalThis as any).process?.env?.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
-
 export const trackEvent = async (eventName: AnalyticsEventName, props: Record<string, unknown> = {}) => {
+  const { url, anonKey } = getSupabaseConfig();
+  if (!url || !anonKey) return;
+
   const body = {
     eventName,
     timestamp: new Date().toISOString(),
-    props
+    props,
   };
 
   try {
-    await fetch(`${supabaseUrl}/functions/v1/analytics-events`, {
+    await fetch(`${url.replace(/\/$/, "")}/functions/v1/analytics-events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${supabaseAnonKey}`
+        Authorization: `Bearer ${anonKey}`,
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
   } catch {
     // Analytics should never block UX.

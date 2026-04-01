@@ -1,14 +1,19 @@
-import { EstimateResult, Meal, MealItem } from "../types";
+import { assertSupabaseConfigured, getSupabaseConfig } from "../lib/env";
 import { sumItems } from "../lib/calculations";
+import { EstimateResult, Meal, MealItem } from "../types";
 
-const supabaseUrl = (globalThis as any).process?.env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = (globalThis as any).process?.env?.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
-const restBase = `${supabaseUrl}/rest/v1`;
+const restBaseUrl = () => {
+  const { url } = getSupabaseConfig();
+  return `${url.replace(/\/$/, "")}/rest/v1`;
+};
 
-const defaultHeaders = {
-  "Content-Type": "application/json",
-  apikey: supabaseAnonKey,
-  Authorization: `Bearer ${supabaseAnonKey}`
+const apiHeaders = () => {
+  const { anonKey } = getSupabaseConfig();
+  return {
+    "Content-Type": "application/json",
+    apikey: anonKey,
+    Authorization: `Bearer ${anonKey}`,
+  };
 };
 
 const requestJson = async <T>(url: string, init: RequestInit): Promise<T> => {
@@ -20,18 +25,20 @@ const requestJson = async <T>(url: string, init: RequestInit): Promise<T> => {
 };
 
 export const estimateMealFromImage = async (imageUrl: string, mealType: Meal["mealType"]): Promise<EstimateResult> => {
-  const response = await fetch(`${supabaseUrl}/functions/v1/estimate-meal`, {
+  assertSupabaseConfigured();
+  const { url: supabaseUrl, anonKey } = getSupabaseConfig();
+  const response = await fetch(`${supabaseUrl.replace(/\/$/, "")}/functions/v1/estimate-meal`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${supabaseAnonKey}`
+      Authorization: `Bearer ${anonKey}`,
     },
     body: JSON.stringify({
       imageUrl,
       mealType,
       eatenAt: new Date().toISOString(),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-    })
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    }),
   });
 
   if (!response.ok) throw new Error("Could not estimate meal.");
@@ -39,10 +46,13 @@ export const estimateMealFromImage = async (imageUrl: string, mealType: Meal["me
 };
 
 export const saveMeal = async (meal: Meal, requestId?: string) => {
+  assertSupabaseConfigured();
   const totals = sumItems(meal.items);
-  const mealRows = await requestJson<Array<{ id: string }>>(`${restBase}/meals?select=id`, {
+  const rb = restBaseUrl();
+  const headers = apiHeaders();
+  const mealRows = await requestJson<Array<{ id: string }>>(`${rb}/meals?select=id`, {
     method: "POST",
-    headers: { ...defaultHeaders, Prefer: "return=representation" },
+    headers: { ...headers, Prefer: "return=representation" },
     body: JSON.stringify([
       {
         meal_type: meal.mealType,
@@ -52,9 +62,9 @@ export const saveMeal = async (meal: Meal, requestId?: string) => {
         total_calories: totals.calories,
         total_protein_g: totals.protein_g,
         total_carbs_g: totals.carbs_g,
-        total_fat_g: totals.fat_g
-      }
-    ])
+        total_fat_g: totals.fat_g,
+      },
+    ]),
   });
   const mealId = mealRows[0]?.id;
   if (!mealId) throw new Error("Could not save meal.");
@@ -68,25 +78,30 @@ export const saveMeal = async (meal: Meal, requestId?: string) => {
     protein_g: item.protein_g,
     carbs_g: item.carbs_g,
     fat_g: item.fat_g,
-    estimation_confidence: item.estimation_confidence ?? null
+    estimation_confidence: item.estimation_confidence ?? null,
   }));
 
-  await requestJson<unknown>(`${restBase}/meal_items`, {
+  await requestJson<unknown>(`${rb}/meal_items`, {
     method: "POST",
-    headers: defaultHeaders,
-    body: JSON.stringify(insertItems)
+    headers,
+    body: JSON.stringify(insertItems),
   });
 
   if (requestId) {
-    await requestJson<unknown>(`${restBase}/estimation_requests?id=eq.${requestId}`, {
+    await requestJson<unknown>(`${rb}/estimation_requests?id=eq.${requestId}`, {
       method: "PATCH",
-      headers: defaultHeaders,
-      body: JSON.stringify({ status: "succeeded" })
+      headers,
+      body: JSON.stringify({ status: "succeeded" }),
     });
   }
 };
 
 export const listMealsForToday = async (): Promise<Meal[]> => {
+  const { url, anonKey } = getSupabaseConfig();
+  if (!url || !anonKey) return [];
+
+  const rb = restBaseUrl();
+  const headers = apiHeaders();
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   const end = new Date();
@@ -95,11 +110,11 @@ export const listMealsForToday = async (): Promise<Meal[]> => {
   const mealsData = await requestJson<
     Array<{ id: string; meal_type: Meal["mealType"]; source: Meal["source"]; eaten_at: string; note: string | null }>
   >(
-    `${restBase}/meals?select=id,meal_type,source,eaten_at,note&eaten_at=gte.${encodeURIComponent(start.toISOString())}&eaten_at=lte.${encodeURIComponent(end.toISOString())}&order=eaten_at.desc`,
+    `${rb}/meals?select=id,meal_type,source,eaten_at,note&eaten_at=gte.${encodeURIComponent(start.toISOString())}&eaten_at=lte.${encodeURIComponent(end.toISOString())}&order=eaten_at.desc`,
     {
       method: "GET",
-      headers: defaultHeaders
-    }
+      headers,
+    },
   );
 
   const ids = mealsData.map((meal) => meal.id);
@@ -118,13 +133,10 @@ export const listMealsForToday = async (): Promise<Meal[]> => {
       fat_g: number;
       estimation_confidence: number | null;
     }>
-  >(
-    `${restBase}/meal_items?select=*&meal_id=in.(${ids.join(",")})`,
-    {
-      method: "GET",
-      headers: defaultHeaders
-    }
-  );
+  >(`${rb}/meal_items?select=*&meal_id=in.(${ids.join(",")})`, {
+    method: "GET",
+    headers,
+  });
 
   return mealsData.map((meal) => ({
     id: meal.id,
@@ -143,19 +155,24 @@ export const listMealsForToday = async (): Promise<Meal[]> => {
         protein_g: Number(item.protein_g),
         carbs_g: Number(item.carbs_g),
         fat_g: Number(item.fat_g),
-        estimation_confidence: item.estimation_confidence ?? undefined
-      }))
+        estimation_confidence: item.estimation_confidence ?? undefined,
+      })),
   }));
 };
 
 export const deleteMealById = async (mealId: string) => {
-  await requestJson<unknown>(`${restBase}/meals?id=eq.${mealId}`, {
+  assertSupabaseConfigured();
+  const rb = restBaseUrl();
+  await requestJson<unknown>(`${rb}/meals?id=eq.${mealId}`, {
     method: "DELETE",
-    headers: defaultHeaders
+    headers: apiHeaders(),
   });
 };
 
 export const logEstimateCorrections = async (requestId: string, originalItems: MealItem[], editedItems: MealItem[]) => {
+  const { url, anonKey } = getSupabaseConfig();
+  if (!url || !anonKey) return;
+
   const corrections: Array<{ field_name: string; old_value: string; new_value: string }> = [];
   const max = Math.max(originalItems.length, editedItems.length);
 
@@ -166,7 +183,7 @@ export const logEstimateCorrections = async (requestId: string, originalItems: M
       corrections.push({
         field_name: `item_${index}_added`,
         old_value: "",
-        new_value: JSON.stringify(edited)
+        new_value: JSON.stringify(edited),
       });
       continue;
     }
@@ -174,7 +191,7 @@ export const logEstimateCorrections = async (requestId: string, originalItems: M
       corrections.push({
         field_name: `item_${index}_removed`,
         old_value: JSON.stringify(original),
-        new_value: ""
+        new_value: "",
       });
       continue;
     }
@@ -184,7 +201,7 @@ export const logEstimateCorrections = async (requestId: string, originalItems: M
         corrections.push({
           field_name: `${index}.${field}`,
           old_value: String(original[field]),
-          new_value: String(edited[field])
+          new_value: String(edited[field]),
         });
       }
     });
@@ -195,11 +212,11 @@ export const logEstimateCorrections = async (requestId: string, originalItems: M
     request_id: requestId,
     field_name: c.field_name,
     old_value: c.old_value,
-    new_value: c.new_value
+    new_value: c.new_value,
   }));
-  await requestJson<unknown>(`${restBase}/estimation_corrections`, {
+  await requestJson<unknown>(`${restBaseUrl()}/estimation_corrections`, {
     method: "POST",
-    headers: defaultHeaders,
-    body: JSON.stringify(payload)
+    headers: apiHeaders(),
+    body: JSON.stringify(payload),
   });
 };

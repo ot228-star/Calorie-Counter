@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
-  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -20,8 +19,20 @@ type Screen = "onboarding" | "dashboard" | "manual" | "camera" | "review";
 
 const mealTypes: MealType[] = ["breakfast", "lunch", "dinner", "snack"];
 
+const createId = (): string => {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+};
+
+/** Avoid RN `Button` on Android (TouchableNativeFeedback) — use opacity press target instead. */
+const PrimaryButton = ({ title, onPress }: { title: string; onPress: () => void }) => (
+  <TouchableOpacity style={styles.primaryBtn} onPress={onPress} activeOpacity={0.7}>
+    <Text style={styles.primaryBtnText}>{title}</Text>
+  </TouchableOpacity>
+);
+
 const makeItem = (): MealItem => ({
-  id: crypto.randomUUID(),
+  id: createId(),
   name: "",
   quantity: 1,
   unit: "piece",
@@ -63,7 +74,7 @@ export default function App() {
     }
 
     const meal: Meal = {
-      id: crypto.randomUUID(),
+      id: createId(),
       mealType,
       source,
       eatenAt: new Date().toISOString(),
@@ -124,7 +135,13 @@ export default function App() {
       await trackEvent("estimate_received", { confidence: result.confidence });
       setScreen("review");
     } catch (error) {
-      Alert.alert("Estimate failed", "Switching to manual entry.");
+      const msg = error instanceof Error ? error.message : String(error);
+      Alert.alert(
+        "Estimate failed",
+        msg.includes("Supabase is not configured")
+          ? msg
+          : `${msg}\n\nYou can still log meals manually.`
+      );
       setScreen("manual");
       console.error(error);
     }
@@ -190,9 +207,9 @@ export default function App() {
         </View>
       ))}
 
-      <Button title="Add item" onPress={() => setMealItems((prev) => [...prev, makeItem()])} />
+      <PrimaryButton title="Add item" onPress={() => setMealItems((prev) => [...prev, makeItem()])} />
       <View style={styles.spacer} />
-      <Button title="Save meal" onPress={() => saveCurrentMeal(source, requestId)} />
+      <PrimaryButton title="Save meal" onPress={() => saveCurrentMeal(source, requestId)} />
     </View>
   );
 
@@ -222,7 +239,7 @@ export default function App() {
             </TouchableOpacity>
           ))}
         </View>
-        <Button
+        <PrimaryButton
           title="Suggest target"
           onPress={() => {
             const suggested = suggestedCalorieTarget({
@@ -241,7 +258,7 @@ export default function App() {
           value={String(targetCalories)}
           onChangeText={(v) => setTargetCalories(Number(v || 0))}
         />
-        <Button
+        <PrimaryButton
           title="Finish onboarding"
           onPress={async () => {
             await trackEvent("onboarding_completed", { targetCalories, goalType });
@@ -256,9 +273,9 @@ export default function App() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Calorie Counter</Text>
       <View style={styles.row}>
-        <Button title="Dashboard" onPress={() => setScreen("dashboard")} />
-        <Button title="Manual log" onPress={() => setScreen("manual")} />
-        <Button title="Camera" onPress={openPhotoPicker} />
+        <PrimaryButton title="Dashboard" onPress={() => setScreen("dashboard")} />
+        <PrimaryButton title="Manual log" onPress={() => setScreen("manual")} />
+        <PrimaryButton title="Camera" onPress={openPhotoPicker} />
       </View>
 
       {screen === "dashboard" && (
@@ -278,7 +295,7 @@ export default function App() {
               <Text>
                 {meal.mealType} ({meal.source}) - {meal.items.reduce((sum, i) => sum + i.calories, 0)} kcal
               </Text>
-              <Button
+              <PrimaryButton
                 title="Delete"
                 onPress={async () => {
                   try {
@@ -300,7 +317,7 @@ export default function App() {
         <View style={styles.card}>
           <Text style={styles.subtitle}>Camera Photo</Text>
           {photoUri ? <Image source={{ uri: photoUri }} style={styles.image} /> : <Text>No photo selected.</Text>}
-          <Button title="Estimate calories" onPress={requestEstimate} />
+          <PrimaryButton title="Estimate calories" onPress={requestEstimate} />
         </View>
       )}
 
@@ -316,14 +333,6 @@ export default function App() {
       )}
     </ScrollView>
   );
-}
-
-// Lazily initialize to avoid crash in environments where crypto is absent.
-if (!globalThis.crypto) {
-  // @ts-ignore
-  globalThis.crypto = {
-    randomUUID: () => Math.random().toString(36).slice(2)
-  };
 }
 
 const styles = StyleSheet.create({
@@ -389,5 +398,17 @@ const styles = StyleSheet.create({
   },
   spacer: {
     height: 8
+  },
+  primaryBtn: {
+    backgroundColor: "#2563eb",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    alignSelf: "flex-start"
+  },
+  primaryBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+    textAlign: "center"
   }
 });

@@ -26,7 +26,7 @@ npm install
 
 ### 2) Configure environment
 
-Copy `.env.example` to `.env` and fill values.
+Copy `.env.example` to `.env` in the **repo root** (next to `README.md`) and set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`. The Expo app (`app/app.config.js`) loads that file automatically so you do not need to duplicate it under `app/` unless you prefer it.
 
 ### 3) Run app
 
