@@ -1,4 +1,5 @@
 import { getSupabaseConfig } from "../lib/env";
+import { authClient } from "./auth";
 
 type AnalyticsEventName =
   | "onboarding_completed"
@@ -11,6 +12,10 @@ type AnalyticsEventName =
 export const trackEvent = async (eventName: AnalyticsEventName, props: Record<string, unknown> = {}) => {
   const { url, anonKey } = getSupabaseConfig();
   if (!url || !anonKey) return;
+  const {
+    data: { session }
+  } = await authClient.auth.getSession();
+  const accessToken = session?.access_token ?? anonKey;
 
   const body = {
     eventName,
@@ -23,7 +28,7 @@ export const trackEvent = async (eventName: AnalyticsEventName, props: Record<st
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${anonKey}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(body),
     });

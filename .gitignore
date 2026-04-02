@@ -16,6 +16,7 @@ app/.env.*
 .DS_Store
 Thumbs.db
 .vscode/
+.idea/
 .cursor/
 
 # Logs

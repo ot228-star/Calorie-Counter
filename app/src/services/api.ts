@@ -1,18 +1,23 @@
 import { assertSupabaseConfigured, getSupabaseConfig } from "../lib/env";
 import { sumItems } from "../lib/calculations";
 import { EstimateResult, Meal, MealItem } from "../types";
+import { authClient } from "./auth";
 
 const restBaseUrl = () => {
   const { url } = getSupabaseConfig();
   return `${url.replace(/\/$/, "")}/rest/v1`;
 };
 
-const apiHeaders = () => {
+const apiHeaders = async () => {
   const { anonKey } = getSupabaseConfig();
+  const {
+    data: { session }
+  } = await authClient.auth.getSession();
+  const accessToken = session?.access_token ?? anonKey;
   return {
     "Content-Type": "application/json",
     apikey: anonKey,
-    Authorization: `Bearer ${anonKey}`,
+    Authorization: `Bearer ${accessToken}`,
   };
 };
 
@@ -49,7 +54,7 @@ export const saveMeal = async (meal: Meal, requestId?: string) => {
   assertSupabaseConfigured();
   const totals = sumItems(meal.items);
   const rb = restBaseUrl();
-  const headers = apiHeaders();
+  const headers = await apiHeaders();
   const mealRows = await requestJson<Array<{ id: string }>>(`${rb}/meals?select=id`, {
     method: "POST",
     headers: { ...headers, Prefer: "return=representation" },
@@ -101,7 +106,7 @@ export const listMealsForToday = async (): Promise<Meal[]> => {
   if (!url || !anonKey) return [];
 
   const rb = restBaseUrl();
-  const headers = apiHeaders();
+  const headers = await apiHeaders();
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   const end = new Date();
@@ -163,9 +168,27 @@ export const listMealsForToday = async (): Promise<Meal[]> => {
 export const deleteMealById = async (mealId: string) => {
   assertSupabaseConfigured();
   const rb = restBaseUrl();
+  const headers = await apiHeaders();
   await requestJson<unknown>(`${rb}/meals?id=eq.${mealId}`, {
     method: "DELETE",
-    headers: apiHeaders(),
+    headers,
+  });
+};
+
+export const upsertProfile = async (profile: {
+  id: string;
+  age: number;
+  height_cm: number;
+  weight_kg: number;
+  goal_type: "lose" | "maintain" | "gain";
+  daily_calorie_target: number;
+}) => {
+  assertSupabaseConfigured();
+  const headers = await apiHeaders();
+  await requestJson<unknown>(`${restBaseUrl()}/profiles?on_conflict=id`, {
+    method: "POST",
+    headers: { ...headers, Prefer: "resolution=merge-duplicates" },
+    body: JSON.stringify([profile])
   });
 };
 
@@ -207,6 +230,7 @@ export const logEstimateCorrections = async (requestId: string, originalItems: M
     });
   }
 
+  const headers = await apiHeaders();
   if (!corrections.length) return;
   const payload = corrections.map((c) => ({
     request_id: requestId,
@@ -216,7 +240,7 @@ export const logEstimateCorrections = async (requestId: string, originalItems: M
   }));
   await requestJson<unknown>(`${restBaseUrl()}/estimation_corrections`, {
     method: "POST",
-    headers: apiHeaders(),
+    headers,
     body: JSON.stringify(payload),
   });
 };

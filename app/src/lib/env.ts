@@ -29,4 +29,14 @@ export function assertSupabaseConfigured(): void {
       "Supabase is not configured. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY to the project root .env (or app/.env), then restart Expo with a clean cache: npx expo start -c"
     );
   }
+
+  const normalized = url.trim().toLowerCase();
+  const looksLikeDashboardUrl = normalized.includes("supabase.com/dashboard/project/");
+  const looksLikeProjectApiUrl = /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(normalized);
+
+  if (looksLikeDashboardUrl || !looksLikeProjectApiUrl) {
+    throw new Error(
+      "Invalid EXPO_PUBLIC_SUPABASE_URL. Use your project API URL (for example: https://<project-ref>.supabase.co), not the Supabase dashboard URL."
+    );
+  }
 }
