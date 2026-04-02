@@ -32,17 +32,28 @@ import {
   startOAuth
 } from "./src/services/auth";
 import { trackEvent } from "./src/services/analytics";
-import type { FoodRecord } from "./src/data/foodDatabase";
+import { FOOD_DATABASE, type FoodRecord } from "./src/data/foodDatabase";
+import { getFoodDetail, getFoodSearchBlob } from "./src/data/foodDetails";
 import { searchFoods } from "./src/services/foodFinder";
 import { suggestedCalorieTarget, summaryFromMeals } from "./src/lib/calculations";
 import { EstimateResult, Meal, MealItem, MealType } from "./src/types";
 
 WebBrowser.maybeCompleteAuthSession();
 
-type Screen = "onboarding" | "dashboard" | "manual" | "foodFinder" | "camera" | "review" | "settings";
+type Screen = "onboarding" | "dashboard" | "manual" | "foodFinder" | "foodSuggestions" | "foodDetail" | "camera" | "review" | "settings";
 type ThemeMode = "light" | "dark";
 type OnboardingStep = 0 | 1 | 2 | 3;
 type AccentPresetId = "blue" | "emerald" | "violet" | "rose" | "orange";
+type CuisineRegionId = "global" | "northAmerican" | "mediterranean" | "southAsian" | "eastAsian" | "latinAmerican" | "middleEastern";
+type BiologicalSex = "man" | "woman";
+type DetailBackScreen = "foodFinder" | "foodSuggestions";
+type DetailContent = {
+  title: string;
+  subtitle: string;
+  description: string;
+  photoUrl: string;
+  sourceLabel: string;
+};
 const AUTH_DISABLED = true;
 
 const mealTypes: MealType[] = ["breakfast", "lunch", "dinner", "snack"];
@@ -76,6 +87,107 @@ const accentPresets: Record<AccentPresetId, { label: string; light: string; dark
   orange: { label: "Orange", light: "#ea580c", dark: "#fb923c" }
 };
 const accentOrder: AccentPresetId[] = ["blue", "emerald", "violet", "rose", "orange"];
+const cuisineRegionPresets: Record<CuisineRegionId, { label: string; keywords: string[] }> = {
+  global: {
+    label: "Global mix",
+    keywords: ["rice", "chicken", "salmon", "oatmeal", "wrap", "soup"]
+  },
+  northAmerican: {
+    label: "North American",
+    keywords: ["hamburger", "cheeseburger", "hot dog", "mac and cheese", "club sandwich", "pancakes", "waffles"]
+  },
+  mediterranean: {
+    label: "Mediterranean",
+    keywords: ["greek salad", "hummus", "pita", "chicken kebab", "falafel", "olive oil"]
+  },
+  southAsian: {
+    label: "South Asian",
+    keywords: ["biryani", "butter chicken", "tikka masala", "curry", "lentil"]
+  },
+  eastAsian: {
+    label: "East Asian",
+    keywords: ["ramen", "sushi", "pad thai", "pho", "dumplings", "teriyaki", "fried rice", "poke"]
+  },
+  latinAmerican: {
+    label: "Latin American",
+    keywords: ["taco", "burrito", "quesadilla", "corn tortilla", "beans"]
+  },
+  middleEastern: {
+    label: "Middle Eastern",
+    keywords: ["shawarma", "falafel", "hummus", "kebab", "pita"]
+  }
+};
+const cuisineRegionOrder: CuisineRegionId[] = [
+  "global",
+  "northAmerican",
+  "mediterranean",
+  "southAsian",
+  "eastAsian",
+  "latinAmerican",
+  "middleEastern"
+];
+const cuisineDetails: Record<CuisineRegionId, { title: string; description: string; photoUrl: string; sourceLabel: string }> = {
+  global: {
+    title: "Global Mix",
+    description:
+      "A balanced set of globally popular meals and staples. This includes lean proteins, rice bowls, soups, and wraps to keep variety high while making calorie tracking easier.",
+    photoUrl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80",
+    sourceLabel: "Photo: Unsplash (real photography)"
+  },
+  northAmerican: {
+    title: "North American",
+    description:
+      "Common comfort and fast-casual foods such as burgers, sandwiches, pancakes, and mac and cheese. Useful for users frequently eating in North American-style restaurants.",
+    photoUrl: "https://images.unsplash.com/photo-1561758033-7e924f619b47?auto=format&fit=crop&w=1200&q=80",
+    sourceLabel: "Photo: Unsplash (real photography)"
+  },
+  mediterranean: {
+    title: "Mediterranean",
+    description:
+      "Cuisine focused on olive oil, vegetables, legumes, fish, grilled meats, and salads. Often nutrient-dense with heart-healthy fats and fiber-rich ingredients.",
+    photoUrl: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1200&q=80",
+    sourceLabel: "Photo: Unsplash (real photography)"
+  },
+  southAsian: {
+    title: "South Asian",
+    description:
+      "Flavorful dishes like biryani, curries, lentils, and spice-forward chicken preparations. Great for suggesting familiar options while keeping macro visibility clear.",
+    photoUrl: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=80",
+    sourceLabel: "Photo: Unsplash (real photography)"
+  },
+  eastAsian: {
+    title: "East Asian",
+    description:
+      "Includes sushi, ramen, stir-fries, rice bowls, and noodle-based meals. This section prioritizes popular dishes with diverse protein and carb profiles.",
+    photoUrl: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80",
+    sourceLabel: "Photo: Unsplash (real photography)"
+  },
+  latinAmerican: {
+    title: "Latin American",
+    description:
+      "Features tacos, burritos, quesadillas, beans, and rice combinations. Helpful for users who frequently log meals from Latin American food spots.",
+    photoUrl: "https://images.unsplash.com/photo-1615870216519-2f9fa575fa5c?auto=format&fit=crop&w=1200&q=80",
+    sourceLabel: "Photo: Unsplash (real photography)"
+  },
+  middleEastern: {
+    title: "Middle Eastern",
+    description:
+      "Highlights shawarma, kebab, hummus, pita, and salad-heavy combinations. This cuisine often provides protein-rich meals with strong herb and spice profiles.",
+    photoUrl: "https://images.unsplash.com/photo-1534939561126-855b8675edd7?auto=format&fit=crop&w=1200&q=80",
+    sourceLabel: "Photo: Unsplash (real photography)"
+  }
+};
+
+const inferCuisineRegion = (): CuisineRegionId => {
+  const locale = Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase();
+  if (/(in|pk|bd|lk|np)/.test(locale)) return "southAsian";
+  if (/(jp|kr|cn|tw|vn|th|ph|sg|my)/.test(locale)) return "eastAsian";
+  if (/(mx|ar|br|cl|co|pe)/.test(locale)) return "latinAmerican";
+  if (/(tr|ae|sa|eg|jo|lb|iq|ir|il)/.test(locale)) return "middleEastern";
+  if (/(it|es|gr|fr|pt)/.test(locale)) return "mediterranean";
+  if (/(us|ca)/.test(locale)) return "northAmerican";
+  return "global";
+};
 
 const createId = (): string => {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
@@ -213,11 +325,15 @@ export default function App() {
   const [age, setAge] = useState("25");
   const [heightCm, setHeightCm] = useState("170");
   const [weightKg, setWeightKg] = useState("70");
+  const [biologicalSex, setBiologicalSex] = useState<BiologicalSex | null>(null);
   const [goalType, setGoalType] = useState<"lose" | "maintain" | "gain">("maintain");
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(0);
   const [surveyGoals, setSurveyGoals] = useState<string[]>([]);
   const [surveyHabits, setSurveyHabits] = useState<string[]>([]);
   const [mealPlanFrequency, setMealPlanFrequency] = useState("Occasionally");
+  const [selectedCuisineRegion, setSelectedCuisineRegion] = useState<CuisineRegionId>(inferCuisineRegion);
+  const [detailBackScreen, setDetailBackScreen] = useState<DetailBackScreen>("foodFinder");
+  const [detailContent, setDetailContent] = useState<DetailContent | null>(null);
   const [foodSearch, setFoodSearch] = useState("");
   const [foodResults, setFoodResults] = useState<FoodRecord[]>([]);
   const [foodSource, setFoodSource] = useState<"cloud" | "local">("local");
@@ -239,6 +355,51 @@ export default function App() {
   const avgMealCalories = mealsLogged ? Math.round(summary.consumedCalories / mealsLogged) : 0;
   const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const toggleTheme = () => setThemeMode((prev) => (prev === "light" ? "dark" : "light"));
+  const bmiValue = useMemo(() => {
+    const h = Number(heightCm);
+    const w = Number(weightKg);
+    if (!h || !w || h <= 0 || w <= 0) return null;
+    const meters = h / 100;
+    return Number((w / (meters * meters)).toFixed(1));
+  }, [heightCm, weightKg]);
+  const bmiLabel = useMemo(() => {
+    if (!bmiValue) return "Unavailable";
+    if (bmiValue < 18.5) return "Underweight";
+    if (bmiValue < 25) return "Healthy";
+    if (bmiValue < 30) return "Overweight";
+    return "Obese";
+  }, [bmiValue]);
+  const suggestedRegionalFoods = useMemo(() => {
+    const keywords = cuisineRegionPresets[selectedCuisineRegion].keywords;
+    const matched = FOOD_DATABASE.filter((food) => keywords.some((keyword) => food.name.toLowerCase().includes(keyword.toLowerCase())));
+    const unique = Array.from(new Map(matched.map((food) => [food.name, food])).values());
+    if (unique.length > 0) return unique.slice(0, 20);
+    return FOOD_DATABASE.filter((food) => food.category === "Prepared").slice(0, 20);
+  }, [selectedCuisineRegion]);
+  const searchableFoodResults = useMemo(() => {
+    const q = foodSearch.trim().toLowerCase();
+    const merged = Array.from(new Map([...foodResults, ...FOOD_DATABASE].map((food) => [food.name, food])).values());
+    if (!q) return merged.slice(0, 120);
+
+    const numericQuery = Number(q);
+    const hasNumericQuery = !Number.isNaN(numericQuery);
+    const scored = merged
+      .map((food) => {
+        const text = getFoodSearchBlob(food);
+        let score = 0;
+        if (food.name.toLowerCase().includes(q)) score += 5;
+        if (food.category.toLowerCase().includes(q)) score += 3;
+        if (text.includes(q)) score += 2;
+        if (hasNumericQuery && Math.abs(food.calories - numericQuery) <= 20) score += 2;
+        if (hasNumericQuery && Math.abs(food.protein_g - numericQuery) <= 5) score += 1;
+        return { food, score };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score || a.food.name.localeCompare(b.food.name))
+      .slice(0, 120)
+      .map((item) => item.food);
+    return scored;
+  }, [foodResults, foodSearch]);
 
   useEffect(() => {
     getSession()
@@ -612,6 +773,32 @@ export default function App() {
     setScreen("manual");
   };
 
+  const openFoodDetail = (food: FoodRecord, backScreen: DetailBackScreen) => {
+    const detail = getFoodDetail(food);
+    setDetailBackScreen(backScreen);
+    setDetailContent({
+      title: food.name,
+      subtitle: `${food.category} • ${food.calories} kcal per 100g`,
+      description: detail.description,
+      photoUrl: detail.photoUrl,
+      sourceLabel: detail.sourceLabel
+    });
+    setScreen("foodDetail");
+  };
+
+  const openCuisineDetail = (regionId: CuisineRegionId) => {
+    const info = cuisineDetails[regionId];
+    setDetailBackScreen("foodSuggestions");
+    setDetailContent({
+      title: info.title,
+      subtitle: "Regional cuisine overview",
+      description: info.description,
+      photoUrl: info.photoUrl,
+      sourceLabel: info.sourceLabel
+    });
+    setScreen("foodDetail");
+  };
+
   const renderMealForm = (source: Meal["source"], requestId?: string) => (
     <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
       <Text style={[styles.subtitle, { color: theme.text }]}>Meal type</Text>
@@ -705,6 +892,7 @@ export default function App() {
     await trackEvent("onboarding_completed", {
       targetCalories,
       goalType,
+      sex: biologicalSex,
       surveyGoals,
       surveyHabits,
       mealPlanFrequency,
@@ -914,6 +1102,36 @@ export default function App() {
               value={weightKg}
               onChangeText={setWeightKg}
             />
+            <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Sex (for calorie/BMI estimate)</Text>
+            <View style={styles.row}>
+              <TouchableOpacity
+                style={[
+                  styles.tag,
+                  { borderColor: biologicalSex === "man" ? theme.primary : theme.border, backgroundColor: theme.inputBackground }
+                ]}
+                onPress={() => setBiologicalSex("man")}
+              >
+                <Text style={[styles.tagText, { color: biologicalSex === "man" ? theme.primary : theme.text, fontWeight: biologicalSex === "man" ? "700" : "500" }]}>
+                  Man
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.tag,
+                  { borderColor: biologicalSex === "woman" ? theme.primary : theme.border, backgroundColor: theme.inputBackground }
+                ]}
+                onPress={() => setBiologicalSex("woman")}
+              >
+                <Text
+                  style={[
+                    styles.tagText,
+                    { color: biologicalSex === "woman" ? theme.primary : theme.text, fontWeight: biologicalSex === "woman" ? "700" : "500" }
+                  ]}
+                >
+                  Woman
+                </Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.row}>
               {(["lose", "maintain", "gain"] as const).map((goal) => (
                 <TouchableOpacity key={goal} style={[styles.tag, { borderColor: theme.border }]} onPress={() => setGoalType(goal)}>
@@ -931,7 +1149,8 @@ export default function App() {
                   age: Number(age),
                   heightCm: Number(heightCm),
                   weightKg: Number(weightKg),
-                  goalType
+                  goalType,
+                  sex: biologicalSex ?? undefined
                 });
                 setTargetCalories(suggested);
               }}
@@ -996,6 +1215,7 @@ export default function App() {
           <PrimaryButton title="Dashboard" onPress={() => setScreen("dashboard")} color={theme.primary} />
           <PrimaryButton title="Manual log" onPress={() => setScreen("manual")} color={theme.primary} />
           <PrimaryButton title="Food finder" onPress={() => setScreen("foodFinder")} color={theme.primary} />
+          <PrimaryButton title="Food suggestions" onPress={() => setScreen("foodSuggestions")} color={theme.primary} />
           <PrimaryButton title="Camera" onPress={openPhotoPicker} color={theme.primary} />
           {!AUTH_DISABLED ? <PrimaryButton title="Sign out" onPress={handleSignOut} color={theme.primary} /> : null}
         </View>
@@ -1096,7 +1316,7 @@ export default function App() {
           </Text>
           <TextInput
             style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Search food (e.g. banana, rice, chicken)"
+            placeholder="Search meals, foods, macros, descriptions"
             placeholderTextColor={theme.mutedText}
             value={foodSearch}
             onChangeText={setFoodSearch}
@@ -1104,22 +1324,90 @@ export default function App() {
           <Text style={[styles.helperText, { color: theme.mutedText }]}>
             Source: {foodSource === "cloud" ? "Cloud database" : "Local fallback database"}
           </Text>
+          <Text style={[styles.helperText, { color: theme.mutedText }]}>
+            Search supports food name, cuisine keywords, description text, and macro numbers.
+          </Text>
           <View style={styles.spacer} />
           {foodLoading ? <Text style={{ color: theme.mutedText }}>Searching...</Text> : null}
-          {!foodLoading && foodResults.length === 0 ? <Text style={{ color: theme.mutedText }}>No foods found.</Text> : null}
-          {foodResults.map((food) => (
+          {!foodLoading && searchableFoodResults.length === 0 ? <Text style={{ color: theme.mutedText }}>No foods found.</Text> : null}
+          {searchableFoodResults.map((food) => (
             <View key={`${food.category}-${food.name}`} style={[styles.foodRow, { borderColor: theme.border }]}>
-              <View style={styles.foodRowLeft}>
+              <TouchableOpacity style={styles.foodRowLeft} onPress={() => openFoodDetail(food, "foodFinder")}>
+                <Image source={{ uri: getFoodDetail(food).photoUrl }} style={styles.foodThumb} />
                 <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
                 <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
                   {food.category} • {food.calories} kcal • P {food.protein_g}g • C {food.carbs_g}g • F {food.fat_g}g
                 </Text>
-              </View>
+                <Text numberOfLines={2} style={[styles.helperText, { color: theme.mutedText }]}>
+                  {getFoodDetail(food).description}
+                </Text>
+                <Text style={[styles.linkText, { color: theme.primary, fontSize: 12 }]}>View details</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food)}>
                 <Text style={styles.addFoodBtnText}>Add</Text>
               </TouchableOpacity>
             </View>
           ))}
+        </View>
+      )}
+
+      {screen === "foodSuggestions" && (
+        <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
+          <Text style={[styles.subtitle, { color: theme.text }]}>Food Suggestions</Text>
+          <Text style={[styles.helperText, { color: theme.mutedText }]}>
+            Region-based cuisine ideas. Pick your region and quickly add foods to your meal log.
+          </Text>
+          <View style={styles.row}>
+            {cuisineRegionOrder.map((regionId) => {
+              const selected = selectedCuisineRegion === regionId;
+              return (
+                <TouchableOpacity
+                  key={regionId}
+                  style={[styles.tag, { borderColor: selected ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
+                  onPress={() => {
+                    setSelectedCuisineRegion(regionId);
+                    openCuisineDetail(regionId);
+                  }}
+                >
+                  <Text style={[styles.tagText, { color: selected ? theme.primary : theme.text, fontWeight: selected ? "700" : "500" }]}>
+                    {cuisineRegionPresets[regionId].label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <View style={styles.spacer} />
+          {suggestedRegionalFoods.map((food) => (
+            <View key={`region-${food.category}-${food.name}`} style={[styles.foodRow, { borderColor: theme.border }]}>
+              <TouchableOpacity style={styles.foodRowLeft} onPress={() => openFoodDetail(food, "foodSuggestions")}>
+                <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
+                <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
+                  {food.category} • {food.calories} kcal • P {food.protein_g}g • C {food.carbs_g}g • F {food.fat_g}g
+                </Text>
+                <Text style={[styles.linkText, { color: theme.primary, fontSize: 12 }]}>View details</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food)}>
+                <Text style={styles.addFoodBtnText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {screen === "foodDetail" && detailContent && (
+        <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
+          <Text style={[styles.subtitle, { color: theme.text }]}>{detailContent.title}</Text>
+          <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.subtitle}</Text>
+          <Image source={{ uri: detailContent.photoUrl }} style={styles.detailImage} />
+          <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.sourceLabel}</Text>
+          <Text style={[styles.recentMealSub, { color: theme.text, lineHeight: 20 }]}>{detailContent.description}</Text>
+          <PrimaryButton
+            title="Back"
+            color={theme.primary}
+            onPress={() => {
+              setScreen(detailBackScreen);
+            }}
+          />
         </View>
       )}
 
@@ -1183,6 +1471,65 @@ export default function App() {
                   </TouchableOpacity>
                 );
               })}
+            </View>
+
+            <View style={[styles.card, { backgroundColor: theme.inputBackground, borderColor: theme.border }]}>
+              <Text style={[styles.subtitle, { color: theme.text }]}>BMI calculator</Text>
+              <Text style={[styles.helperText, { color: theme.mutedText }]}>
+                Enter body data to estimate BMI and a calorie target suggestion.
+              </Text>
+              <View style={styles.row}>
+                <TouchableOpacity
+                  style={[styles.tag, { borderColor: biologicalSex === "man" ? theme.primary : theme.border, backgroundColor: theme.cardBackground }]}
+                  onPress={() => setBiologicalSex("man")}
+                >
+                  <Text style={[styles.tagText, { color: biologicalSex === "man" ? theme.primary : theme.text, fontWeight: biologicalSex === "man" ? "700" : "500" }]}>
+                    Man
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.tag, { borderColor: biologicalSex === "woman" ? theme.primary : theme.border, backgroundColor: theme.cardBackground }]}
+                  onPress={() => setBiologicalSex("woman")}
+                >
+                  <Text
+                    style={[
+                      styles.tagText,
+                      { color: biologicalSex === "woman" ? theme.primary : theme.text, fontWeight: biologicalSex === "woman" ? "700" : "500" }
+                    ]}
+                  >
+                    Woman
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {biologicalSex ? null : (
+                <Text style={[styles.helperText, { color: theme.mutedText }]}>
+                  Optional: choose sex for more accurate calorie estimation.
+                </Text>
+              )}
+              <View style={styles.row}>
+                <View style={styles.metricPill}>
+                  <Text style={[styles.helperText, { color: theme.mutedText }]}>BMI</Text>
+                  <Text style={[styles.statValue, { color: theme.text }]}>{bmiValue ?? "--"}</Text>
+                </View>
+                <View style={styles.metricPill}>
+                  <Text style={[styles.helperText, { color: theme.mutedText }]}>Status</Text>
+                  <Text style={[styles.recentMealTitle, { color: theme.text }]}>{bmiLabel}</Text>
+                </View>
+              </View>
+              <PrimaryButton
+                title="Recalculate suggested calories"
+                color={theme.primary}
+                onPress={() => {
+                  const suggested = suggestedCalorieTarget({
+                    age: Number(age),
+                    heightCm: Number(heightCm),
+                    weightKg: Number(weightKg),
+                    goalType,
+                    sex: biologicalSex ?? undefined
+                  });
+                  setTargetCalories(suggested);
+                }}
+              />
             </View>
           </View>
         )}
@@ -1315,6 +1662,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700"
   },
+  metricPill: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#94a3b8",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    gap: 2
+  },
   recentMealRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1394,6 +1750,12 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2
   },
+  foodThumb: {
+    width: "100%",
+    height: 120,
+    borderRadius: 8,
+    marginBottom: 6
+  },
   addFoodBtn: {
     borderRadius: 8,
     paddingHorizontal: 12,
@@ -1454,6 +1816,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 220,
     borderRadius: 10
+  },
+  detailImage: {
+    width: "100%",
+    height: 220,
+    borderRadius: 10,
+    marginVertical: 8
   },
   warning: {
     color: "#b45309",

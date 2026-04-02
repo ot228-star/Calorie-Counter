@@ -40,15 +40,18 @@ export const suggestedCalorieTarget = ({
   weightKg,
   heightCm,
   age,
-  goalType
+  goalType,
+  sex
 }: {
   weightKg: number;
   heightCm: number;
   age: number;
   goalType: "lose" | "maintain" | "gain";
+  sex?: "man" | "woman";
 }) => {
-  // Baseline Mifflin-like approximation for MVP.
-  const bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+  // Mifflin-St Jeor estimate. Uses sex-specific constant when available.
+  const sexConstant = sex === "woman" ? -161 : 5;
+  const bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + sexConstant;
   const maintenance = Math.round(bmr * 1.4);
   if (goalType === "lose") return Math.max(maintenance - 350, 1200);
   if (goalType === "gain") return maintenance + 300;

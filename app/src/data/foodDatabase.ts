@@ -1,3 +1,5 @@
+import { EXTRA_FOODS } from "./extraFoods";
+
 export type FoodRecord = {
   name: string;
   category: string;
@@ -8,7 +10,7 @@ export type FoodRecord = {
 };
 
 // Values are approximate per 100g edible portion.
-export const FOOD_DATABASE: FoodRecord[] = [
+const BASE_FOODS: FoodRecord[] = [
   { name: "Apple", category: "Fruit", calories: 52, protein_g: 0.3, carbs_g: 13.8, fat_g: 0.2 },
   { name: "Banana", category: "Fruit", calories: 89, protein_g: 1.1, carbs_g: 22.8, fat_g: 0.3 },
   { name: "Orange", category: "Fruit", calories: 47, protein_g: 0.9, carbs_g: 11.8, fat_g: 0.1 },
@@ -191,3 +193,5 @@ export const FOOD_DATABASE: FoodRecord[] = [
   { name: "Milkshake (vanilla)", category: "Other", calories: 133, protein_g: 3.2, carbs_g: 18.8, fat_g: 5.0 },
   { name: "Smoothie (fruit)", category: "Other", calories: 95, protein_g: 1.7, carbs_g: 21.5, fat_g: 0.8 }
 ];
+
+export const FOOD_DATABASE: FoodRecord[] = [...BASE_FOODS, ...EXTRA_FOODS];
