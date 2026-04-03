@@ -7,8 +7,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  useColorScheme
+  View
 } from "react-native";
 import type { Provider, Session } from "@supabase/supabase-js";
 import * as AuthSession from "expo-auth-session";
@@ -230,6 +229,11 @@ const FallbackImage = ({
   const safeUris = uris.length > 0 ? uris : [];
   const current = safeUris[Math.min(index, Math.max(0, safeUris.length - 1))];
 
+  useEffect(() => {
+    setIndex(0);
+    setAllFailed(false);
+  }, [uris]);
+
   if (safeUris.length === 0 || allFailed) {
     return (
       <View style={[style, styles.photoPlaceholder]}>
@@ -341,8 +345,7 @@ const palettes = {
 } as const;
 
 export default function App() {
-  const systemTheme = useColorScheme();
-  const [themeMode, setThemeMode] = useState<ThemeMode>(systemTheme === "dark" ? "dark" : "light");
+  const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [accentId, setAccentId] = useState<AccentPresetId>("blue");
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -374,6 +377,7 @@ export default function App() {
   const [detailBackScreen, setDetailBackScreen] = useState<DetailBackScreen>("foodFinder");
   const [detailContent, setDetailContent] = useState<DetailContent | null>(null);
   const [foodSearch, setFoodSearch] = useState("");
+  const [foodPortions, setFoodPortions] = useState<Record<string, string>>({});
   const [foodResults, setFoodResults] = useState<FoodRecord[]>([]);
   const [foodSource, setFoodSource] = useState<"cloud" | "local">("local");
   const [foodLoading, setFoodLoading] = useState(false);
@@ -797,16 +801,33 @@ export default function App() {
     );
   };
 
-  const addFoodToMeal = (food: FoodRecord) => {
+  const getPortionValue = (foodName: string): number => {
+    const raw = foodPortions[foodName];
+    const parsed = Number(raw);
+    if (!raw || Number.isNaN(parsed)) return 1;
+    return Math.min(20, Math.max(0.25, parsed));
+  };
+
+  const setPortionValue = (foodName: string, value: string) => {
+    setFoodPortions((prev) => ({ ...prev, [foodName]: value }));
+  };
+
+  const adjustPortionValue = (foodName: string, delta: number) => {
+    const next = Math.min(20, Math.max(0.25, getPortionValue(foodName) + delta));
+    setFoodPortions((prev) => ({ ...prev, [foodName]: String(Number(next.toFixed(2))) }));
+  };
+
+  const addFoodToMeal = (food: FoodRecord, portions = 1) => {
+    const clamped = Math.min(20, Math.max(0.25, portions));
     const newItem: MealItem = {
       id: createId(),
       name: food.name,
-      quantity: 100,
+      quantity: Number((100 * clamped).toFixed(0)),
       unit: "g",
-      calories: food.calories,
-      protein_g: food.protein_g,
-      carbs_g: food.carbs_g,
-      fat_g: food.fat_g
+      calories: Math.round(food.calories * clamped),
+      protein_g: Number((food.protein_g * clamped).toFixed(1)),
+      carbs_g: Number((food.carbs_g * clamped).toFixed(1)),
+      fat_g: Number((food.fat_g * clamped).toFixed(1))
     };
     setMealItems((prev) => [...prev, newItem]);
     setScreen("manual");
@@ -1377,7 +1398,11 @@ export default function App() {
               style={[styles.foodRow, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
             >
               <TouchableOpacity style={styles.foodRowLeft} onPress={() => openFoodDetail(food, "foodFinder")}>
-                <FallbackImage uris={getFoodPhotoCandidates(food)} style={styles.foodThumb} placeholderText="No verified photo yet" />
+                <FallbackImage
+                  uris={getFoodPhotoCandidates(food)}
+                  style={styles.foodThumb}
+                  placeholderText="No verified photo yet"
+                />
                 <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
                 <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
                   {food.category} • {food.calories} kcal • P {food.protein_g}g • C {food.carbs_g}g • F {food.fat_g}g
@@ -1385,9 +1410,30 @@ export default function App() {
                 <Text numberOfLines={2} style={[styles.helperText, { color: theme.mutedText }]}>
                   {getFoodDetail(food).description}
                 </Text>
+                <View style={styles.portionRow}>
+                  <TouchableOpacity
+                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
+                    onPress={() => adjustPortionValue(food.name, -0.25)}
+                  >
+                    <Text style={[styles.portionBtnText, { color: theme.text }]}>-</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={[styles.portionInput, { borderColor: theme.border, backgroundColor: theme.cardBackground, color: theme.text }]}
+                    keyboardType="decimal-pad"
+                    value={foodPortions[food.name] ?? "1"}
+                    onChangeText={(v) => setPortionValue(food.name, v)}
+                  />
+                  <TouchableOpacity
+                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
+                    onPress={() => adjustPortionValue(food.name, 0.25)}
+                  >
+                    <Text style={[styles.portionBtnText, { color: theme.text }]}>+</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.helperText, { color: theme.mutedText }]}>portion(s)</Text>
+                </View>
                 <Text style={[styles.linkText, { color: theme.primary, fontSize: 12 }]}>View details</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food)}>
+              <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food, getPortionValue(food.name))}>
                 <Text style={styles.addFoodBtnText}>Add</Text>
               </TouchableOpacity>
             </View>
@@ -1431,9 +1477,30 @@ export default function App() {
                 <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
                   {food.category} • {food.calories} kcal • P {food.protein_g}g • C {food.carbs_g}g • F {food.fat_g}g
                 </Text>
+                <View style={styles.portionRow}>
+                  <TouchableOpacity
+                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
+                    onPress={() => adjustPortionValue(food.name, -0.25)}
+                  >
+                    <Text style={[styles.portionBtnText, { color: theme.text }]}>-</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={[styles.portionInput, { borderColor: theme.border, backgroundColor: theme.cardBackground, color: theme.text }]}
+                    keyboardType="decimal-pad"
+                    value={foodPortions[food.name] ?? "1"}
+                    onChangeText={(v) => setPortionValue(food.name, v)}
+                  />
+                  <TouchableOpacity
+                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
+                    onPress={() => adjustPortionValue(food.name, 0.25)}
+                  >
+                    <Text style={[styles.portionBtnText, { color: theme.text }]}>+</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.helperText, { color: theme.mutedText }]}>portion(s)</Text>
+                </View>
                 <Text style={[styles.linkText, { color: theme.primary, fontSize: 12 }]}>View details</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food)}>
+              <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food, getPortionValue(food.name))}>
                 <Text style={styles.addFoodBtnText}>Add</Text>
               </TouchableOpacity>
             </View>
@@ -1445,7 +1512,11 @@ export default function App() {
         <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
           <Text style={[styles.subtitle, { color: theme.text }]}>{detailContent.title}</Text>
           <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.subtitle}</Text>
-          <FallbackImage uris={detailContent.photoCandidates} style={styles.detailImage} placeholderText="No verified photo for this item yet" />
+          <FallbackImage
+            uris={detailContent.photoCandidates}
+            style={styles.detailImage}
+            placeholderText="No verified photo for this item yet"
+          />
           <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.sourceLabel}</Text>
           <Text style={[styles.recentMealSub, { color: theme.text, lineHeight: 20 }]}>{detailContent.description}</Text>
           <PrimaryButton
@@ -1804,6 +1875,32 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 8,
     marginBottom: 6
+  },
+  portionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 4
+  },
+  portionBtn: {
+    width: 28,
+    height: 28,
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  portionBtnText: {
+    fontWeight: "700",
+    fontSize: 15
+  },
+  portionInput: {
+    minWidth: 52,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    textAlign: "center"
   },
   addFoodBtn: {
     borderRadius: 8,

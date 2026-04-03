@@ -1,4 +1,4 @@
-import type { FoodRecord } from "./foodDatabase";
+import { FOOD_DATABASE, type FoodRecord } from "./foodDatabase";
 
 export type FoodDetail = {
   description: string;
@@ -9,6 +9,17 @@ export type FoodDetail = {
 };
 
 const PHOTO_SOURCE = "Photo: Unsplash (real photography)";
+
+const CATEGORY_PHOTO: Record<FoodRecord["category"], string> = {
+  Fruit: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80",
+  Grain: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
+  Protein: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=80",
+  Dairy: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1200&q=80",
+  Vegetable: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+  Fat: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+  Prepared: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
+  Other: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=1200&q=80"
+};
 
 const DETAIL_HINTS: Record<string, { aliases: string[]; summary: string }> = {
   "Hot Dog": { aliases: ["hot dog", "frankfurter", "sausage bun"], summary: "A grilled or steamed sausage in a bun with optional sauces and toppings." },
@@ -115,17 +126,51 @@ const PINNED_PHOTO_BY_FOOD: Record<string, string> = {
   Mocha: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80"
 };
 
-const KEYWORD_PHOTO_FALLBACKS: Array<{ keys: string[]; url: string }> = [
-  { keys: ["burger"], url: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["pizza"], url: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["biryani", "curry", "masala"], url: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["sushi", "nigiri", "maki"], url: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["ramen", "pho", "soup"], url: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["taco", "burrito", "quesadilla", "fajita"], url: "https://images.unsplash.com/photo-1611250188496-e966043a0629?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["wrap", "shawarma", "gyro", "kebab", "falafel"], url: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["salad"], url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["smoothie", "shake"], url: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=80" },
-  { keys: ["oatmeal", "pancake", "waffle", "toast", "omelette"], url: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=1200&q=80" }
+const PHOTO_BY_TAG = {
+  burger: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80",
+  pizza: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=1200&q=80",
+  curry: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=1200&q=80",
+  sushi: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80",
+  noodles: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=1200&q=80",
+  soup: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80",
+  mexican: "https://images.unsplash.com/photo-1611250188496-e966043a0629?auto=format&fit=crop&w=1200&q=80",
+  wrap: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=1200&q=80",
+  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
+  breakfast: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=1200&q=80",
+  smoothie: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=80",
+  coffee: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
+  grain: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
+  fruit: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80",
+  protein: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=80",
+  dairy: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1200&q=80",
+  vegetable: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+  nuts: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+  snack: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=1200&q=80"
+} as const;
+
+const PHOTO_BY_REGEX_RULE: Array<{ pattern: RegExp; url: string }> = [
+  { pattern: /\bhot dog\b/i, url: "https://images.unsplash.com/photo-1612392062798-2eaede5f4c44?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bcheeseburger\b/i, url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bhamburger|burger\b/i, url: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bpepperoni pizza\b/i, url: "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bpizza\b/i, url: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bbiryani\b/i, url: "https://images.unsplash.com/photo-1701579231305-d84d8af9a3fd?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bbutter chicken\b/i, url: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\btikka masala\b/i, url: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bcurry\b/i, url: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bsushi|nigiri|maki\b/i, url: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bpoke bowl\b/i, url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bramen\b/i, url: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bpho\b/i, url: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\byakisoba|noodle|udon|pad thai\b/i, url: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bsoup|stew|minestrone|chili|pozole\b/i, url: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\btaco|burrito|quesadilla|fajita|enchilada\b/i, url: "https://images.unsplash.com/photo-1611250188496-e966043a0629?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bshawarma|gyro|kebab|kofta|falafel|wrap|pita\b/i, url: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bcaesar|salad|tabbouleh|fattoush\b/i, url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\boatmeal|pancake|waffle|omelette|toast|breakfast|egg\b/i, url: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bsmoothie|milkshake|acai|shake\b/i, url: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\blatte|mocha|cappuccino|coffee\b/i, url: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80" },
+  { pattern: /\bfruit\b|apple|banana|orange|berry|grapes|kiwi|mango/i, url: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80" }
 ];
 
 const normalizeFoodName = (name: string): string =>
@@ -135,6 +180,35 @@ const normalizeFoodName = (name: string): string =>
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
+
+const inferPhotoTag = (food: FoodRecord): keyof typeof PHOTO_BY_TAG => {
+  const n = normalizeFoodName(food.name);
+  if (/(burger|hamburger|hot dog)/.test(n)) return "burger";
+  if (/pizza/.test(n)) return "pizza";
+  if (/(biryani|curry|masala|rendang|tandoori|palak|chana|dal)/.test(n)) return "curry";
+  if (/(sushi|nigiri|maki|poke)/.test(n)) return "sushi";
+  if (/(noodle|ramen|udon|yakisoba|pad thai|pho|dumpling|congee)/.test(n)) return "noodles";
+  if (/soup|stew|chili|pozole|minestrone/.test(n)) return "soup";
+  if (/(taco|burrito|quesadilla|fajita|enchilada|tortilla)/.test(n)) return "mexican";
+  if (/(wrap|shawarma|gyro|kebab|kofta|falafel|pita)/.test(n)) return "wrap";
+  if (/salad|tabbouleh|fattoush/.test(n)) return "salad";
+  if (/(pancake|waffle|omelette|oatmeal|toast|egg|breakfast|yogurt bowl)/.test(n)) return "breakfast";
+  if (/(smoothie|milkshake|acai|shake)/.test(n)) return "smoothie";
+  if (/(latte|mocha|cappuccino|coffee)/.test(n)) return "coffee";
+  if (food.category === "Fruit") return "fruit";
+  if (food.category === "Grain") return "grain";
+  if (food.category === "Protein") return "protein";
+  if (food.category === "Dairy") return "dairy";
+  if (food.category === "Vegetable") return "vegetable";
+  if (food.category === "Fat") return "nuts";
+  if (food.category === "Other") return "snack";
+  return "grain";
+};
+
+const AUTO_PINNED_PHOTO_BY_FOOD: Record<string, string> = FOOD_DATABASE.reduce<Record<string, string>>((acc, food) => {
+  acc[food.name] = PHOTO_BY_TAG[inferPhotoTag(food)];
+  return acc;
+}, {});
 
 const macroFocus = (food: FoodRecord): string => {
   const map = [
@@ -165,16 +239,17 @@ const getAliasesForFood = (food: FoodRecord): string[] => {
 export const getFoodPhotoCandidates = (food: FoodRecord): string[] => {
   const candidates: string[] = [];
 
-  const pinned = PINNED_PHOTO_BY_FOOD[food.name];
+  const pinned = PINNED_PHOTO_BY_FOOD[food.name] ?? AUTO_PINNED_PHOTO_BY_FOOD[food.name];
   if (pinned) candidates.push(pinned);
 
-  const lower = food.name.toLowerCase();
-  for (const rule of KEYWORD_PHOTO_FALLBACKS) {
-    if (rule.keys.some((k) => lower.includes(k))) {
+  for (const rule of PHOTO_BY_REGEX_RULE) {
+    if (rule.pattern.test(food.name)) {
       candidates.push(rule.url);
       break;
     }
   }
+
+  candidates.push(CATEGORY_PHOTO[food.category]);
 
   return Array.from(new Set(candidates));
 };
