@@ -33,7 +33,7 @@ import {
 } from "./src/services/auth";
 import { trackEvent } from "./src/services/analytics";
 import { FOOD_DATABASE, type FoodRecord } from "./src/data/foodDatabase";
-import { getFoodDetail, getFoodSearchBlob } from "./src/data/foodDetails";
+import { getFoodDetail, getFoodPhotoCandidates, getFoodSearchBlob } from "./src/data/foodDetails";
 import { searchFoods } from "./src/services/foodFinder";
 import { suggestedCalorieTarget, summaryFromMeals } from "./src/lib/calculations";
 import { EstimateResult, Meal, MealItem, MealType } from "./src/types";
@@ -52,6 +52,7 @@ type DetailContent = {
   subtitle: string;
   description: string;
   photoUrl: string;
+  photoCandidates: string[];
   sourceLabel: string;
 };
 const AUTH_DISABLED = true;
@@ -214,6 +215,44 @@ const PrimaryButton = ({
     <Text style={styles.primaryBtnText}>{title}</Text>
   </TouchableOpacity>
 );
+
+const FallbackImage = ({
+  uris,
+  style,
+  placeholderText
+}: {
+  uris: string[];
+  style: object;
+  placeholderText?: string;
+}) => {
+  const [index, setIndex] = useState(0);
+  const [allFailed, setAllFailed] = useState(false);
+  const safeUris = uris.length > 0 ? uris : [];
+  const current = safeUris[Math.min(index, Math.max(0, safeUris.length - 1))];
+
+  if (safeUris.length === 0 || allFailed) {
+    return (
+      <View style={[style, styles.photoPlaceholder]}>
+        <Ionicons name="image-outline" size={22} color="#94a3b8" />
+        <Text style={styles.photoPlaceholderText}>{placeholderText ?? "Verified photo unavailable"}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <Image
+      source={{ uri: current }}
+      style={style}
+      onError={() => {
+        if (index >= safeUris.length - 1) {
+          setAllFailed(true);
+          return;
+        }
+        setIndex((prev) => Math.min(prev + 1, safeUris.length - 1));
+      }}
+    />
+  );
+};
 
 const makeItem = (): MealItem => ({
   id: createId(),
@@ -781,6 +820,7 @@ export default function App() {
       subtitle: `${food.category} • ${food.calories} kcal per 100g`,
       description: detail.description,
       photoUrl: detail.photoUrl,
+      photoCandidates: detail.photoCandidates ?? getFoodPhotoCandidates(food),
       sourceLabel: detail.sourceLabel
     });
     setScreen("foodDetail");
@@ -794,6 +834,7 @@ export default function App() {
       subtitle: "Regional cuisine overview",
       description: info.description,
       photoUrl: info.photoUrl,
+      photoCandidates: [info.photoUrl, "https://picsum.photos/1200/800"],
       sourceLabel: info.sourceLabel
     });
     setScreen("foodDetail");
@@ -1331,9 +1372,12 @@ export default function App() {
           {foodLoading ? <Text style={{ color: theme.mutedText }}>Searching...</Text> : null}
           {!foodLoading && searchableFoodResults.length === 0 ? <Text style={{ color: theme.mutedText }}>No foods found.</Text> : null}
           {searchableFoodResults.map((food) => (
-            <View key={`${food.category}-${food.name}`} style={[styles.foodRow, { borderColor: theme.border }]}>
+            <View
+              key={`${food.category}-${food.name}`}
+              style={[styles.foodRow, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
+            >
               <TouchableOpacity style={styles.foodRowLeft} onPress={() => openFoodDetail(food, "foodFinder")}>
-                <Image source={{ uri: getFoodDetail(food).photoUrl }} style={styles.foodThumb} />
+                <FallbackImage uris={getFoodPhotoCandidates(food)} style={styles.foodThumb} placeholderText="No verified photo yet" />
                 <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
                 <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
                   {food.category} • {food.calories} kcal • P {food.protein_g}g • C {food.carbs_g}g • F {food.fat_g}g
@@ -1378,7 +1422,10 @@ export default function App() {
           </View>
           <View style={styles.spacer} />
           {suggestedRegionalFoods.map((food) => (
-            <View key={`region-${food.category}-${food.name}`} style={[styles.foodRow, { borderColor: theme.border }]}>
+            <View
+              key={`region-${food.category}-${food.name}`}
+              style={[styles.foodRow, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
+            >
               <TouchableOpacity style={styles.foodRowLeft} onPress={() => openFoodDetail(food, "foodSuggestions")}>
                 <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
                 <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
@@ -1398,7 +1445,7 @@ export default function App() {
         <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
           <Text style={[styles.subtitle, { color: theme.text }]}>{detailContent.title}</Text>
           <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.subtitle}</Text>
-          <Image source={{ uri: detailContent.photoUrl }} style={styles.detailImage} />
+          <FallbackImage uris={detailContent.photoCandidates} style={styles.detailImage} placeholderText="No verified photo for this item yet" />
           <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.sourceLabel}</Text>
           <Text style={[styles.recentMealSub, { color: theme.text, lineHeight: 20 }]}>{detailContent.description}</Text>
           <PrimaryButton
@@ -1566,8 +1613,8 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   container: {
-    padding: 16,
-    gap: 12
+    padding: 18,
+    gap: 14
   },
   authContainer: {
     padding: 20,
@@ -1578,9 +1625,9 @@ const styles = StyleSheet.create({
   authCard: {
     borderWidth: 1,
     borderColor: "#ddd",
-    borderRadius: 14,
-    padding: 14,
-    gap: 10
+    borderRadius: 16,
+    padding: 16,
+    gap: 12
   },
   authSubtext: {
     color: "#555"
@@ -1697,12 +1744,14 @@ const styles = StyleSheet.create({
     fontWeight: "700"
   },
   foodRow: {
-    borderTopWidth: 1,
-    paddingTop: 10,
-    marginTop: 8,
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 8
+    alignItems: "flex-start",
+    gap: 10
   },
   surveyOption: {
     borderWidth: 1,
@@ -1777,9 +1826,9 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
     borderColor: "#ddd",
-    borderRadius: 10,
-    padding: 12,
-    gap: 8
+    borderRadius: 14,
+    padding: 14,
+    gap: 10
   },
   row: {
     flexDirection: "row",
@@ -1823,6 +1872,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 8
   },
+  photoPlaceholder: {
+    borderWidth: 1,
+    borderColor: "#94a3b8",
+    borderStyle: "dashed",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingHorizontal: 10
+  },
+  photoPlaceholderText: {
+    fontSize: 12,
+    color: "#64748b",
+    textAlign: "center"
+  },
   warning: {
     color: "#b45309",
     fontWeight: "600"
@@ -1838,9 +1902,9 @@ const styles = StyleSheet.create({
     height: 8
   },
   primaryBtn: {
-    paddingVertical: 10,
+    paddingVertical: 11,
     paddingHorizontal: 14,
-    borderRadius: 8,
+    borderRadius: 10,
     alignSelf: "flex-start"
   },
   primaryBtnFull: {

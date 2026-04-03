@@ -5,20 +5,10 @@ export type FoodDetail = {
   photoUrl: string;
   sourceLabel: string;
   aliases?: string[];
+  photoCandidates?: string[];
 };
 
 const PHOTO_SOURCE = "Photo: Unsplash (real photography)";
-
-const CATEGORY_PHOTO: Record<FoodRecord["category"], string> = {
-  Fruit: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80",
-  Grain: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
-  Protein: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=80",
-  Dairy: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1200&q=80",
-  Vegetable: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-  Fat: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
-  Prepared: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
-  Other: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=1200&q=80"
-};
 
 const DETAIL_HINTS: Record<string, { aliases: string[]; summary: string }> = {
   "Hot Dog": { aliases: ["hot dog", "frankfurter", "sausage bun"], summary: "A grilled or steamed sausage in a bun with optional sauces and toppings." },
@@ -172,16 +162,21 @@ const getAliasesForFood = (food: FoodRecord): string[] => {
   return Array.from(new Set([...hinted, normalized, ...parts, food.category.toLowerCase()]));
 };
 
-const getPhotoUrlForFood = (food: FoodRecord): string => {
+export const getFoodPhotoCandidates = (food: FoodRecord): string[] => {
+  const candidates: string[] = [];
+
   const pinned = PINNED_PHOTO_BY_FOOD[food.name];
-  if (pinned) return pinned;
+  if (pinned) candidates.push(pinned);
 
   const lower = food.name.toLowerCase();
   for (const rule of KEYWORD_PHOTO_FALLBACKS) {
-    if (rule.keys.some((k) => lower.includes(k))) return rule.url;
+    if (rule.keys.some((k) => lower.includes(k))) {
+      candidates.push(rule.url);
+      break;
+    }
   }
 
-  return CATEGORY_PHOTO[food.category];
+  return Array.from(new Set(candidates));
 };
 
 export const getFoodDetail = (food: FoodRecord): FoodDetail => {
@@ -192,11 +187,13 @@ export const getFoodDetail = (food: FoodRecord): FoodDetail => {
   const description = `${descriptionLead} Per 100g, it has about ${food.calories} kcal, ${food.protein_g}g protein, ${food.carbs_g}g carbs, and ${food.fat_g}g fat. ${macroFocus(
     food
   )} ${calorieDensity(food.calories)}`;
+  const candidates = getFoodPhotoCandidates(food);
   return {
     description,
-    photoUrl: getPhotoUrlForFood(food),
+    photoUrl: candidates[0],
     sourceLabel: PHOTO_SOURCE,
-    aliases: getAliasesForFood(food)
+    aliases: getAliasesForFood(food),
+    photoCandidates: candidates
   };
 };
 
