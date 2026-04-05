@@ -26,7 +26,15 @@ const requestJson = async <T>(url: string, init: RequestInit): Promise<T> => {
   if (!response.ok) {
     throw new Error(await response.text());
   }
-  return response.json();
+  // Some Supabase endpoints return 204/empty body; parsing that as JSON throws.
+  const raw = await response.text();
+  if (!raw.trim()) return undefined as T;
+  try {
+    return JSON.parse(raw) as T;
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "Invalid JSON response";
+    throw new Error(`Could not parse server response: ${detail}`);
+  }
 };
 
 export const estimateMealFromImage = async (imageUrl: string, mealType: Meal["mealType"]): Promise<EstimateResult> => {
@@ -47,7 +55,9 @@ export const estimateMealFromImage = async (imageUrl: string, mealType: Meal["me
   });
 
   if (!response.ok) throw new Error("Could not estimate meal.");
-  return response.json();
+  const raw = await response.text();
+  if (!raw.trim()) throw new Error("Could not estimate meal: empty response.");
+  return JSON.parse(raw) as EstimateResult;
 };
 
 export const saveMeal = async (meal: Meal, requestId?: string) => {

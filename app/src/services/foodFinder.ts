@@ -31,7 +31,9 @@ export const searchFoods = async (query: string): Promise<SearchResult> => {
       }
     });
     if (!response.ok) throw new Error("Cloud search request failed");
-    const data = (await response.json()) as FoodRecord[];
+    const raw = await response.text();
+    if (!raw.trim()) return { foods: localSearch(query), source: "local" };
+    const data = JSON.parse(raw) as FoodRecord[];
     if (Array.isArray(data) && data.length > 0) {
       return { foods: data, source: "cloud" };
     }

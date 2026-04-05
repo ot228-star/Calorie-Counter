@@ -1,7 +1,6 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +8,17 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { useFonts } from "expo-font";
+import {
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold
+} from "@expo-google-fonts/manrope";
+import {
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold
+} from "@expo-google-fonts/plus-jakarta-sans";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Provider, Session } from "@supabase/supabase-js";
 import * as AuthSession from "expo-auth-session";
 import * as ImagePicker from "expo-image-picker";
@@ -39,13 +49,38 @@ import { searchFoods } from "./src/services/foodFinder";
 import { mapPhotoUrisForMaxWidth } from "./src/lib/photoUrls";
 import { suggestedCalorieTarget, summaryFromMeals } from "./src/lib/calculations";
 import { EstimateResult, Meal, MealItem, MealType } from "./src/types";
+import { StitchLoadingScreen } from "./src/components/StitchLoadingScreen";
+import { StitchAuthScreen } from "./src/components/stitch/StitchAuthScreen";
+import { StitchBottomNav, type StitchNavId } from "./src/components/stitch/StitchBottomNav";
+import { StitchDashboard } from "./src/components/stitch/StitchDashboard";
+import { StitchTopBar, stitchScrollPaddingTop } from "./src/components/stitch/StitchTopBar";
+import { StitchSecondaryHeader } from "./src/components/stitch/StitchSecondaryHeader";
+import { StitchManualMealForm } from "./src/components/stitch/StitchManualMealForm";
+import { StitchFoodFinderScreen } from "./src/components/stitch/StitchFoodFinderScreen";
+import { StitchFoodSuggestionsScreen } from "./src/components/stitch/StitchFoodSuggestionsScreen";
+import { StitchFoodDetailScreen } from "./src/components/stitch/StitchFoodDetailScreen";
+import { StitchCameraScreen } from "./src/components/stitch/StitchCameraScreen";
+import { StitchReviewEstimateScreen } from "./src/components/stitch/StitchReviewEstimateScreen";
+import { StitchSettingsScreen } from "./src/components/stitch/StitchSettingsScreen";
+import { onPrimaryByAccent, stitchDark, stitchFonts } from "./src/theme/stitch";
+import { AppThemeProvider } from "./src/theme/AppThemeContext";
+import { semanticSurfaces } from "./src/lib/themeColors";
+import {
+  clearOnboardingPending,
+  hasOnboardingDone,
+  hasOnboardingPending,
+  isRecentlyCreatedAccount,
+  setOnboardingDone,
+  setOnboardingPending
+} from "./src/lib/onboardingStorage";
 
 WebBrowser.maybeCompleteAuthSession();
 
 type Screen = "onboarding" | "dashboard" | "manual" | "foodFinder" | "foodSuggestions" | "foodDetail" | "camera" | "review" | "settings";
 type ThemeMode = "light" | "dark";
-type OnboardingStep = 0 | 1 | 2 | 3;
+type OnboardingStep = 0 | 1 | 2 | 3 | 4;
 type AccentPresetId = "blue" | "emerald" | "violet" | "rose" | "orange";
+type UiPaletteId = "midnight" | "forest" | "ocean" | "graphite" | "sunrise";
 type CuisineRegionId = "global" | "northAmerican" | "mediterranean" | "southAsian" | "eastAsian" | "latinAmerican" | "middleEastern";
 type BiologicalSex = "man" | "woman";
 type DetailBackScreen = "foodFinder" | "foodSuggestions";
@@ -56,6 +91,10 @@ type DetailContent = {
   photoUrl: string;
   photoCandidates: string[];
   sourceLabel: string;
+  caloriesPer100: number;
+  proteinGPer100: number;
+  carbsGPer100: number;
+  fatGPer100: number;
 };
 const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_AUTH_DISABLED?: string } | undefined;
 /** When true, skips login and backend session checks (local UI dev only). Default: auth required. */
@@ -84,14 +123,65 @@ const habitOptions = [
   "Prioritize sleep"
 ];
 const mealPlanFrequencyOptions = ["Never", "Rarely", "Occasionally", "Frequently", "Always"];
+const ONBOARDING_STEPS_TOTAL = 5;
 const accentPresets: Record<AccentPresetId, { label: string; light: string; dark: string }> = {
   blue: { label: "Blue", light: "#2563eb", dark: "#3b82f6" },
-  emerald: { label: "Emerald", light: "#059669", dark: "#10b981" },
+  /** Stitch mint primary */
+  emerald: { label: "Emerald", light: "#4edea2", dark: "#4edea2" },
   violet: { label: "Violet", light: "#7c3aed", dark: "#8b5cf6" },
   rose: { label: "Rose", light: "#e11d48", dark: "#f43f5e" },
   orange: { label: "Orange", light: "#ea580c", dark: "#fb923c" }
 };
-const accentOrder: AccentPresetId[] = ["blue", "emerald", "violet", "rose", "orange"];
+const accentOrder: AccentPresetId[] = ["emerald", "blue", "violet", "rose", "orange"];
+const uiPalettes: Record<
+  UiPaletteId,
+  {
+    label: string;
+    light: {
+      background: string;
+      cardBackground: string;
+      text: string;
+      mutedText: string;
+      border: string;
+      inputBackground: string;
+    };
+    dark: {
+      background: string;
+      cardBackground: string;
+      text: string;
+      mutedText: string;
+      border: string;
+      inputBackground: string;
+    };
+  }
+> = {
+  midnight: {
+    label: "Midnight",
+    light: { background: "#eef4f8", cardBackground: "#ffffff", text: "#0f172a", mutedText: "#64748b", border: "rgba(15, 23, 42, 0.12)", inputBackground: "#ffffff" },
+    dark: { background: "#060e20", cardBackground: "#0b1325", text: "#dae2fc", mutedText: "#94a3b8", border: "rgba(148, 163, 184, 0.18)", inputBackground: "#111c33" }
+  },
+  forest: {
+    label: "Forest",
+    light: { background: "#eef7f1", cardBackground: "#ffffff", text: "#0f2b1f", mutedText: "#4f7266", border: "rgba(22, 101, 52, 0.2)", inputBackground: "#f7fffb" },
+    dark: { background: "#071710", cardBackground: "#0d221a", text: "#d8fbe8", mutedText: "#8ab9a1", border: "rgba(74, 222, 128, 0.18)", inputBackground: "#123024" }
+  },
+  ocean: {
+    label: "Ocean",
+    light: { background: "#edf4fb", cardBackground: "#ffffff", text: "#10233f", mutedText: "#5c7394", border: "rgba(37, 99, 235, 0.18)", inputBackground: "#f5f9ff" },
+    dark: { background: "#071324", cardBackground: "#0f1f35", text: "#d8e9ff", mutedText: "#91a8c8", border: "rgba(96, 165, 250, 0.2)", inputBackground: "#122742" }
+  },
+  graphite: {
+    label: "Graphite",
+    light: { background: "#f2f3f5", cardBackground: "#ffffff", text: "#1f2937", mutedText: "#6b7280", border: "rgba(31, 41, 55, 0.14)", inputBackground: "#ffffff" },
+    dark: { background: "#111217", cardBackground: "#1a1d25", text: "#eceff6", mutedText: "#98a2b3", border: "rgba(148, 163, 184, 0.18)", inputBackground: "#232936" }
+  },
+  sunrise: {
+    label: "Sunrise",
+    light: { background: "#fff5ef", cardBackground: "#ffffff", text: "#3d1b0f", mutedText: "#8f5d4d", border: "rgba(234, 88, 12, 0.18)", inputBackground: "#fffaf6" },
+    dark: { background: "#1c120f", cardBackground: "#2a1814", text: "#ffe7dc", mutedText: "#d3a295", border: "rgba(251, 146, 60, 0.2)", inputBackground: "#38211b" }
+  }
+};
+const uiPaletteOrder: UiPaletteId[] = ["midnight", "forest", "ocean", "graphite", "sunrise"];
 const cuisineRegionPresets: Record<CuisineRegionId, { label: string; keywords: string[] }> = {
   global: {
     label: "Global mix",
@@ -131,56 +221,15 @@ const cuisineRegionOrder: CuisineRegionId[] = [
   "latinAmerican",
   "middleEastern"
 ];
-const cuisineDetails: Record<CuisineRegionId, { title: string; description: string; photoUrl: string; sourceLabel: string }> = {
-  global: {
-    title: "Global Mix",
-    description:
-      "A balanced set of globally popular meals and staples. This includes lean proteins, rice bowls, soups, and wraps to keep variety high while making calorie tracking easier.",
-    photoUrl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80",
-    sourceLabel: "Photo: Unsplash (real photography)"
-  },
-  northAmerican: {
-    title: "North American",
-    description:
-      "Common comfort and fast-casual foods such as burgers, sandwiches, pancakes, and mac and cheese. Useful for users frequently eating in North American-style restaurants.",
-    photoUrl: "https://images.unsplash.com/photo-1561758033-7e924f619b47?auto=format&fit=crop&w=1200&q=80",
-    sourceLabel: "Photo: Unsplash (real photography)"
-  },
-  mediterranean: {
-    title: "Mediterranean",
-    description:
-      "Cuisine focused on olive oil, vegetables, legumes, fish, grilled meats, and salads. Often nutrient-dense with heart-healthy fats and fiber-rich ingredients.",
-    photoUrl: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1200&q=80",
-    sourceLabel: "Photo: Unsplash (real photography)"
-  },
-  southAsian: {
-    title: "South Asian",
-    description:
-      "Flavorful dishes like biryani, curries, lentils, and spice-forward chicken preparations. Great for suggesting familiar options while keeping macro visibility clear.",
-    photoUrl: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=80",
-    sourceLabel: "Photo: Unsplash (real photography)"
-  },
-  eastAsian: {
-    title: "East Asian",
-    description:
-      "Includes sushi, ramen, stir-fries, rice bowls, and noodle-based meals. This section prioritizes popular dishes with diverse protein and carb profiles.",
-    photoUrl: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80",
-    sourceLabel: "Photo: Unsplash (real photography)"
-  },
-  latinAmerican: {
-    title: "Latin American",
-    description:
-      "Features tacos, burritos, quesadillas, beans, and rice combinations. Helpful for users who frequently log meals from Latin American food spots.",
-    photoUrl: "https://images.unsplash.com/photo-1615870216519-2f9fa575fa5c?auto=format&fit=crop&w=1200&q=80",
-    sourceLabel: "Photo: Unsplash (real photography)"
-  },
-  middleEastern: {
-    title: "Middle Eastern",
-    description:
-      "Highlights shawarma, kebab, hummus, pita, and salad-heavy combinations. This cuisine often provides protein-rich meals with strong herb and spice profiles.",
-    photoUrl: "https://images.unsplash.com/photo-1534939561126-855b8675edd7?auto=format&fit=crop&w=1200&q=80",
-    sourceLabel: "Photo: Unsplash (real photography)"
-  }
+const cuisineRegionLabels: Record<string, string> = Object.fromEntries(
+  cuisineRegionOrder.map((id) => [id, cuisineRegionPresets[id].label])
+);
+
+const inferGoalTypeFromSelections = (goals: string[]): "lose" | "maintain" | "gain" => {
+  const normalized = goals.map((g) => g.toLowerCase());
+  if (normalized.some((g) => g.includes("lose"))) return "lose";
+  if (normalized.some((g) => g.includes("gain"))) return "gain";
+  return "maintain";
 };
 
 const inferCuisineRegion = (): CuisineRegionId => {
@@ -204,19 +253,22 @@ const PrimaryButton = ({
   title,
   onPress,
   color,
-  fullWidth
+  fullWidth,
+  textColor
 }: {
   title: string;
   onPress: () => void;
   color?: string;
   fullWidth?: boolean;
+  /** Label color on solid primary fills (e.g. dark text on mint). */
+  textColor?: string;
 }) => (
   <TouchableOpacity
     style={[styles.primaryBtn, { backgroundColor: color ?? "#2563eb" }, fullWidth ? styles.primaryBtnFull : null]}
     onPress={onPress}
     activeOpacity={0.7}
   >
-    <Text style={styles.primaryBtnText}>{title}</Text>
+    <Text style={[styles.primaryBtnText, textColor ? { color: textColor } : null]}>{title}</Text>
   </TouchableOpacity>
 );
 
@@ -344,32 +396,37 @@ const debugAuthLog = (
 
 const palettes = {
   light: {
-    background: "#f8fafc",
+    background: "#f4f9f7",
     cardBackground: "#ffffff",
-    text: "#111827",
-    mutedText: "#6b7280",
-    border: "#d1d5db",
+    text: "#0f172a",
+    mutedText: "#64748b",
+    border: "rgba(15, 23, 42, 0.12)",
     inputBackground: "#ffffff",
     primary: "#2563eb",
     danger: "#dc2626",
     success: "#065f46"
   },
   dark: {
-    background: "#0f172a",
-    cardBackground: "#111827",
-    text: "#f9fafb",
-    mutedText: "#9ca3af",
-    border: "#334155",
-    inputBackground: "#1f2937",
-    primary: "#3b82f6",
-    danger: "#f87171",
-    success: "#34d399"
+    ...stitchDark,
+    primary: "#3b82f6"
   }
 } as const;
 
+const STITCH_TAB_BAR_VISUAL = 72;
+
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold
+  });
+  const insets = useSafeAreaInsets();
+
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
-  const [accentId, setAccentId] = useState<AccentPresetId>("blue");
+  const [accentId, setAccentId] = useState<AccentPresetId>("emerald");
+  const [uiPaletteId, setUiPaletteId] = useState<UiPaletteId>("midnight");
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authBusy, setAuthBusy] = useState(false);
@@ -379,7 +436,7 @@ export default function App() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authInfo, setAuthInfo] = useState<string | null>(null);
 
-  const [screen, setScreen] = useState<Screen>("onboarding");
+  const [screen, setScreen] = useState<Screen>("dashboard");
   const [meals, setMeals] = useState<Meal[]>([]);
   const [targetCalories, setTargetCalories] = useState(2200);
   const [mealType, setMealType] = useState<MealType>("lunch");
@@ -393,12 +450,14 @@ export default function App() {
   const [biologicalSex, setBiologicalSex] = useState<BiologicalSex | null>(null);
   const [goalType, setGoalType] = useState<"lose" | "maintain" | "gain">("maintain");
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(0);
+  const [nickname, setNickname] = useState("");
   const [surveyGoals, setSurveyGoals] = useState<string[]>([]);
   const [surveyHabits, setSurveyHabits] = useState<string[]>([]);
   const [mealPlanFrequency, setMealPlanFrequency] = useState("Occasionally");
   const [selectedCuisineRegion, setSelectedCuisineRegion] = useState<CuisineRegionId>(inferCuisineRegion);
   const [detailBackScreen, setDetailBackScreen] = useState<DetailBackScreen>("foodFinder");
   const [detailContent, setDetailContent] = useState<DetailContent | null>(null);
+  const [detailFood, setDetailFood] = useState<FoodRecord | null>(null);
   const [foodSearch, setFoodSearch] = useState("");
   const [foodPortions, setFoodPortions] = useState<Record<string, string>>({});
   const [foodResults, setFoodResults] = useState<FoodRecord[]>([]);
@@ -406,21 +465,38 @@ export default function App() {
   const [foodLoading, setFoodLoading] = useState(false);
 
   const accent = accentPresets[accentId];
-  const theme = useMemo(
-    () => ({
+  const uiPalette = uiPalettes[uiPaletteId];
+  const theme = useMemo(() => {
+    const base = {
+      mode: themeMode,
       ...palettes[themeMode],
-      primary: themeMode === "dark" ? accent.dark : accent.light
-    }),
-    [themeMode, accent.dark, accent.light]
-  );
+      ...(themeMode === "dark" ? uiPalette.dark : uiPalette.light),
+      primary: themeMode === "dark" ? accent.dark : accent.light,
+      onPrimary: onPrimaryByAccent[accentId]
+    };
+    return {
+      ...base,
+      ...semanticSurfaces({
+        mode: themeMode,
+        background: base.background,
+        cardBackground: base.cardBackground,
+        text: base.text,
+        mutedText: base.mutedText,
+        primary: base.primary
+      })
+    };
+  }, [themeMode, accent.dark, accent.light, accentId, uiPalette]);
+  const font = fontsLoaded ? stitchFonts : null;
   const summary = useMemo(() => summaryFromMeals(meals, targetCalories), [meals, targetCalories]);
   const caloriesProgress = summary.targetCalories > 0 ? Math.min(summary.consumedCalories / summary.targetCalories, 1) : 0;
-  const caloriesProgressWidth: `${number}%` = `${Math.round(caloriesProgress * 100)}%`;
   const recentMeals = meals.slice(0, 3);
   const mealsLogged = meals.length;
   const avgMealCalories = mealsLogged ? Math.round(summary.consumedCalories / mealsLogged) : 0;
   const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const toggleTheme = () => setThemeMode((prev) => (prev === "light" ? "dark" : "light"));
+  /** Shown in main header only after user enters a nickname during onboarding. */
+  const headerBrandTitle = nickname.trim();
+  const inferredGoalType = useMemo(() => inferGoalTypeFromSelections(surveyGoals), [surveyGoals]);
   const bmiValue = useMemo(() => {
     const h = Number(heightCm);
     const w = Number(weightKg);
@@ -428,6 +504,14 @@ export default function App() {
     const meters = h / 100;
     return Number((w / (meters * meters)).toFixed(1));
   }, [heightCm, weightKg]);
+  const bmrValue = useMemo(() => {
+    const ageN = Number(age);
+    const h = Number(heightCm);
+    const w = Number(weightKg);
+    if (!ageN || !h || !w || ageN <= 0 || h <= 0 || w <= 0) return null;
+    const sexConstant = biologicalSex === "woman" ? -161 : 5;
+    return Math.round(10 * w + 6.25 * h - 5 * ageN + sexConstant);
+  }, [age, heightCm, weightKg, biologicalSex]);
   const bmiLabel = useMemo(() => {
     if (!bmiValue) return "Unavailable";
     if (bmiValue < 18.5) return "Underweight";
@@ -435,6 +519,37 @@ export default function App() {
     if (bmiValue < 30) return "Overweight";
     return "Obese";
   }, [bmiValue]);
+  const calculateQuestionnaireTarget = useCallback(() => {
+    const ageN = Number(age);
+    const heightN = Number(heightCm);
+    const weightN = Number(weightKg);
+    if (!Number.isFinite(ageN) || !Number.isFinite(heightN) || !Number.isFinite(weightN) || ageN <= 0 || heightN <= 0 || weightN <= 0) {
+      return 2200;
+    }
+
+    let activityMultiplier = 1.35;
+    if (mealPlanFrequency === "Never") activityMultiplier -= 0.03;
+    if (mealPlanFrequency === "Rarely") activityMultiplier -= 0.01;
+    if (mealPlanFrequency === "Frequently") activityMultiplier += 0.03;
+    if (mealPlanFrequency === "Always") activityMultiplier += 0.06;
+    if (surveyHabits.includes("Move more")) activityMultiplier += 0.05;
+    if (surveyHabits.includes("Workout more")) activityMultiplier += 0.08;
+
+    let calorieAdjustment = 0;
+    if (surveyHabits.includes("Eat more protein")) calorieAdjustment += 70;
+    if (surveyHabits.includes("Eat more fiber")) calorieAdjustment -= 40;
+    if (surveyGoals.includes("Manage stress")) calorieAdjustment += 50;
+
+    return suggestedCalorieTarget({
+      age: ageN,
+      heightCm: heightN,
+      weightKg: weightN,
+      goalType: inferredGoalType,
+      sex: biologicalSex ?? undefined,
+      activityMultiplier,
+      calorieAdjustment
+    });
+  }, [age, heightCm, weightKg, biologicalSex, inferredGoalType, mealPlanFrequency, surveyHabits, surveyGoals]);
   const suggestedRegionalFoods = useMemo(() => {
     const keywords = cuisineRegionPresets[selectedCuisineRegion].keywords;
     const matched = FOOD_DATABASE.filter((food) => keywords.some((keyword) => food.name.toLowerCase().includes(keyword.toLowerCase())));
@@ -467,9 +582,30 @@ export default function App() {
     return scored;
   }, [foodResults, foodSearch]);
 
+  const stitchNavActive = useMemo((): StitchNavId | null => {
+    if (screen === "dashboard") return "home";
+    if (screen === "foodFinder") return "search";
+    if (screen === "manual") return "log";
+    if (screen === "foodSuggestions") return "plan";
+    if (screen === "camera" || screen === "review") return "camera";
+    if (screen === "foodDetail") return detailBackScreen === "foodSuggestions" ? "plan" : "search";
+    return null;
+  }, [screen, detailBackScreen]);
+
+  const stitchDateLabel = useMemo(
+    () => new Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "long" }).format(new Date()),
+    []
+  );
+
+  const bottomSafe = Math.max(insets.bottom, 6);
+  const scrollBottomPad = STITCH_TAB_BAR_VISUAL + bottomSafe + 88;
+  const fabBottom = STITCH_TAB_BAR_VISUAL + bottomSafe + 14;
+  const stitchTopPad = stitchScrollPaddingTop(insets.top);
+  const scrollPadTop = screen === "foodDetail" ? insets.top + 10 : stitchTopPad;
+
   useEffect(() => {
     getSession()
-      .then((existingSession) => {
+      .then(async (existingSession) => {
         // #region agent log
         debugAuthLog("run-1", "H1-H5", "App.tsx:getSession.then", "initial_session_read", {
           hasSession: Boolean(existingSession),
@@ -477,6 +613,10 @@ export default function App() {
         });
         // #endregion
         setSession(existingSession);
+        if (existingSession?.user?.id && !AUTH_DISABLED) {
+          const pending = await hasOnboardingPending(existingSession.user.id);
+          setScreen(pending ? "onboarding" : "dashboard");
+        }
       })
       .catch(() => {
         // #region agent log
@@ -502,12 +642,8 @@ export default function App() {
       // #endregion
       if (nextSession) {
         setSession(nextSession);
-        // Only navigate to onboarding on fresh sign-in. TOKEN_REFRESHED and other events
-        // would otherwise reset the screen after "Finish onboarding" (setScreen("dashboard")).
-        if (event === "SIGNED_IN") {
-          setOnboardingStep(0);
-          setScreen("onboarding");
-        }
+        // Do not change `screen` here — login vs signup vs resume is handled in auth handlers
+        // and getSession (onboarding only when pending flag is set for new signups).
         return;
       }
 
@@ -579,8 +715,10 @@ export default function App() {
         });
         // #endregion
         if (data.session) {
+          await setOnboardingPending(data.session.user.id);
           setSession(data.session);
           setAuthInfo("Account created and signed in.");
+          setOnboardingStep(0);
           setScreen("onboarding");
         } else {
           // Common when email confirmation is enabled in Supabase.
@@ -597,8 +735,9 @@ export default function App() {
         });
         // #endregion
         if (data.session) {
+          await clearOnboardingPending(data.session.user.id);
           setSession(data.session);
-          setScreen("onboarding");
+          setScreen("dashboard");
         } else {
           setAuthError("Login did not return an active session. Please try again.");
         }
@@ -721,8 +860,25 @@ export default function App() {
       });
       // #endregion
       if (sessionData.session) {
+        const u = sessionData.session.user;
         setSession(sessionData.session);
-        setScreen("onboarding");
+        if (u?.id) {
+          const done = await hasOnboardingDone(u.id);
+          const pending = await hasOnboardingPending(u.id);
+          const brandNew = isRecentlyCreatedAccount(u.created_at);
+          if (done) {
+            setScreen("dashboard");
+          } else if (pending || brandNew) {
+            await setOnboardingPending(u.id);
+            setOnboardingStep(0);
+            setScreen("onboarding");
+          } else {
+            await clearOnboardingPending(u.id);
+            setScreen("dashboard");
+          }
+        } else {
+          setScreen("dashboard");
+        }
       } else {
         throw new Error("Authentication completed but no session is active.");
       }
@@ -747,7 +903,7 @@ export default function App() {
     }
     setMeals([]);
     setOnboardingStep(0);
-    setScreen("onboarding");
+    setScreen("dashboard");
   };
 
   const saveCurrentMeal = async (source: Meal["source"], requestId?: string) => {
@@ -878,97 +1034,21 @@ export default function App() {
   const openFoodDetail = (food: FoodRecord, backScreen: DetailBackScreen) => {
     const detail = getFoodDetail(food);
     setDetailBackScreen(backScreen);
+    setDetailFood(food);
     setDetailContent({
       title: food.name,
       subtitle: `${food.category} • ${food.calories} kcal per 100g`,
       description: detail.description,
       photoUrl: detail.photoUrl,
       photoCandidates: detail.photoCandidates ?? getFoodPhotoCandidates(food),
-      sourceLabel: detail.sourceLabel
+      sourceLabel: detail.sourceLabel,
+      caloriesPer100: food.calories,
+      proteinGPer100: food.protein_g,
+      carbsGPer100: food.carbs_g,
+      fatGPer100: food.fat_g
     });
     setScreen("foodDetail");
   };
-
-  const openCuisineDetail = (regionId: CuisineRegionId) => {
-    const info = cuisineDetails[regionId];
-    setDetailBackScreen("foodSuggestions");
-    setDetailContent({
-      title: info.title,
-      subtitle: "Regional cuisine overview",
-      description: info.description,
-      photoUrl: info.photoUrl,
-      photoCandidates: [info.photoUrl, "https://picsum.photos/1200/800"],
-      sourceLabel: info.sourceLabel
-    });
-    setScreen("foodDetail");
-  };
-
-  const renderMealForm = (source: Meal["source"], requestId?: string) => (
-    <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-      <Text style={[styles.subtitle, { color: theme.text }]}>Meal type</Text>
-      <View style={styles.row}>
-        {mealTypes.map((type) => (
-          <TouchableOpacity key={type} style={[styles.tag, { borderColor: theme.border }]} onPress={() => setMealType(type)}>
-            <Text style={mealType === type ? [styles.tagText, { color: theme.primary, fontWeight: "700" }] : [styles.tagText, { color: theme.text }]}>
-              {type}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {mealItems.map((item) => (
-        <View key={item.id} style={[styles.itemCard, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Food item name"
-            placeholderTextColor={theme.mutedText}
-            value={item.name}
-            onChangeText={(text) => updateItem(item.id, "name", text)}
-          />
-          <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Calories</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Calories (kcal)"
-            placeholderTextColor={theme.mutedText}
-            keyboardType="numeric"
-            value={displayNumber(item.calories)}
-            onChangeText={(text) => updateItem(item.id, "calories", text)}
-          />
-          <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Protein</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Protein (g)"
-            placeholderTextColor={theme.mutedText}
-            keyboardType="numeric"
-            value={displayNumber(item.protein_g)}
-            onChangeText={(text) => updateItem(item.id, "protein_g", text)}
-          />
-          <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Carbs</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Carbs (g)"
-            placeholderTextColor={theme.mutedText}
-            keyboardType="numeric"
-            value={displayNumber(item.carbs_g)}
-            onChangeText={(text) => updateItem(item.id, "carbs_g", text)}
-          />
-          <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Fat</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Fat (g)"
-            placeholderTextColor={theme.mutedText}
-            keyboardType="numeric"
-            value={displayNumber(item.fat_g)}
-            onChangeText={(text) => updateItem(item.id, "fat_g", text)}
-          />
-        </View>
-      ))}
-
-      <PrimaryButton title="Add item" onPress={() => setMealItems((prev) => [...prev, makeItem()])} color={theme.primary} />
-      <View style={styles.spacer} />
-      <PrimaryButton title="Save meal" onPress={() => saveCurrentMeal(source, requestId)} color={theme.primary} />
-    </View>
-  );
 
   const toggleGoalSelection = (goal: string) => {
     setSurveyGoals((prev) => {
@@ -983,6 +1063,10 @@ export default function App() {
   };
 
   const finishOnboarding = async () => {
+    const computedTarget = calculateQuestionnaireTarget();
+    setGoalType(inferredGoalType);
+    setTargetCalories(computedTarget);
+
     if (session?.user?.id) {
       const toPositiveIntOrNull = (value: string) => {
         const n = Number(value);
@@ -995,7 +1079,7 @@ export default function App() {
         return Number.isFinite(n) && n > 0 ? n : null;
       };
 
-      const safeTarget = Number.isFinite(targetCalories) && targetCalories > 0 ? Math.round(targetCalories) : 2200;
+      const safeTarget = Number.isFinite(computedTarget) && computedTarget > 0 ? Math.round(computedTarget) : 2200;
 
       try {
         await upsertProfile({
@@ -1003,7 +1087,7 @@ export default function App() {
           age: toPositiveIntOrNull(age),
           height_cm: toPositiveIntOrNull(heightCm),
           weight_kg: toPositiveNumberOrNull(weightKg),
-          goal_type: goalType,
+          goal_type: inferredGoalType,
           daily_calorie_target: safeTarget
         });
       } catch (error) {
@@ -1015,163 +1099,174 @@ export default function App() {
       }
     }
     await trackEvent("onboarding_completed", {
-      targetCalories,
-      goalType,
+      targetCalories: computedTarget,
+      goalType: inferredGoalType,
       sex: biologicalSex,
       surveyGoals,
       surveyHabits,
       mealPlanFrequency,
-      accent: accentId
+      accent: accentId,
+      nickname: nickname.trim()
     });
+    if (session?.user?.id) {
+      await setOnboardingDone(session.user.id);
+      await clearOnboardingPending(session.user.id);
+    }
     setScreen("dashboard");
   };
 
+  if (!fontsLoaded) {
+    return <StitchLoadingScreen />;
+  }
+
   if (authLoading && !AUTH_DISABLED) {
-    return (
-      <View style={[styles.centered, { backgroundColor: theme.background }]}>
-        <Text style={[styles.subtitle, { color: theme.text }]}>Loading...</Text>
-      </View>
-    );
+    return <StitchLoadingScreen useCustomFonts />;
   }
 
   if (!session && !AUTH_DISABLED) {
     return (
-      <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.authContainer}>
-        <Text style={[styles.title, { color: theme.text }]}>Calorie Counter</Text>
-        <Text style={[styles.authSubtext, { color: theme.mutedText }]}>
-          Track calories from meals faster with photos and quick corrections.
-        </Text>
-
-        <View style={[styles.authCard, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-          <View style={[styles.authSwitcher, { borderColor: theme.border }]}>
-            <TouchableOpacity
-              style={[
-                styles.switchBtn,
-                { backgroundColor: theme.inputBackground },
-                authMode === "login" && { backgroundColor: theme.primary }
-              ]}
-              onPress={() => setAuthMode("login")}
-            >
-              <Text style={authMode === "login" ? styles.switchTextActive : [styles.switchText, { color: theme.text }]}>
-                Log In
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.switchBtn,
-                { backgroundColor: theme.inputBackground },
-                authMode === "signup" && { backgroundColor: theme.primary }
-              ]}
-              onPress={() => setAuthMode("signup")}
-            >
-              <Text style={authMode === "signup" ? styles.switchTextActive : [styles.switchText, { color: theme.text }]}>
-                Sign Up
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Email"
-            placeholderTextColor={theme.mutedText}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Password"
-            placeholderTextColor={theme.mutedText}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-          {authMode === "signup" ? <Text style={[styles.helperText, { color: theme.mutedText }]}>Use 8+ characters for password.</Text> : null}
-          {authError ? <Text style={[styles.errorText, { color: theme.danger }]}>{authError}</Text> : null}
-          {authInfo ? <Text style={[styles.infoText, { color: theme.success }]}>{authInfo}</Text> : null}
-          <PrimaryButton
-            title={authBusy ? "Please wait..." : authMode === "signup" ? "Create account" : "Continue"}
-            onPress={handleEmailAuth}
-            color={theme.primary}
-          />
-          {authMode === "login" ? (
-            <TouchableOpacity onPress={handleForgotPassword}>
-              <Text style={[styles.linkText, { color: theme.primary }]}>Forgot password?</Text>
-            </TouchableOpacity>
-          ) : null}
-
-          <View style={styles.dividerRow}>
-            <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-            <Text style={[styles.dividerText, { color: theme.mutedText }]}>or continue with</Text>
-            <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-          </View>
-
-          <PrimaryButton title="Continue with Google" onPress={() => handleOAuth("google")} color={theme.primary} />
-          <PrimaryButton title="Continue with Facebook" onPress={() => handleOAuth("facebook")} color={theme.primary} />
-        </View>
-      </ScrollView>
+      <StitchAuthScreen
+        authMode={authMode}
+        setAuthMode={setAuthMode}
+        email={email}
+        password={password}
+        setEmail={setEmail}
+        setPassword={setPassword}
+        authError={authError}
+        authInfo={authInfo}
+        authBusy={authBusy}
+        onEmailAuth={() => void handleEmailAuth()}
+        onForgotPassword={() => void handleForgotPassword()}
+        onGoogle={() => void handleOAuth("google")}
+        onFacebook={() => void handleOAuth("facebook")}
+        useCustomFonts={Boolean(font)}
+      />
     );
   }
 
   if (screen === "onboarding") {
-    const onboardingProgressWidth: `${number}%` = `${((onboardingStep + 1) / 4) * 100}%`;
+    const onboardingProgressWidth: `${number}%` = `${((onboardingStep + 1) / ONBOARDING_STEPS_TOTAL) * 100}%`;
+    const surveyTheme = {
+      background: "#0b141f",
+      cardBackground: "#1a2634",
+      inputBackground: "#152433",
+      text: "#ffffff",
+      mutedText: "#94a3b8",
+      border: "rgba(148, 163, 184, 0.22)"
+    } as const;
     return (
-      <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.container}>
-        <Text style={[styles.subtitle, { color: theme.text, textAlign: "center" }]}>Goals Setup</Text>
-        <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
+      <ScrollView
+        style={{ backgroundColor: surveyTheme.background }}
+        contentContainerStyle={[styles.container, { paddingTop: 18, paddingBottom: 34 }]}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.onboardingHeader}>
+          <View style={styles.onboardingBrandSlot}>
+            {onboardingStep === 4 && nickname.trim().length > 0 ? (
+              <Text style={[styles.onboardingBrand, { color: theme.primary }, font?.display && { fontFamily: font.display }]}>
+                {nickname.trim()}
+              </Text>
+            ) : null}
+          </View>
+          <View style={styles.onboardingStepColumn}>
+            <Text style={[styles.onboardingStepText, font?.bodySemibold && { fontFamily: font.bodySemibold }]}>
+              Step {onboardingStep + 1} of {ONBOARDING_STEPS_TOTAL}
+            </Text>
+            <View style={styles.onboardingStepTrack}>
+              <View style={[styles.onboardingStepFill, { width: onboardingProgressWidth, backgroundColor: theme.primary }]} />
+            </View>
+          </View>
+        </View>
+        <View style={[styles.progressTrack, { backgroundColor: "rgba(148, 163, 184, 0.25)" }]}>
           <View style={[styles.progressFill, { backgroundColor: theme.primary, width: onboardingProgressWidth }]} />
         </View>
 
         {onboardingStep === 0 && (
-          <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <Text style={[styles.title, { color: theme.text }]}>Let's start with your goals.</Text>
-            <Text style={[styles.helperText, { color: theme.mutedText }]}>Select up to three that matter most to you.</Text>
-            {onboardingGoalOptions.map((goal) => {
-              const selected = surveyGoals.includes(goal);
-              return (
-                <TouchableOpacity
-                  key={goal}
-                  style={[styles.surveyOption, { borderColor: selected ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
-                  onPress={() => toggleGoalSelection(goal)}
-                >
-                  <Text style={[styles.recentMealTitle, { color: theme.text }]}>{goal}</Text>
-                  <View style={[styles.selectionBox, { borderColor: selected ? theme.primary : theme.border, backgroundColor: selected ? theme.primary : "transparent" }]} />
-                </TouchableOpacity>
-              );
-            })}
+          <View style={[styles.onboardingGoalsCard, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+            <Text style={[styles.onboardingGoalsH1, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>
+              Let's start with your goals.
+            </Text>
+            <Text style={[styles.onboardingGoalsSub, { color: surveyTheme.mutedText }]}>
+              Select up to three that matter most to you.
+            </Text>
+            <View style={{ gap: 10 }}>
+              {onboardingGoalOptions.map((goal) => {
+                const selected = surveyGoals.includes(goal);
+                return (
+                  <TouchableOpacity
+                    key={goal}
+                    style={[
+                      styles.onboardingGoalRow,
+                      {
+                        borderColor: selected ? theme.primary : surveyTheme.border,
+                        backgroundColor: surveyTheme.inputBackground
+                      }
+                    ]}
+                    onPress={() => toggleGoalSelection(goal)}
+                    activeOpacity={0.88}
+                  >
+                    <Text style={[styles.onboardingGoalText, { color: surveyTheme.text }]}>{goal}</Text>
+                    <View
+                      style={[
+                        styles.onboardingGoalCheck,
+                        {
+                          borderColor: selected ? theme.primary : surveyTheme.border,
+                          backgroundColor: selected ? `${theme.primary}28` : "transparent"
+                        }
+                      ]}
+                    >
+                      {selected ? <Ionicons name="checkmark" size={16} color={theme.primary} /> : null}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
         )}
 
         {onboardingStep === 1 && (
-          <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <Text style={[styles.title, { color: theme.text }]}>Which healthy habits are most important?</Text>
-            <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Recommended for you</Text>
+          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+            <Text style={[styles.title, { color: surveyTheme.text }]}>Which healthy habits are most important?</Text>
+            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Recommended for you</Text>
             <View style={styles.row}>
               {recommendedHabitOptions.map((habit) => {
                 const selected = surveyHabits.includes(habit);
                 return (
                   <TouchableOpacity
                     key={habit}
-                    style={[styles.tag, { borderColor: selected ? theme.primary : theme.border, backgroundColor: selected ? `${theme.primary}22` : theme.inputBackground }]}
+                    style={[
+                      styles.tag,
+                      {
+                        borderColor: selected ? theme.primary : surveyTheme.border,
+                        backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
+                      }
+                    ]}
                     onPress={() => toggleHabitSelection(habit)}
                   >
-                    <Text style={[styles.tagText, { color: selected ? theme.primary : theme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
+                    <Text style={[styles.tagText, { color: selected ? theme.primary : surveyTheme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
                   </TouchableOpacity>
                 );
               })}
             </View>
-            <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>More healthy habits</Text>
+            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>More healthy habits</Text>
             <View style={styles.row}>
               {habitOptions.map((habit) => {
                 const selected = surveyHabits.includes(habit);
                 return (
                   <TouchableOpacity
                     key={habit}
-                    style={[styles.tag, { borderColor: selected ? theme.primary : theme.border, backgroundColor: selected ? `${theme.primary}22` : theme.inputBackground }]}
+                    style={[
+                      styles.tag,
+                      {
+                        borderColor: selected ? theme.primary : surveyTheme.border,
+                        backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
+                      }
+                    ]}
                     onPress={() => toggleHabitSelection(habit)}
                   >
-                    <Text style={[styles.tagText, { color: selected ? theme.primary : theme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
+                    <Text style={[styles.tagText, { color: selected ? theme.primary : surveyTheme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -1180,77 +1275,92 @@ export default function App() {
         )}
 
         {onboardingStep === 2 && (
-          <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <Text style={[styles.title, { color: theme.text }]}>How often do you plan your meals in advance?</Text>
+          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border, gap: 14 }]}>
+            <Text style={[styles.title, { color: surveyTheme.text, fontSize: 30 }]}>How often do you plan your meals in advance?</Text>
+            <Text style={[styles.recentMealSub, { color: surveyTheme.mutedText, fontSize: 16, lineHeight: 24 }]}>
+              We'll tailor your sanctuary experience based on your current routine and rhythmic habits.
+            </Text>
             {mealPlanFrequencyOptions.map((option) => {
               const selected = option === mealPlanFrequency;
               return (
                 <TouchableOpacity
                   key={option}
-                  style={[styles.surveyOption, { borderColor: selected ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
+                  style={[
+                    styles.onboardingMealOption,
+                    {
+                      borderColor: selected ? theme.primary : "transparent",
+                      backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
+                    }
+                  ]}
                   onPress={() => setMealPlanFrequency(option)}
                 >
-                  <Text style={[styles.recentMealTitle, { color: theme.text }]}>{option}</Text>
-                  <View style={[styles.radioCircle, { borderColor: selected ? theme.primary : theme.border }]}>
-                    {selected ? <View style={[styles.radioDot, { backgroundColor: theme.primary }]} /> : null}
+                  <Text style={[styles.recentMealTitle, { color: selected ? theme.primary : surveyTheme.text, fontSize: 20 }]}>{option}</Text>
+                  <View style={[styles.onboardingMealRadio, { borderColor: selected ? theme.primary : surveyTheme.border }]}>
+                    {selected ? <View style={[styles.onboardingMealDot, { backgroundColor: theme.primary }]} /> : null}
                   </View>
                 </TouchableOpacity>
               );
             })}
+            <View style={[styles.card, { backgroundColor: surveyTheme.inputBackground, borderColor: "transparent" }]}>
+              <Text style={[styles.recentMealTitle, { color: surveyTheme.text }]}>Why we ask</Text>
+              <Text style={[styles.helperText, { color: surveyTheme.mutedText, fontSize: 13, lineHeight: 20 }]}>
+                Planning builds a sanctuary of routine, reducing decision fatigue and keeping your nutritional goals within gentle reach.
+              </Text>
+            </View>
           </View>
         )}
 
         {onboardingStep === 3 && (
-          <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <Text style={[styles.title, { color: theme.text }]}>A few more details</Text>
+          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+            <Text style={[styles.title, { color: surveyTheme.text }]}>A few more details</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-              placeholderTextColor={theme.mutedText}
+              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+              placeholderTextColor={surveyTheme.mutedText}
               placeholder="Age"
               keyboardType="numeric"
               value={age}
               onChangeText={setAge}
             />
             <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-              placeholderTextColor={theme.mutedText}
+              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+              placeholderTextColor={surveyTheme.mutedText}
               placeholder="Height cm"
               keyboardType="numeric"
               value={heightCm}
               onChangeText={setHeightCm}
             />
             <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-              placeholderTextColor={theme.mutedText}
+              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+              placeholderTextColor={surveyTheme.mutedText}
               placeholder="Weight kg"
               keyboardType="numeric"
               value={weightKg}
               onChangeText={setWeightKg}
             />
-            <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Sex (for calorie/BMI estimate)</Text>
+            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Sex (for calorie/BMI estimate)</Text>
             <View style={styles.row}>
               <TouchableOpacity
                 style={[
                   styles.tag,
-                  { borderColor: biologicalSex === "man" ? theme.primary : theme.border, backgroundColor: theme.inputBackground }
+                  { borderColor: biologicalSex === "man" ? theme.primary : surveyTheme.border, backgroundColor: surveyTheme.inputBackground }
                 ]}
                 onPress={() => setBiologicalSex("man")}
               >
-                <Text style={[styles.tagText, { color: biologicalSex === "man" ? theme.primary : theme.text, fontWeight: biologicalSex === "man" ? "700" : "500" }]}>
+                <Text style={[styles.tagText, { color: biologicalSex === "man" ? theme.primary : surveyTheme.text, fontWeight: biologicalSex === "man" ? "700" : "500" }]}>
                   Man
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.tag,
-                  { borderColor: biologicalSex === "woman" ? theme.primary : theme.border, backgroundColor: theme.inputBackground }
+                  { borderColor: biologicalSex === "woman" ? theme.primary : surveyTheme.border, backgroundColor: surveyTheme.inputBackground }
                 ]}
                 onPress={() => setBiologicalSex("woman")}
               >
                 <Text
                   style={[
                     styles.tagText,
-                    { color: biologicalSex === "woman" ? theme.primary : theme.text, fontWeight: biologicalSex === "woman" ? "700" : "500" }
+                    { color: biologicalSex === "woman" ? theme.primary : surveyTheme.text, fontWeight: biologicalSex === "woman" ? "700" : "500" }
                   ]}
                 >
                   Woman
@@ -1258,37 +1368,33 @@ export default function App() {
               </TouchableOpacity>
             </View>
             <View style={styles.row}>
-              {(["lose", "maintain", "gain"] as const).map((goal) => (
-                <TouchableOpacity key={goal} style={[styles.tag, { borderColor: theme.border }]} onPress={() => setGoalType(goal)}>
-                  <Text style={goalType === goal ? [styles.tagText, { color: theme.primary, fontWeight: "700" }] : [styles.tagText, { color: theme.text }]}>
-                    {goal}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              <View style={[styles.metricPill, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}>
+                <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>BMI</Text>
+                <Text style={[styles.statValue, { color: surveyTheme.text }]}>{bmiValue ?? "--"}</Text>
+              </View>
+              <View style={[styles.metricPill, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}>
+                <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>BMR</Text>
+                <Text style={[styles.statValue, { color: surveyTheme.text }]}>{bmrValue ?? "--"}</Text>
+              </View>
             </View>
             <PrimaryButton
               title="Suggest target"
               color={theme.primary}
+              textColor={theme.onPrimary}
               onPress={() => {
-                const suggested = suggestedCalorieTarget({
-                  age: Number(age),
-                  heightCm: Number(heightCm),
-                  weightKg: Number(weightKg),
-                  goalType,
-                  sex: biologicalSex ?? undefined
-                });
+                const suggested = calculateQuestionnaireTarget();
                 setTargetCalories(suggested);
               }}
             />
             <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-              placeholderTextColor={theme.mutedText}
+              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+              placeholderTextColor={surveyTheme.mutedText}
               placeholder="Daily calorie target"
               keyboardType="numeric"
               value={String(targetCalories)}
               onChangeText={(v) => setTargetCalories(Number(v || 0))}
             />
-            <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Choose your app color theme</Text>
+            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Choose your app color theme</Text>
             <View style={styles.row}>
               {accentOrder.map((id) => {
                 const preset = accentPresets[id];
@@ -1297,11 +1403,11 @@ export default function App() {
                 return (
                   <TouchableOpacity
                     key={id}
-                    style={[styles.colorOption, { borderColor: isSelected ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
+                    style={[styles.colorOption, { borderColor: isSelected ? theme.primary : surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}
                     onPress={() => setAccentId(id)}
                   >
                     <View style={[styles.colorSwatch, { backgroundColor: preview }]} />
-                    <Text style={[styles.helperText, { color: theme.text, fontWeight: isSelected ? "700" : "500" }]}>{preset.label}</Text>
+                    <Text style={[styles.helperText, { color: surveyTheme.text, fontWeight: isSelected ? "700" : "500" }]}>{preset.label}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -1309,22 +1415,48 @@ export default function App() {
           </View>
         )}
 
-        <View style={styles.rowBetween}>
+        {onboardingStep === 4 && (
+          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+            <Text style={[styles.title, { color: surveyTheme.text }]}>One last thing</Text>
+            <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>
+              Pick a nickname. We will use it in the app header.
+            </Text>
+            <TextInput
+              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+              placeholderTextColor={surveyTheme.mutedText}
+              placeholder="Nickname"
+              value={nickname}
+              onChangeText={setNickname}
+              maxLength={24}
+              autoCapitalize="words"
+            />
+            {nickname.trim().length > 0 ? (
+              <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>Preview: {nickname.trim()}</Text>
+            ) : (
+              <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>
+                Your nickname will show in the app header after you finish.
+              </Text>
+            )}
+          </View>
+        )}
+
+        <View style={styles.onboardingFooter}>
           <TouchableOpacity
-            style={[styles.secondaryBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
+            style={[styles.onboardingBackBtn, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}
             onPress={() => setOnboardingStep((prev) => Math.max(0, prev - 1) as OnboardingStep)}
           >
-            <Text style={[styles.secondaryBtnText, { color: theme.text }]}>Back</Text>
+            <Text style={[styles.secondaryBtnText, { color: surveyTheme.text }]}>Back</Text>
           </TouchableOpacity>
           <PrimaryButton
-            title={onboardingStep === 3 ? "Finish onboarding" : "Next"}
+            title={onboardingStep === 4 ? "Finish onboarding" : "Next"}
             color={theme.primary}
+            textColor={theme.onPrimary}
             onPress={() => {
-              if (onboardingStep === 3) {
+              if (onboardingStep === 4) {
                 void finishOnboarding();
                 return;
               }
-              setOnboardingStep((prev) => Math.min(3, prev + 1) as OnboardingStep);
+              setOnboardingStep((prev) => Math.min(4, prev + 1) as OnboardingStep);
             }}
           />
         </View>
@@ -1332,411 +1464,269 @@ export default function App() {
     );
   }
 
+  const shellBg = theme.background;
+
+  const onStitchNav = (id: StitchNavId) => {
+    switch (id) {
+      case "home":
+        setScreen("dashboard");
+        return;
+      case "search":
+        setScreen("foodFinder");
+        return;
+      case "log":
+        setScreen("manual");
+        return;
+      case "plan":
+        setScreen("foodSuggestions");
+        return;
+      case "camera":
+        void openPhotoPicker();
+        return;
+      default:
+    }
+  };
+
+  const showSecondaryHeader = screen === "settings";
+  const showMainTopBar = screen !== "settings" && screen !== "foodDetail";
+
   return (
-    <View style={[styles.appShell, { backgroundColor: theme.background }]}>
-      <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={[styles.container, { paddingBottom: 96 }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Calorie Counter</Text>
-        <View style={styles.row}>
-          <PrimaryButton title="Dashboard" onPress={() => setScreen("dashboard")} color={theme.primary} />
-          <PrimaryButton title="Manual log" onPress={() => setScreen("manual")} color={theme.primary} />
-          <PrimaryButton title="Food finder" onPress={() => setScreen("foodFinder")} color={theme.primary} />
-          <PrimaryButton title="Food suggestions" onPress={() => setScreen("foodSuggestions")} color={theme.primary} />
-          <PrimaryButton title="Camera" onPress={openPhotoPicker} color={theme.primary} />
-          {!AUTH_DISABLED ? <PrimaryButton title="Sign out" onPress={handleSignOut} color={theme.primary} /> : null}
-        </View>
-
+    <AppThemeProvider value={theme}>
+    <View style={[styles.appShell, { backgroundColor: shellBg }]}>
+      {showSecondaryHeader ? (
+        <StitchSecondaryHeader
+          title="Settings"
+          onBack={() => setScreen("dashboard")}
+          useCustomFonts={Boolean(font)}
+          themeMode={themeMode}
+          primaryColor={theme.primary}
+          textColor={theme.primary}
+        />
+      ) : showMainTopBar ? (
+        <StitchTopBar
+          title={headerBrandTitle}
+          onSettings={() => setScreen("settings")}
+          useCustomFonts={Boolean(font)}
+          themeMode={themeMode}
+          primaryColor={theme.primary}
+          textColor={theme.primary}
+        />
+      ) : null}
+      <ScrollView
+        style={{ backgroundColor: shellBg }}
+        contentContainerStyle={[styles.container, { paddingTop: scrollPadTop, paddingBottom: scrollBottomPad }]}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews
+        keyboardShouldPersistTaps="handled"
+        overScrollMode="never"
+        decelerationRate="fast"
+      >
       {screen === "dashboard" && (
-        <View style={styles.dashboardStack}>
-          <View style={[styles.heroCard, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <View style={styles.rowBetween}>
-              <View>
-                <Text style={[styles.heroTitle, { color: theme.text }]}>Welcome back</Text>
-                <Text style={[styles.heroSubtitle, { color: theme.mutedText }]}>Let's hit your goal today.</Text>
-              </View>
-              <View style={[styles.badgePill, { backgroundColor: `${theme.primary}22` }]}>
-                <Text style={[styles.badgeText, { color: theme.primary }]}>{Math.round(caloriesProgress * 100)}% done</Text>
-              </View>
-            </View>
+        <StitchDashboard
+          remainingCalories={summary.remainingCalories}
+          targetCalories={summary.targetCalories}
+          consumedCalories={summary.consumedCalories}
+          mealsLogged={mealsLogged}
+          progress01={caloriesProgress}
+          proteinG={summary.protein_g}
+          carbsG={summary.carbs_g}
+          fatG={summary.fat_g}
+          avgMealCalories={avgMealCalories || 0}
+          recentMeals={recentMeals.map((meal) => ({
+            id: meal.id,
+            mealType: meal.mealType,
+            source: meal.source,
+            itemCount: meal.items.length,
+            calories: meal.items.reduce((sum, i) => sum + i.calories, 0)
+          }))}
+          dateLabel={stitchDateLabel}
+          useCustomFonts={Boolean(font)}
+          onQuickLog={() => setScreen("manual")}
+          onLogBreakfast={() => {
+            setMealType("breakfast");
+            setScreen("manual");
+          }}
+          onDeleteMeal={async (mealId) => {
+            try {
+              if (!AUTH_DISABLED) {
+                await deleteMealById(mealId);
+              }
+              setMeals((prev) => prev.filter((m) => m.id !== mealId));
+            } catch {
+              Alert.alert("Could not delete meal.");
+            }
+          }}
+        />
+      )}
 
-            <View style={styles.heroGrid}>
-              <View style={styles.heroMetricBlock}>
-                <Text style={[styles.metricBig, { color: theme.text }]}>{summary.remainingCalories}</Text>
-                <Text style={[styles.metricLabel, { color: theme.mutedText }]}>Remaining kcal</Text>
-              </View>
-              <View style={styles.heroRightMetrics}>
-                <Text style={[styles.metricRow, { color: theme.text }]}>Goal: {summary.targetCalories}</Text>
-                <Text style={[styles.metricRow, { color: theme.text }]}>Food: {summary.consumedCalories}</Text>
-                <Text style={[styles.metricRow, { color: theme.text }]}>Meals: {mealsLogged}</Text>
-              </View>
-            </View>
-
-            <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-              <View style={[styles.progressFill, { backgroundColor: theme.primary, width: caloriesProgressWidth }]} />
-            </View>
+      {screen === "manual" && (
+        <View style={{ gap: 16 }}>
+          <View style={{ marginBottom: 4 }}>
+            <Text
+              style={[
+                { fontSize: 28, fontWeight: "800", letterSpacing: -0.5, color: theme.text },
+                font?.display && { fontFamily: font.display }
+              ]}
+            >
+              Log Nutrition
+            </Text>
+            <Text style={[{ fontSize: 15, color: theme.mutedText, marginTop: 6, fontWeight: "500" }, font?.body && { fontFamily: font.body }]}>
+              Record your journey, one meal at a time.
+            </Text>
           </View>
-
-          <View style={styles.statsRow}>
-            <View style={[styles.statCard, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-              <Text style={[styles.statTitle, { color: theme.mutedText }]}>Protein</Text>
-              <Text style={[styles.statValue, { color: theme.text }]}>{summary.protein_g} g</Text>
-            </View>
-            <View style={[styles.statCard, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-              <Text style={[styles.statTitle, { color: theme.mutedText }]}>Carbs</Text>
-              <Text style={[styles.statValue, { color: theme.text }]}>{summary.carbs_g} g</Text>
-            </View>
-            <View style={[styles.statCard, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-              <Text style={[styles.statTitle, { color: theme.mutedText }]}>Fat</Text>
-              <Text style={[styles.statValue, { color: theme.text }]}>{summary.fat_g} g</Text>
-            </View>
-          </View>
-
-          <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <View style={styles.rowBetween}>
-              <Text style={[styles.subtitle, { color: theme.text }]}>Recent meals</Text>
-              <Text style={[styles.helperText, { color: theme.mutedText }]}>Avg {avgMealCalories || 0} kcal</Text>
-            </View>
-            {recentMeals.length === 0 ? <Text style={{ color: theme.mutedText }}>No meals saved yet.</Text> : null}
-            {recentMeals.map((meal) => (
-              <View key={meal.id} style={styles.recentMealRow}>
-                <View style={styles.recentMealTextWrap}>
-                  <Text style={[styles.recentMealTitle, { color: theme.text }]}>
-                    {meal.mealType[0].toUpperCase() + meal.mealType.slice(1)} • {meal.source}
-                  </Text>
-                  <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
-                    {meal.items.length} item(s)
-                  </Text>
-                </View>
-                <View style={styles.recentMealRight}>
-                  <Text style={[styles.recentMealKcal, { color: theme.text }]}>
-                    {meal.items.reduce((sum, i) => sum + i.calories, 0)} kcal
-                  </Text>
-                  <TouchableOpacity
-                    onPress={async () => {
-                      try {
-                        if (!AUTH_DISABLED) {
-                          await deleteMealById(meal.id);
-                        }
-                        setMeals((prev) => prev.filter((m) => m.id !== meal.id));
-                      } catch {
-                        Alert.alert("Could not delete meal.");
-                      }
-                    }}
-                  >
-                    <Text style={[styles.linkText, { color: theme.primary }]}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </View>
+          <StitchManualMealForm
+            mealTypes={mealTypes}
+            mealType={mealType}
+            setMealType={setMealType}
+            mealItems={mealItems}
+            updateItem={updateItem}
+            displayNumber={displayNumber}
+            onAddItem={() => setMealItems((prev) => [...prev, makeItem()])}
+            onSave={() => void saveCurrentMeal("manual")}
+            useCustomFonts={Boolean(font)}
+          />
         </View>
       )}
 
-      {screen === "manual" && renderMealForm("manual")}
-
       {screen === "foodFinder" && (
-        <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-          <Text style={[styles.subtitle, { color: theme.text }]}>Food Finder</Text>
-          <Text style={[styles.helperText, { color: theme.mutedText }]}>
-            Search our built-in database and add foods with auto macros.
-          </Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
-            placeholder="Search meals, foods, macros, descriptions"
-            placeholderTextColor={theme.mutedText}
-            value={foodSearch}
-            onChangeText={setFoodSearch}
-          />
-          <Text style={[styles.helperText, { color: theme.mutedText }]}>
-            Source: {foodSource === "cloud" ? "Cloud database" : "Local fallback database"}
-          </Text>
-          <Text style={[styles.helperText, { color: theme.mutedText }]}>
-            Search supports food name, cuisine keywords, description text, and macro numbers.
-          </Text>
-          <View style={styles.spacer} />
-          {foodLoading ? <Text style={{ color: theme.mutedText }}>Searching...</Text> : null}
-          {!foodLoading && searchableFoodResults.length === 0 ? <Text style={{ color: theme.mutedText }}>No foods found.</Text> : null}
-          {searchableFoodResults.map((food) => (
-            <View
-              key={`${food.category}-${food.name}`}
-              style={[styles.foodRow, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
-            >
-              <TouchableOpacity style={styles.foodRowLeft} onPress={() => openFoodDetail(food, "foodFinder")}>
-                <FallbackImage
-                  uris={getFoodPhotoCandidates(food)}
-                  style={styles.foodThumb}
-                  placeholderText="No verified photo yet"
-                  urlMaxWidth={560}
-                  priority="low"
-                />
-                <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
-                <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
-                  {food.category} • {food.calories} kcal • P {food.protein_g}g • C {food.carbs_g}g • F {food.fat_g}g
-                </Text>
-                <Text numberOfLines={2} style={[styles.helperText, { color: theme.mutedText }]}>
-                  {getFoodDetail(food).description}
-                </Text>
-                <View style={styles.portionRow}>
-                  <TouchableOpacity
-                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
-                    onPress={() => adjustPortionValue(food.name, -0.25)}
-                  >
-                    <Text style={[styles.portionBtnText, { color: theme.text }]}>-</Text>
-                  </TouchableOpacity>
-                  <TextInput
-                    style={[styles.portionInput, { borderColor: theme.border, backgroundColor: theme.cardBackground, color: theme.text }]}
-                    keyboardType="decimal-pad"
-                    value={foodPortions[food.name] ?? "1"}
-                    onChangeText={(v) => setPortionValue(food.name, v)}
-                  />
-                  <TouchableOpacity
-                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
-                    onPress={() => adjustPortionValue(food.name, 0.25)}
-                  >
-                    <Text style={[styles.portionBtnText, { color: theme.text }]}>+</Text>
-                  </TouchableOpacity>
-                  <Text style={[styles.helperText, { color: theme.mutedText }]}>portion(s)</Text>
-                </View>
-                <Text style={[styles.linkText, { color: theme.primary, fontSize: 12 }]}>View details</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food, getPortionValue(food.name))}>
-                <Text style={styles.addFoodBtnText}>Add</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+        <StitchFoodFinderScreen
+          foodSearch={foodSearch}
+          onSearchChange={setFoodSearch}
+          foodSource={foodSource}
+          foodLoading={foodLoading}
+          foods={searchableFoodResults}
+          useCustomFonts={Boolean(font)}
+          renderFoodThumb={(food) => (
+            <FallbackImage
+              uris={getFoodPhotoCandidates(food)}
+              style={{ width: "100%", height: "100%" }}
+              placeholderText="No verified photo yet"
+              urlMaxWidth={560}
+              priority="low"
+            />
+          )}
+          getDescription={(food) => getFoodDetail(food).description}
+          onOpenDetail={(food) => openFoodDetail(food, "foodFinder")}
+          onAdd={(food) => addFoodToMeal(food, getPortionValue(food.name))}
+          onAdjustPortion={adjustPortionValue}
+          portionValue={(name) => foodPortions[name] ?? "1"}
+          onPortionChange={setPortionValue}
+        />
       )}
 
       {screen === "foodSuggestions" && (
-        <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-          <Text style={[styles.subtitle, { color: theme.text }]}>Food Suggestions</Text>
-          <Text style={[styles.helperText, { color: theme.mutedText }]}>
-            Region-based cuisine ideas. Pick your region and quickly add foods to your meal log.
-          </Text>
-          <View style={styles.row}>
-            {cuisineRegionOrder.map((regionId) => {
-              const selected = selectedCuisineRegion === regionId;
-              return (
-                <TouchableOpacity
-                  key={regionId}
-                  style={[styles.tag, { borderColor: selected ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
-                  onPress={() => {
-                    setSelectedCuisineRegion(regionId);
-                    openCuisineDetail(regionId);
-                  }}
-                >
-                  <Text style={[styles.tagText, { color: selected ? theme.primary : theme.text, fontWeight: selected ? "700" : "500" }]}>
-                    {cuisineRegionPresets[regionId].label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-          <View style={styles.spacer} />
-          {suggestedRegionalFoods.map((food) => (
-            <View
-              key={`region-${food.category}-${food.name}`}
-              style={[styles.foodRow, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
-            >
-              <TouchableOpacity style={styles.foodRowLeft} onPress={() => openFoodDetail(food, "foodSuggestions")}>
-                <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
-                <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
-                  {food.category} • {food.calories} kcal • P {food.protein_g}g • C {food.carbs_g}g • F {food.fat_g}g
-                </Text>
-                <View style={styles.portionRow}>
-                  <TouchableOpacity
-                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
-                    onPress={() => adjustPortionValue(food.name, -0.25)}
-                  >
-                    <Text style={[styles.portionBtnText, { color: theme.text }]}>-</Text>
-                  </TouchableOpacity>
-                  <TextInput
-                    style={[styles.portionInput, { borderColor: theme.border, backgroundColor: theme.cardBackground, color: theme.text }]}
-                    keyboardType="decimal-pad"
-                    value={foodPortions[food.name] ?? "1"}
-                    onChangeText={(v) => setPortionValue(food.name, v)}
-                  />
-                  <TouchableOpacity
-                    style={[styles.portionBtn, { borderColor: theme.border, backgroundColor: theme.cardBackground }]}
-                    onPress={() => adjustPortionValue(food.name, 0.25)}
-                  >
-                    <Text style={[styles.portionBtnText, { color: theme.text }]}>+</Text>
-                  </TouchableOpacity>
-                  <Text style={[styles.helperText, { color: theme.mutedText }]}>portion(s)</Text>
-                </View>
-                <Text style={[styles.linkText, { color: theme.primary, fontSize: 12 }]}>View details</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.addFoodBtn, { backgroundColor: theme.primary }]} onPress={() => addFoodToMeal(food, getPortionValue(food.name))}>
-                <Text style={styles.addFoodBtnText}>Add</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+        <StitchFoodSuggestionsScreen
+          regionOrder={cuisineRegionOrder}
+          regionLabels={cuisineRegionLabels}
+          selectedRegion={selectedCuisineRegion}
+          onSelectRegion={(id) => setSelectedCuisineRegion(id as CuisineRegionId)}
+          foods={suggestedRegionalFoods}
+          useCustomFonts={Boolean(font)}
+          onOpenDetail={(food) => openFoodDetail(food, "foodSuggestions")}
+          onAdd={(food) => addFoodToMeal(food, getPortionValue(food.name))}
+          onAdjustPortion={adjustPortionValue}
+          portionValue={(name) => foodPortions[name] ?? "1"}
+          onPortionChange={setPortionValue}
+        />
       )}
 
       {screen === "foodDetail" && detailContent && (
-        <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-          <Text style={[styles.subtitle, { color: theme.text }]}>{detailContent.title}</Text>
-          <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.subtitle}</Text>
-          <FallbackImage
-            uris={detailContent.photoCandidates}
-            style={styles.detailImage}
-            placeholderText="No verified photo for this item yet"
-            urlMaxWidth={1080}
-          />
-          <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.sourceLabel}</Text>
-          <Text style={[styles.recentMealSub, { color: theme.text, lineHeight: 20 }]}>{detailContent.description}</Text>
-          <PrimaryButton
-            title="Back"
-            color={theme.primary}
-            onPress={() => {
-              setScreen(detailBackScreen);
-            }}
-          />
-        </View>
+        <StitchFoodDetailScreen
+          title={detailContent.title}
+          subtitle={detailContent.subtitle}
+          description={detailContent.description}
+          sourceLabel={detailContent.sourceLabel}
+          caloriesPer100={detailContent.caloriesPer100}
+          proteinGPer100={detailContent.proteinGPer100}
+          carbsGPer100={detailContent.carbsGPer100}
+          fatGPer100={detailContent.fatGPer100}
+          imageSlot={
+            <FallbackImage
+              uris={detailContent.photoCandidates}
+              style={{ width: "100%", height: 280 }}
+              placeholderText="No verified photo for this item yet"
+              urlMaxWidth={1080}
+            />
+          }
+          onBack={() => {
+            setDetailFood(null);
+            setScreen(detailBackScreen);
+          }}
+          onLogToDay={
+            detailFood
+              ? () => {
+                  addFoodToMeal(detailFood, 1);
+                  setDetailFood(null);
+                }
+              : undefined
+          }
+          useCustomFonts={Boolean(font)}
+        />
       )}
 
-      {screen === "camera" && (
-        <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-          <Text style={[styles.subtitle, { color: theme.text }]}>Camera Photo</Text>
-          {photoUri ? <Image source={{ uri: photoUri }} style={styles.image} /> : <Text style={{ color: theme.mutedText }}>No photo selected.</Text>}
-          <PrimaryButton title="Estimate calories" onPress={requestEstimate} color={theme.primary} />
-        </View>
+      {screen === "camera" && <StitchCameraScreen photoUri={photoUri} onEstimate={requestEstimate} useCustomFonts={Boolean(font)} />}
+
+      {screen === "settings" && (
+        <StitchSettingsScreen
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+          accentId={accentId}
+          setAccentId={setAccentId}
+          accentOrder={accentOrder}
+          accentPresets={accentPresets}
+          uiPaletteId={uiPaletteId}
+          setUiPaletteId={setUiPaletteId}
+          uiPaletteOrder={uiPaletteOrder}
+          uiPalettes={uiPalettes}
+          biologicalSex={biologicalSex}
+          setBiologicalSex={setBiologicalSex}
+          bmiValue={bmiValue}
+          bmrValue={bmrValue}
+          bmiLabel={bmiLabel}
+          onRecalculateCalories={() => {
+            const suggested = calculateQuestionnaireTarget();
+            setTargetCalories(suggested);
+          }}
+          onSignOut={() => void handleSignOut()}
+          showSignOut={!AUTH_DISABLED}
+          useCustomFonts={Boolean(font)}
+        />
       )}
 
-        {screen === "settings" && (
-          <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <Text style={[styles.subtitle, { color: theme.text }]}>Settings</Text>
-
-            <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Theme mode</Text>
-            <View style={styles.row}>
-              <TouchableOpacity
-                style={[styles.tag, { borderColor: themeMode === "light" ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
-                onPress={() => setThemeMode("light")}
-              >
-                <Text
-                  style={[
-                    styles.tagText,
-                    { color: themeMode === "light" ? theme.primary : theme.text, fontWeight: themeMode === "light" ? "700" : "500" }
-                  ]}
-                >
-                  Light
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.tag, { borderColor: themeMode === "dark" ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
-                onPress={() => setThemeMode("dark")}
-              >
-                <Text
-                  style={[
-                    styles.tagText,
-                    { color: themeMode === "dark" ? theme.primary : theme.text, fontWeight: themeMode === "dark" ? "700" : "500" }
-                  ]}
-                >
-                  Dark
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={[styles.fieldLabel, { color: theme.mutedText }]}>Accent color</Text>
-            <Text style={[styles.helperText, { color: theme.mutedText }]}>Changes icon/button color theme in the app.</Text>
-            <View style={styles.row}>
-              {accentOrder.map((id) => {
-                const preset = accentPresets[id];
-                const selected = id === accentId;
-                const preview = themeMode === "dark" ? preset.dark : preset.light;
-                return (
-                  <TouchableOpacity
-                    key={id}
-                    style={[styles.colorOption, { borderColor: selected ? theme.primary : theme.border, backgroundColor: theme.inputBackground }]}
-                    onPress={() => setAccentId(id)}
-                  >
-                    <View style={[styles.colorSwatch, { backgroundColor: preview }]} />
-                    <Text style={[styles.helperText, { color: theme.text, fontWeight: selected ? "700" : "500" }]}>{preset.label}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            <View style={[styles.card, { backgroundColor: theme.inputBackground, borderColor: theme.border }]}>
-              <Text style={[styles.subtitle, { color: theme.text }]}>BMI calculator</Text>
-              <Text style={[styles.helperText, { color: theme.mutedText }]}>
-                Enter body data to estimate BMI and a calorie target suggestion.
-              </Text>
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={[styles.tag, { borderColor: biologicalSex === "man" ? theme.primary : theme.border, backgroundColor: theme.cardBackground }]}
-                  onPress={() => setBiologicalSex("man")}
-                >
-                  <Text style={[styles.tagText, { color: biologicalSex === "man" ? theme.primary : theme.text, fontWeight: biologicalSex === "man" ? "700" : "500" }]}>
-                    Man
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.tag, { borderColor: biologicalSex === "woman" ? theme.primary : theme.border, backgroundColor: theme.cardBackground }]}
-                  onPress={() => setBiologicalSex("woman")}
-                >
-                  <Text
-                    style={[
-                      styles.tagText,
-                      { color: biologicalSex === "woman" ? theme.primary : theme.text, fontWeight: biologicalSex === "woman" ? "700" : "500" }
-                    ]}
-                  >
-                    Woman
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              {biologicalSex ? null : (
-                <Text style={[styles.helperText, { color: theme.mutedText }]}>
-                  Optional: choose sex for more accurate calorie estimation.
-                </Text>
-              )}
-              <View style={styles.row}>
-                <View style={styles.metricPill}>
-                  <Text style={[styles.helperText, { color: theme.mutedText }]}>BMI</Text>
-                  <Text style={[styles.statValue, { color: theme.text }]}>{bmiValue ?? "--"}</Text>
-                </View>
-                <View style={styles.metricPill}>
-                  <Text style={[styles.helperText, { color: theme.mutedText }]}>Status</Text>
-                  <Text style={[styles.recentMealTitle, { color: theme.text }]}>{bmiLabel}</Text>
-                </View>
-              </View>
-              <PrimaryButton
-                title="Recalculate suggested calories"
-                color={theme.primary}
-                onPress={() => {
-                  const suggested = suggestedCalorieTarget({
-                    age: Number(age),
-                    heightCm: Number(heightCm),
-                    weightKg: Number(weightKg),
-                    goalType,
-                    sex: biologicalSex ?? undefined
-                  });
-                  setTargetCalories(suggested);
-                }}
-              />
-            </View>
-          </View>
-        )}
-
-        {screen === "review" && (
-          <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
-            <Text style={[styles.subtitle, { color: theme.text }]}>Review Estimate</Text>
-            <Text style={{ color: theme.text }}>Confidence: {estimate?.confidence ?? 0}</Text>
-            {(estimate?.confidence ?? 0) < 0.7 ? (
-              <Text style={styles.warning}>Low confidence: review is required before saving.</Text>
-            ) : null}
-            {renderMealForm("camera", estimate?.requestId)}
-          </View>
-        )}
+      {screen === "review" && (
+        <StitchReviewEstimateScreen
+          confidence={estimate?.confidence ?? 0}
+          useCustomFonts={Boolean(font)}
+          mealForm={
+            <StitchManualMealForm
+              mealTypes={mealTypes}
+              mealType={mealType}
+              setMealType={setMealType}
+              mealItems={mealItems}
+              updateItem={updateItem}
+              displayNumber={displayNumber}
+              onAddItem={() => setMealItems((prev) => [...prev, makeItem()])}
+              onSave={() => void saveCurrentMeal("camera", estimate?.requestId)}
+              useCustomFonts={Boolean(font)}
+            />
+          }
+        />
+      )}
       </ScrollView>
-      <TouchableOpacity
-        style={[styles.settingsFab, { backgroundColor: theme.primary, borderColor: theme.border }]}
-        onPress={() => setScreen("settings")}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="settings-sharp" size={24} color="#ffffff" />
-      </TouchableOpacity>
+
+      <StitchBottomNav active={stitchNavActive} onSelect={onStitchNav} useCustomFonts={Boolean(font)} />
+
+      {screen !== "settings" ? (
+        <TouchableOpacity
+          style={[styles.settingsFab, { backgroundColor: theme.primary, borderColor: theme.border, bottom: fabBottom }]}
+          onPress={() => setScreen("settings")}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="settings-sharp" size={24} color={theme.onPrimary} />
+        </TouchableOpacity>
+      ) : null}
     </View>
+    </AppThemeProvider>
   );
 }
 
@@ -1752,6 +1742,92 @@ const styles = StyleSheet.create({
   container: {
     padding: 18,
     gap: 14
+  },
+  onboardingHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 4
+  },
+  onboardingBrandSlot: {
+    flex: 1,
+    minHeight: 32,
+    justifyContent: "center"
+  },
+  onboardingBrand: {
+    fontSize: 22,
+    fontWeight: "900",
+    letterSpacing: -0.4
+  },
+  onboardingStepColumn: {
+    alignItems: "flex-end",
+    gap: 6,
+    minWidth: 112
+  },
+  onboardingStepTrack: {
+    width: 56,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(134, 148, 138, 0.3)",
+    overflow: "hidden"
+  },
+  onboardingStepFill: {
+    height: "100%",
+    borderRadius: 999
+  },
+  onboardingStepText: {
+    fontSize: 11,
+    color: "#b4c0d8",
+    textTransform: "uppercase",
+    letterSpacing: 1.1,
+    fontWeight: "700"
+  },
+  onboardingMealOption: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  onboardingMealRadio: {
+    width: 24,
+    height: 24,
+    borderRadius: 999,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  onboardingMealDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 999
+  },
+  onboardingFooter: {
+    marginTop: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10
+  },
+  onboardingBackBtn: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 16
+  },
+  signOutBtn: {
+    marginTop: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: "center"
+  },
+  signOutBtnText: {
+    fontWeight: "700",
+    fontSize: 15
   },
   authContainer: {
     padding: 20,
@@ -1774,8 +1850,8 @@ const styles = StyleSheet.create({
   },
   heroCard: {
     borderWidth: 1,
-    borderRadius: 16,
-    padding: 14,
+    borderRadius: 20,
+    padding: 16,
     gap: 12
   },
   heroTitle: {
@@ -1819,13 +1895,52 @@ const styles = StyleSheet.create({
     fontWeight: "700"
   },
   progressTrack: {
-    height: 10,
+    height: 12,
     borderRadius: 999,
     overflow: "hidden"
   },
   progressFill: {
     height: "100%",
     borderRadius: 999
+  },
+  onboardingGoalsCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 18,
+    gap: 12
+  },
+  onboardingGoalsH1: {
+    fontSize: 24,
+    fontWeight: "800",
+    letterSpacing: -0.3
+  },
+  onboardingGoalsSub: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "500"
+  },
+  onboardingGoalRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1
+  },
+  onboardingGoalText: {
+    fontSize: 15,
+    fontWeight: "700",
+    flex: 1,
+    paddingRight: 12
+  },
+  onboardingGoalCheck: {
+    width: 22,
+    height: 22,
+    borderRadius: 5,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center"
   },
   statsRow: {
     flexDirection: "row",
@@ -1849,7 +1964,6 @@ const styles = StyleSheet.create({
   metricPill: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#94a3b8",
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 10,
@@ -1859,8 +1973,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
+    borderTopWidth: StyleSheet.hairlineWidth,
     paddingTop: 10,
     marginTop: 8
   },
@@ -2077,7 +2190,6 @@ const styles = StyleSheet.create({
   settingsFab: {
     position: "absolute",
     right: 16,
-    bottom: 16,
     width: 56,
     height: 56,
     borderRadius: 28,

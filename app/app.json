@@ -6,8 +6,18 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "platforms": ["android"],
+    "icon": "./assets/logo-mindful-bowl.png",
+    "splash": {
+      "image": "./assets/logo-mindful-bowl.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
     "android": {
-      "package": "com.ot228star.caloriecounter"
+      "package": "com.ot228star.caloriecounter",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo-mindful-bowl.png",
+        "backgroundColor": "#000000"
+      }
     }
   }
 }
