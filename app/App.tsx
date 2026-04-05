@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Image,
@@ -12,7 +12,9 @@ import {
 import type { Provider, Session } from "@supabase/supabase-js";
 import * as AuthSession from "expo-auth-session";
 import * as ImagePicker from "expo-image-picker";
+import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
+import { Image as ExpoImage } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import {
   deleteMealById,
@@ -34,6 +36,7 @@ import { trackEvent } from "./src/services/analytics";
 import { FOOD_DATABASE, type FoodRecord } from "./src/data/foodDatabase";
 import { getFoodDetail, getFoodPhotoCandidates, getFoodSearchBlob } from "./src/data/foodDetails";
 import { searchFoods } from "./src/services/foodFinder";
+import { mapPhotoUrisForMaxWidth } from "./src/lib/photoUrls";
 import { suggestedCalorieTarget, summaryFromMeals } from "./src/lib/calculations";
 import { EstimateResult, Meal, MealItem, MealType } from "./src/types";
 
@@ -54,7 +57,9 @@ type DetailContent = {
   photoCandidates: string[];
   sourceLabel: string;
 };
-const AUTH_DISABLED = true;
+const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_AUTH_DISABLED?: string } | undefined;
+/** When true, skips login and backend session checks (local UI dev only). Default: auth required. */
+const AUTH_DISABLED = extra?.EXPO_PUBLIC_AUTH_DISABLED === "true";
 
 const mealTypes: MealType[] = ["breakfast", "lunch", "dinner", "snack"];
 const onboardingGoalOptions = ["Lose weight", "Maintain weight", "Gain weight", "Gain muscle", "Modify my diet", "Plan meals", "Manage stress"];
@@ -215,24 +220,33 @@ const PrimaryButton = ({
   </TouchableOpacity>
 );
 
-const FallbackImage = ({
+const FallbackImage = memo(function FallbackImage({
   uris,
   style,
-  placeholderText
+  placeholderText,
+  urlMaxWidth,
+  priority = "normal"
 }: {
   uris: string[];
   style: object;
   placeholderText?: string;
-}) => {
+  /** Smaller CDN width for list rows — same photo, less decode lag (Unsplash `w=`). */
+  urlMaxWidth?: number;
+  priority?: "low" | "normal" | "high";
+}) {
+  const displayUris = useMemo(
+    () => (urlMaxWidth != null && uris.length > 0 ? mapPhotoUrisForMaxWidth(uris, urlMaxWidth) : uris),
+    [uris, urlMaxWidth]
+  );
   const [index, setIndex] = useState(0);
   const [allFailed, setAllFailed] = useState(false);
-  const safeUris = uris.length > 0 ? uris : [];
+  const safeUris = displayUris.length > 0 ? displayUris : [];
   const current = safeUris[Math.min(index, Math.max(0, safeUris.length - 1))];
 
   useEffect(() => {
     setIndex(0);
     setAllFailed(false);
-  }, [uris]);
+  }, [displayUris]);
 
   if (safeUris.length === 0 || allFailed) {
     return (
@@ -244,9 +258,13 @@ const FallbackImage = ({
   }
 
   return (
-    <Image
+    <ExpoImage
       source={{ uri: current }}
       style={style}
+      cachePolicy="memory-disk"
+      contentFit="cover"
+      priority={priority}
+      transition={120}
       onError={() => {
         if (index >= safeUris.length - 1) {
           setAllFailed(true);
@@ -256,7 +274,7 @@ const FallbackImage = ({
       }}
     />
   );
-};
+});
 
 const makeItem = (): MealItem => ({
   id: createId(),
@@ -271,21 +289,26 @@ const makeItem = (): MealItem => ({
 
 const displayNumber = (value: number) => (value === 0 ? "" : String(value));
 
-const parseOAuthTokens = (callbackUrl: string) => {
-  const [beforeHash, hashPart] = callbackUrl.split("#");
-  const queryPart = beforeHash.includes("?") ? beforeHash.split("?")[1] : "";
-  const hashParams = new URLSearchParams(hashPart ?? "");
-  const queryParams = new URLSearchParams(queryPart);
-
-  const accessToken = hashParams.get("access_token") ?? queryParams.get("access_token");
-  const refreshToken = hashParams.get("refresh_token") ?? queryParams.get("refresh_token");
-  return { accessToken, refreshToken };
-};
-
-const parseOAuthCode = (callbackUrl: string) => {
-  const queryPart = callbackUrl.includes("?") ? callbackUrl.split("?")[1].split("#")[0] : "";
-  const queryParams = new URLSearchParams(queryPart);
-  return queryParams.get("code");
+/**
+ * Supabase OAuth may return `code` (PKCE) or tokens in the query string or hash fragment.
+ * `new URL()` is unreliable for some custom-scheme redirects, so we parse manually.
+ */
+const parseOAuthCallback = (callbackUrl: string) => {
+  const hashIdx = callbackUrl.indexOf("#");
+  const beforeHash = hashIdx === -1 ? callbackUrl : callbackUrl.slice(0, hashIdx);
+  const hashPart = hashIdx === -1 ? "" : callbackUrl.slice(hashIdx + 1);
+  const qIdx = beforeHash.indexOf("?");
+  const queryPart = qIdx === -1 ? "" : beforeHash.slice(qIdx + 1);
+  const searchParams = new URLSearchParams(queryPart);
+  const hashParams = new URLSearchParams(hashPart);
+  const get = (key: string) => searchParams.get(key) ?? hashParams.get(key);
+  return {
+    code: get("code"),
+    accessToken: get("access_token"),
+    refreshToken: get("refresh_token"),
+    error: get("error"),
+    errorDescription: get("error_description")
+  };
 };
 
 const makeOAuthRedirectUri = () =>
@@ -479,8 +502,12 @@ export default function App() {
       // #endregion
       if (nextSession) {
         setSession(nextSession);
-        setOnboardingStep(0);
-        setScreen("onboarding");
+        // Only navigate to onboarding on fresh sign-in. TOKEN_REFRESHED and other events
+        // would otherwise reset the screen after "Finish onboarding" (setScreen("dashboard")).
+        if (event === "SIGNED_IN") {
+          setOnboardingStep(0);
+          setScreen("onboarding");
+        }
         return;
       }
 
@@ -624,12 +651,18 @@ export default function App() {
       if (!data?.url) throw new Error("Could not start OAuth.");
 
       const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+      const resultUrl = (result as { url?: string }).url ?? "";
+      const parsedForLog = resultUrl ? parseOAuthCallback(resultUrl) : null;
       // #region agent log
       debugAuthLog("run-1", "H3-H4", "App.tsx:handleOAuth.result", "oauth_browser_result", {
         provider,
         resultType: result.type,
-        hasResultUrl: Boolean((result as { url?: string }).url),
-        resultUrlHost: (result as { url?: string }).url?.split("/")[2] ?? ""
+        hasResultUrl: Boolean(resultUrl),
+        resultUrlHost: resultUrl.split("/")[2] ?? "",
+        hasCode: Boolean(parsedForLog?.code),
+        hasAccessToken: Boolean(parsedForLog?.accessToken),
+        hasRefreshToken: Boolean(parsedForLog?.refreshToken),
+        oauthError: parsedForLog?.error ?? null
       });
       // #endregion
       if (result.type !== "success") return;
@@ -639,9 +672,14 @@ export default function App() {
         );
       }
 
-      const code = parseOAuthCode(result.url);
-      if (code) {
-        const { data: exchangeData, error: exchangeError } = await authClient.auth.exchangeCodeForSession(code);
+      const parsed = parseOAuthCallback(result.url);
+      if (parsed.error) {
+        const detail = parsed.errorDescription ? decodeURIComponent(parsed.errorDescription) : parsed.error;
+        throw new Error(detail);
+      }
+
+      if (parsed.code) {
+        const { data: exchangeData, error: exchangeError } = await authClient.auth.exchangeCodeForSession(parsed.code);
         if (exchangeError) throw exchangeError;
         // #region agent log
         debugAuthLog("run-1", "H3-H4", "App.tsx:handleOAuth.exchange", "oauth_code_exchange", {
@@ -653,23 +691,27 @@ export default function App() {
         if (!exchangeData.session) {
           throw new Error("OAuth code exchange did not return a session.");
         }
-      } else {
-        const { accessToken, refreshToken } = parseOAuthTokens(result.url);
-        if (!accessToken || !refreshToken) {
-          throw new Error("OAuth callback missing access token and code.");
-        }
+      } else if (parsed.accessToken) {
         const { error: setSessionError } = await authClient.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken
+          access_token: parsed.accessToken,
+          refresh_token: parsed.refreshToken ?? ""
         });
         if (setSessionError) throw setSessionError;
         // #region agent log
         debugAuthLog("run-1", "H3-H4", "App.tsx:handleOAuth.token", "oauth_token_set_session", {
           usedCodeFlow: false,
-          hadAccessToken: Boolean(accessToken),
-          hadRefreshToken: Boolean(refreshToken)
+          hadAccessToken: Boolean(parsed.accessToken),
+          hadRefreshToken: Boolean(parsed.refreshToken)
         });
         // #endregion
+      } else {
+        console.warn(
+          "OAuth callback could not be parsed (no code or access_token). URL shape:",
+          result.url.split("#")[0]?.slice(0, 120)
+        );
+        throw new Error(
+          "OAuth callback missing access token and code. Add this redirect URL in Supabase Auth → URL Configuration, then retry."
+        );
       }
       const { data: sessionData } = await authClient.auth.getSession();
       // #region agent log
@@ -942,14 +984,35 @@ export default function App() {
 
   const finishOnboarding = async () => {
     if (session?.user?.id) {
-      await upsertProfile({
-        id: session.user.id,
-        age: Number(age),
-        height_cm: Number(heightCm),
-        weight_kg: Number(weightKg),
-        goal_type: goalType,
-        daily_calorie_target: targetCalories
-      });
+      const toPositiveIntOrNull = (value: string) => {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return null;
+        const rounded = Math.round(n);
+        return rounded > 0 ? rounded : null;
+      };
+      const toPositiveNumberOrNull = (value: string) => {
+        const n = Number(value);
+        return Number.isFinite(n) && n > 0 ? n : null;
+      };
+
+      const safeTarget = Number.isFinite(targetCalories) && targetCalories > 0 ? Math.round(targetCalories) : 2200;
+
+      try {
+        await upsertProfile({
+          id: session.user.id,
+          age: toPositiveIntOrNull(age),
+          height_cm: toPositiveIntOrNull(heightCm),
+          weight_kg: toPositiveNumberOrNull(weightKg),
+          goal_type: goalType,
+          daily_calorie_target: safeTarget
+        });
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        Alert.alert(
+          "Could not save profile",
+          `You can continue using the app. If this keeps happening, check Supabase profiles table / RLS.\n\nDetails: ${detail}`
+        );
+      }
     }
     await trackEvent("onboarding_completed", {
       targetCalories,
@@ -1402,6 +1465,8 @@ export default function App() {
                   uris={getFoodPhotoCandidates(food)}
                   style={styles.foodThumb}
                   placeholderText="No verified photo yet"
+                  urlMaxWidth={560}
+                  priority="low"
                 />
                 <Text style={[styles.recentMealTitle, { color: theme.text }]}>{food.name}</Text>
                 <Text style={[styles.recentMealSub, { color: theme.mutedText }]}>
@@ -1516,6 +1581,7 @@ export default function App() {
             uris={detailContent.photoCandidates}
             style={styles.detailImage}
             placeholderText="No verified photo for this item yet"
+            urlMaxWidth={1080}
           />
           <Text style={[styles.helperText, { color: theme.mutedText }]}>{detailContent.sourceLabel}</Text>
           <Text style={[styles.recentMealSub, { color: theme.text, lineHeight: 20 }]}>{detailContent.description}</Text>

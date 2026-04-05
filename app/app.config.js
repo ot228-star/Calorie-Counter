@@ -18,6 +18,8 @@ module.exports = {
       EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL ?? "",
       EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
       EXPO_PUBLIC_ENV: process.env.EXPO_PUBLIC_ENV ?? "development",
+      // Set to "true" only for local UI testing without signing in (skips Supabase session gate).
+      EXPO_PUBLIC_AUTH_DISABLED: process.env.EXPO_PUBLIC_AUTH_DISABLED ?? "false",
     },
   },
 };

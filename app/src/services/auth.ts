@@ -9,7 +9,10 @@ export const authClient = createClient(url, anonKey, {
     storage: AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false
+    detectSessionInUrl: false,
+    // PKCE puts `code` in the query string. Implicit grant puts tokens in the URL hash,
+    // which Expo WebBrowser / some OEM browsers drop on return — empty callback.
+    flowType: "pkce"
   }
 });
 

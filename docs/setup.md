@@ -22,6 +22,29 @@
    - `AI_PROVIDER_API_KEY` (optional at first)
    - `AI_PROVIDER_BASE_URL` (optional at first)
 
+## Google sign-in (Supabase Auth)
+
+1. **Google Cloud Console** (same Google account you use for testing):
+   - APIs & Services → OAuth consent screen (configure app name, your email as test user if External).
+   - Credentials → Create Credentials → **OAuth client ID** → type **Web application**.
+   - Under **Authorized redirect URIs**, add exactly:
+     - `https://<YOUR_PROJECT_REF>.supabase.co/auth/v1/callback`
+   - Save and copy the **Client ID** and **Client secret**.
+
+2. **Supabase Dashboard** → Authentication → Providers → **Google**:
+   - Enable the provider.
+   - Paste the Web client **Client ID** and **Client secret** from step 1.
+
+3. **Supabase** → Authentication → **URL Configuration** → **Redirect URLs**:
+   - Add `caloriecounter://**` (matches `scheme` in `app/app.json` and Expo AuthSession).
+   - Add `exp://**` if you test in **Expo Go** (or add the exact URI printed in Metro when you tap “Continue with Google”: look for `OAuth redirect URI:` in the device/log output).
+
+4. App env: ensure `.env` has valid `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`, and **do not** set `EXPO_PUBLIC_AUTH_DISABLED=true` while testing sign-in.
+
+5. The app uses **PKCE** (`flowType: "pkce"` in `app/src/services/auth.ts`) so the OAuth callback carries a `code` in the **query string**. The default implicit flow puts tokens in the **URL hash**, which some in-app browsers omit when returning to the app, leading to “missing access token and code.”
+
+6. Restart Expo after changing `.env`.
+
 ## Mobile App
 
 1. `cd app`
