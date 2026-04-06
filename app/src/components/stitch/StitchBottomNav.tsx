@@ -7,7 +7,7 @@ import { useAppTheme } from "../../theme/AppThemeContext";
 import { mixHex } from "../../lib/themeColors";
 import { stitchFonts } from "../../theme/stitch";
 
-export type StitchNavId = "home" | "search" | "log" | "plan" | "camera";
+export type StitchNavId = "home" | "search" | "log" | "plan" | "favourites" | "camera";
 
 type Tab = {
   id: StitchNavId;
@@ -22,6 +22,7 @@ const TABS: Tab[] = [
   { id: "search", label: "Search", icon: "search-outline", iconActive: "search" },
   { id: "log", label: "Log", icon: "add-circle-outline", iconActive: "add-circle", emphasizeCenter: true },
   { id: "plan", label: "Plan", icon: "restaurant-outline", iconActive: "restaurant" },
+  { id: "favourites", label: "Fav", icon: "heart-outline", iconActive: "heart" },
   { id: "camera", label: "Camera", icon: "camera-outline", iconActive: "camera" }
 ];
 

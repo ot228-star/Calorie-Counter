@@ -187,6 +187,7 @@ export const deleteMealById = async (mealId: string) => {
 
 export const upsertProfile = async (profile: {
   id: string;
+  display_name?: string | null;
   age: number | null;
   height_cm: number | null;
   weight_kg: number | null;
@@ -198,8 +199,39 @@ export const upsertProfile = async (profile: {
   await requestJson<unknown>(`${restBaseUrl()}/profiles?on_conflict=id`, {
     method: "POST",
     headers: { ...headers, Prefer: "resolution=merge-duplicates" },
-    body: JSON.stringify([profile])
+    body: JSON.stringify([
+      {
+        ...profile,
+        display_name: profile.display_name ?? null
+      }
+    ])
   });
+};
+
+export const getProfile = async (userId: string): Promise<{
+  display_name: string | null;
+  age: number | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  goal_type: "lose" | "maintain" | "gain" | null;
+  daily_calorie_target: number | null;
+} | null> => {
+  assertSupabaseConfigured();
+  const headers = await apiHeaders();
+  const rows = await requestJson<
+    Array<{
+      display_name: string | null;
+      age: number | null;
+      height_cm: number | null;
+      weight_kg: number | null;
+      goal_type: "lose" | "maintain" | "gain" | null;
+      daily_calorie_target: number | null;
+    }>
+  >(`${restBaseUrl()}/profiles?select=display_name,age,height_cm,weight_kg,goal_type,daily_calorie_target&id=eq.${userId}&limit=1`, {
+    method: "GET",
+    headers
+  });
+  return rows[0] ?? null;
 };
 
 export const logEstimateCorrections = async (requestId: string, originalItems: MealItem[], editedItems: MealItem[]) => {

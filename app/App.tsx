@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -29,6 +29,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   deleteMealById,
   estimateMealFromImage,
+  getProfile,
   listMealsForToday,
   logEstimateCorrections,
   saveMeal,
@@ -59,31 +60,36 @@ import { StitchManualMealForm } from "./src/components/stitch/StitchManualMealFo
 import { StitchFoodFinderScreen } from "./src/components/stitch/StitchFoodFinderScreen";
 import { StitchFoodSuggestionsScreen } from "./src/components/stitch/StitchFoodSuggestionsScreen";
 import { StitchFoodDetailScreen } from "./src/components/stitch/StitchFoodDetailScreen";
+import { StitchFavouritesScreen } from "./src/components/stitch/StitchFavouritesScreen";
 import { StitchCameraScreen } from "./src/components/stitch/StitchCameraScreen";
 import { StitchReviewEstimateScreen } from "./src/components/stitch/StitchReviewEstimateScreen";
 import { StitchSettingsScreen } from "./src/components/stitch/StitchSettingsScreen";
 import { onPrimaryByAccent, stitchDark, stitchFonts } from "./src/theme/stitch";
 import { AppThemeProvider } from "./src/theme/AppThemeContext";
 import { semanticSurfaces } from "./src/lib/themeColors";
+import { loadFavorites, saveFavorites } from "./src/lib/favoritesStorage";
 import {
+  clearOnboardingDraft,
   clearOnboardingPending,
   hasOnboardingDone,
   hasOnboardingPending,
   isRecentlyCreatedAccount,
+  loadOnboardingDraft,
+  saveOnboardingDraft,
   setOnboardingDone,
   setOnboardingPending
 } from "./src/lib/onboardingStorage";
 
 WebBrowser.maybeCompleteAuthSession();
 
-type Screen = "onboarding" | "dashboard" | "manual" | "foodFinder" | "foodSuggestions" | "foodDetail" | "camera" | "review" | "settings";
+type Screen = "onboarding" | "dashboard" | "manual" | "foodFinder" | "foodSuggestions" | "foodDetail" | "favourites" | "camera" | "review" | "settings";
 type ThemeMode = "light" | "dark";
 type OnboardingStep = 0 | 1 | 2 | 3 | 4;
 type AccentPresetId = "blue" | "emerald" | "violet" | "rose" | "orange";
 type UiPaletteId = "midnight" | "forest" | "ocean" | "graphite" | "sunrise";
 type CuisineRegionId = "global" | "northAmerican" | "mediterranean" | "southAsian" | "eastAsian" | "latinAmerican" | "middleEastern";
 type BiologicalSex = "man" | "woman";
-type DetailBackScreen = "foodFinder" | "foodSuggestions";
+type DetailBackScreen = "foodFinder" | "foodSuggestions" | "favourites";
 type DetailContent = {
   title: string;
   subtitle: string;
@@ -91,6 +97,8 @@ type DetailContent = {
   photoUrl: string;
   photoCandidates: string[];
   sourceLabel: string;
+  keyIngredients: string[];
+  wellnessTip: string;
   caloriesPer100: number;
   proteinGPer100: number;
   carbsGPer100: number;
@@ -415,6 +423,7 @@ const palettes = {
 const STITCH_TAB_BAR_VISUAL = 72;
 
 export default function App() {
+  const previousUserIdRef = useRef<string | null>(null);
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
@@ -463,6 +472,17 @@ export default function App() {
   const [foodResults, setFoodResults] = useState<FoodRecord[]>([]);
   const [foodSource, setFoodSource] = useState<"cloud" | "local">("local");
   const [foodLoading, setFoodLoading] = useState(false);
+  const [favouriteFoodNames, setFavouriteFoodNames] = useState<string[]>([]);
+
+  const resetProfileInputs = useCallback(() => {
+    setNickname("");
+    setAge("25");
+    setHeightCm("170");
+    setWeightKg("70");
+    setBiologicalSex(null);
+    setGoalType("maintain");
+    setTargetCalories(2200);
+  }, []);
 
   const accent = accentPresets[accentId];
   const uiPalette = uiPalettes[uiPaletteId];
@@ -527,18 +547,43 @@ export default function App() {
       return 2200;
     }
 
-    let activityMultiplier = 1.35;
-    if (mealPlanFrequency === "Never") activityMultiplier -= 0.03;
-    if (mealPlanFrequency === "Rarely") activityMultiplier -= 0.01;
+    const normalizedGoals = surveyGoals.map((g) => g.toLowerCase());
+    const normalizedHabits = surveyHabits.map((h) => h.toLowerCase());
+
+    let activityMultiplier = 1.32;
+    if (mealPlanFrequency === "Never") activityMultiplier -= 0.04;
+    if (mealPlanFrequency === "Rarely") activityMultiplier -= 0.02;
+    if (mealPlanFrequency === "Occasionally") activityMultiplier += 0;
     if (mealPlanFrequency === "Frequently") activityMultiplier += 0.03;
     if (mealPlanFrequency === "Always") activityMultiplier += 0.06;
-    if (surveyHabits.includes("Move more")) activityMultiplier += 0.05;
-    if (surveyHabits.includes("Workout more")) activityMultiplier += 0.08;
+    if (normalizedHabits.some((h) => h.includes("move more"))) activityMultiplier += 0.05;
+    if (normalizedHabits.some((h) => h.includes("workout more"))) activityMultiplier += 0.09;
+
+    // Goal intention score improves coupling between survey and target.
+    const loseIntent = normalizedGoals.filter((g) => g.includes("lose")).length;
+    const gainIntent = normalizedGoals.filter((g) => g.includes("gain")).length;
+    const maintainIntent = normalizedGoals.filter((g) => g.includes("maintain")).length;
 
     let calorieAdjustment = 0;
-    if (surveyHabits.includes("Eat more protein")) calorieAdjustment += 70;
-    if (surveyHabits.includes("Eat more fiber")) calorieAdjustment -= 40;
-    if (surveyGoals.includes("Manage stress")) calorieAdjustment += 50;
+    calorieAdjustment += loseIntent * -120;
+    calorieAdjustment += gainIntent * 110;
+    calorieAdjustment += maintainIntent * 20;
+
+    if (normalizedGoals.some((g) => g.includes("gain muscle"))) calorieAdjustment += 140;
+    if (normalizedGoals.some((g) => g.includes("manage stress"))) calorieAdjustment += 40;
+    if (normalizedGoals.some((g) => g.includes("plan meals"))) calorieAdjustment -= 20;
+    if (normalizedGoals.some((g) => g.includes("modify my diet"))) calorieAdjustment -= 10;
+
+    if (normalizedHabits.some((h) => h.includes("eat more protein"))) calorieAdjustment += 80;
+    if (normalizedHabits.some((h) => h.includes("eat more fiber"))) calorieAdjustment -= 50;
+    if (normalizedHabits.some((h) => h.includes("eat mindfully"))) calorieAdjustment -= 25;
+    if (normalizedHabits.some((h) => h.includes("drink more water"))) calorieAdjustment -= 20;
+    if (normalizedHabits.some((h) => h.includes("prioritize sleep"))) calorieAdjustment -= 15;
+
+    // BMI-aware safety guardrails.
+    const bmiEstimate = weightN / Math.pow(heightN / 100, 2);
+    if (bmiEstimate >= 30 && inferredGoalType === "lose") calorieAdjustment -= 90;
+    if (bmiEstimate < 19 && inferredGoalType !== "lose") calorieAdjustment += 120;
 
     return suggestedCalorieTarget({
       age: ageN,
@@ -582,13 +627,46 @@ export default function App() {
     return scored;
   }, [foodResults, foodSearch]);
 
+  const toPositiveIntOrNull = useCallback((value: string) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    const rounded = Math.round(n);
+    return rounded > 0 ? rounded : null;
+  }, []);
+
+  const toPositiveNumberOrNull = useCallback((value: string) => {
+    const n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }, []);
+
+  const persistProfile = useCallback(
+    async (userId: string, nextGoalType: "lose" | "maintain" | "gain", target: number) => {
+      const safeTarget = Number.isFinite(target) && target > 0 ? Math.round(target) : 2200;
+      await upsertProfile({
+        id: userId,
+        display_name: nickname.trim() || null,
+        age: toPositiveIntOrNull(age),
+        height_cm: toPositiveIntOrNull(heightCm),
+        weight_kg: toPositiveNumberOrNull(weightKg),
+        goal_type: nextGoalType,
+        daily_calorie_target: safeTarget
+      });
+    },
+    [nickname, age, heightCm, weightKg, toPositiveIntOrNull, toPositiveNumberOrNull]
+  );
+
   const stitchNavActive = useMemo((): StitchNavId | null => {
     if (screen === "dashboard") return "home";
     if (screen === "foodFinder") return "search";
     if (screen === "manual") return "log";
     if (screen === "foodSuggestions") return "plan";
+    if (screen === "favourites") return "favourites";
     if (screen === "camera" || screen === "review") return "camera";
-    if (screen === "foodDetail") return detailBackScreen === "foodSuggestions" ? "plan" : "search";
+    if (screen === "foodDetail") {
+      if (detailBackScreen === "foodSuggestions") return "plan";
+      if (detailBackScreen === "favourites") return "favourites";
+      return "search";
+    }
     return null;
   }, [screen, detailBackScreen]);
 
@@ -599,7 +677,6 @@ export default function App() {
 
   const bottomSafe = Math.max(insets.bottom, 6);
   const scrollBottomPad = STITCH_TAB_BAR_VISUAL + bottomSafe + 88;
-  const fabBottom = STITCH_TAB_BAR_VISUAL + bottomSafe + 14;
   const stitchTopPad = stitchScrollPaddingTop(insets.top);
   const scrollPadTop = screen === "foodDetail" ? insets.top + 10 : stitchTopPad;
 
@@ -615,6 +692,20 @@ export default function App() {
         setSession(existingSession);
         if (existingSession?.user?.id && !AUTH_DISABLED) {
           const pending = await hasOnboardingPending(existingSession.user.id);
+          if (pending) {
+            const draft = await loadOnboardingDraft(existingSession.user.id);
+            if (draft) {
+              setOnboardingStep(draft.onboardingStep);
+              setAge(draft.age);
+              setHeightCm(draft.heightCm);
+              setWeightKg(draft.weightKg);
+              setBiologicalSex(draft.biologicalSex);
+              setNickname(draft.nickname);
+              setSurveyGoals(draft.surveyGoals);
+              setSurveyHabits(draft.surveyHabits);
+              setMealPlanFrequency(draft.mealPlanFrequency);
+            }
+          }
           setScreen(pending ? "onboarding" : "dashboard");
         }
       })
@@ -657,6 +748,22 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId || screen !== "onboarding") return;
+    void saveOnboardingDraft(userId, {
+      onboardingStep,
+      age,
+      heightCm,
+      weightKg,
+      biologicalSex,
+      nickname,
+      surveyGoals,
+      surveyHabits,
+      mealPlanFrequency
+    });
+  }, [session?.user?.id, screen, onboardingStep, age, heightCm, weightKg, biologicalSex, nickname, surveyGoals, surveyHabits, mealPlanFrequency]);
+
+  useEffect(() => {
     if (!session) return;
     listMealsForToday()
       .then((savedMeals) => setMeals(savedMeals))
@@ -664,6 +771,44 @@ export default function App() {
         // Allow app to continue in local-only mode if backend is unavailable.
       });
   }, [session]);
+
+  useEffect(() => {
+    if (!session?.user?.id) {
+      setFavouriteFoodNames([]);
+      return;
+    }
+    loadFavorites(session.user.id)
+      .then((saved) => setFavouriteFoodNames(saved))
+      .catch(() => setFavouriteFoodNames([]));
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    void saveFavorites(session.user.id, favouriteFoodNames);
+  }, [session?.user?.id, favouriteFoodNames]);
+
+  useEffect(() => {
+    if (!session?.user?.id || AUTH_DISABLED) return;
+    if (previousUserIdRef.current !== session.user.id) {
+      resetProfileInputs();
+      previousUserIdRef.current = session.user.id;
+    }
+    getProfile(session.user.id)
+      .then((profile) => {
+        if (!profile) return;
+        setNickname(profile.display_name ?? "");
+        if (profile.age != null) setAge(String(profile.age));
+        if (profile.height_cm != null) setHeightCm(String(profile.height_cm));
+        if (profile.weight_kg != null) setWeightKg(String(profile.weight_kg));
+        if (profile.goal_type) setGoalType(profile.goal_type);
+        if (profile.daily_calorie_target != null && profile.daily_calorie_target > 0) {
+          setTargetCalories(profile.daily_calorie_target);
+        }
+      })
+      .catch(() => {
+        // Silent fail: profile may not exist yet.
+      });
+  }, [session?.user?.id, resetProfileInputs]);
 
   useEffect(() => {
     let active = true;
@@ -715,6 +860,11 @@ export default function App() {
         });
         // #endregion
         if (data.session) {
+          try {
+            await persistProfile(data.session.user.id, inferredGoalType, calculateQuestionnaireTarget());
+          } catch {
+            // Profile row can be re-attempted at onboarding completion.
+          }
           await setOnboardingPending(data.session.user.id);
           setSession(data.session);
           setAuthInfo("Account created and signed in.");
@@ -863,6 +1013,11 @@ export default function App() {
         const u = sessionData.session.user;
         setSession(sessionData.session);
         if (u?.id) {
+          try {
+            await persistProfile(u.id, inferredGoalType, calculateQuestionnaireTarget());
+          } catch {
+            // Best-effort at first auth; onboarding finish retries.
+          }
           const done = await hasOnboardingDone(u.id);
           const pending = await hasOnboardingPending(u.id);
           const brandNew = isRecentlyCreatedAccount(u.created_at);
@@ -904,6 +1059,19 @@ export default function App() {
     setMeals([]);
     setOnboardingStep(0);
     setScreen("dashboard");
+  };
+
+  const handleSaveNickname = async () => {
+    if (!session?.user?.id || AUTH_DISABLED) {
+      Alert.alert("Saved", "Username updated locally.");
+      return;
+    }
+    try {
+      await persistProfile(session.user.id, goalType, targetCalories);
+      Alert.alert("Saved", "Username updated.");
+    } catch (error) {
+      Alert.alert("Could not save username", String(error));
+    }
   };
 
   const saveCurrentMeal = async (source: Meal["source"], requestId?: string) => {
@@ -1031,6 +1199,18 @@ export default function App() {
     setScreen("manual");
   };
 
+  const toggleFavouriteFood = useCallback((foodName: string) => {
+    setFavouriteFoodNames((prev) => (prev.includes(foodName) ? prev.filter((n) => n !== foodName) : [...prev, foodName]));
+  }, []);
+
+  const favouriteFoods = useMemo(
+    () =>
+      favouriteFoodNames
+        .map((name) => FOOD_DATABASE.find((f) => f.name === name))
+        .filter((f): f is FoodRecord => Boolean(f)),
+    [favouriteFoodNames]
+  );
+
   const openFoodDetail = (food: FoodRecord, backScreen: DetailBackScreen) => {
     const detail = getFoodDetail(food);
     setDetailBackScreen(backScreen);
@@ -1042,6 +1222,8 @@ export default function App() {
       photoUrl: detail.photoUrl,
       photoCandidates: detail.photoCandidates ?? getFoodPhotoCandidates(food),
       sourceLabel: detail.sourceLabel,
+      keyIngredients: detail.keyIngredients,
+      wellnessTip: detail.wellnessTip,
       caloriesPer100: food.calories,
       proteinGPer100: food.protein_g,
       carbsGPer100: food.carbs_g,
@@ -1068,28 +1250,8 @@ export default function App() {
     setTargetCalories(computedTarget);
 
     if (session?.user?.id) {
-      const toPositiveIntOrNull = (value: string) => {
-        const n = Number(value);
-        if (!Number.isFinite(n)) return null;
-        const rounded = Math.round(n);
-        return rounded > 0 ? rounded : null;
-      };
-      const toPositiveNumberOrNull = (value: string) => {
-        const n = Number(value);
-        return Number.isFinite(n) && n > 0 ? n : null;
-      };
-
-      const safeTarget = Number.isFinite(computedTarget) && computedTarget > 0 ? Math.round(computedTarget) : 2200;
-
       try {
-        await upsertProfile({
-          id: session.user.id,
-          age: toPositiveIntOrNull(age),
-          height_cm: toPositiveIntOrNull(heightCm),
-          weight_kg: toPositiveNumberOrNull(weightKg),
-          goal_type: inferredGoalType,
-          daily_calorie_target: safeTarget
-        });
+        await persistProfile(session.user.id, inferredGoalType, computedTarget);
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
         Alert.alert(
@@ -1110,6 +1272,7 @@ export default function App() {
     });
     if (session?.user?.id) {
       await setOnboardingDone(session.user.id);
+      await clearOnboardingDraft(session.user.id);
       await clearOnboardingPending(session.user.id);
     }
     setScreen("dashboard");
@@ -1483,6 +1646,9 @@ export default function App() {
       case "camera":
         void openPhotoPicker();
         return;
+      case "favourites":
+        setScreen("favourites");
+        return;
       default:
     }
   };
@@ -1636,10 +1802,16 @@ export default function App() {
           subtitle={detailContent.subtitle}
           description={detailContent.description}
           sourceLabel={detailContent.sourceLabel}
+          keyIngredients={detailContent.keyIngredients}
+          wellnessTip={detailContent.wellnessTip}
           caloriesPer100={detailContent.caloriesPer100}
           proteinGPer100={detailContent.proteinGPer100}
           carbsGPer100={detailContent.carbsGPer100}
           fatGPer100={detailContent.fatGPer100}
+          isFavorite={Boolean(detailFood && favouriteFoodNames.includes(detailFood.name))}
+          onToggleFavorite={() => {
+            if (detailFood) toggleFavouriteFood(detailFood.name);
+          }}
           imageSlot={
             <FallbackImage
               uris={detailContent.photoCandidates}
@@ -1654,13 +1826,23 @@ export default function App() {
           }}
           onLogToDay={
             detailFood
-              ? () => {
-                  addFoodToMeal(detailFood, 1);
+              ? (servings) => {
+                  addFoodToMeal(detailFood, servings);
                   setDetailFood(null);
                 }
               : undefined
           }
           useCustomFonts={Boolean(font)}
+        />
+      )}
+
+      {screen === "favourites" && (
+        <StitchFavouritesScreen
+          favourites={favouriteFoods}
+          useCustomFonts={Boolean(font)}
+          onOpenDetail={(food) => openFoodDetail(food, "favourites")}
+          onAdd={(food) => addFoodToMeal(food, getPortionValue(food.name))}
+          onRemove={(foodName) => setFavouriteFoodNames((prev) => prev.filter((n) => n !== foodName))}
         />
       )}
 
@@ -1683,6 +1865,9 @@ export default function App() {
           bmiValue={bmiValue}
           bmrValue={bmrValue}
           bmiLabel={bmiLabel}
+          nickname={nickname}
+          setNickname={setNickname}
+          onSaveNickname={() => void handleSaveNickname()}
           onRecalculateCalories={() => {
             const suggested = calculateQuestionnaireTarget();
             setTargetCalories(suggested);
@@ -1715,16 +1900,6 @@ export default function App() {
       </ScrollView>
 
       <StitchBottomNav active={stitchNavActive} onSelect={onStitchNav} useCustomFonts={Boolean(font)} />
-
-      {screen !== "settings" ? (
-        <TouchableOpacity
-          style={[styles.settingsFab, { backgroundColor: theme.primary, borderColor: theme.border, bottom: fabBottom }]}
-          onPress={() => setScreen("settings")}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="settings-sharp" size={24} color={theme.onPrimary} />
-        </TouchableOpacity>
-      ) : null}
     </View>
     </AppThemeProvider>
   );
@@ -2186,17 +2361,6 @@ const styles = StyleSheet.create({
   primaryBtnFull: {
     alignSelf: "stretch",
     alignItems: "center"
-  },
-  settingsFab: {
-    position: "absolute",
-    right: 16,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 3
   },
   primaryBtnText: {
     color: "#fff",

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import type { AppThemeTokens } from "../../theme/AppThemeContext";
@@ -27,6 +27,9 @@ type Props = {
   bmrValue: number | null;
   bmiLabel: string;
   onRecalculateCalories: () => void;
+  nickname: string;
+  setNickname: (name: string) => void;
+  onSaveNickname: () => void;
   onSignOut?: () => void;
   showSignOut?: boolean;
   useCustomFonts?: boolean;
@@ -39,6 +42,28 @@ function createStyles(t: AppThemeTokens, themeMode: "light" | "dark") {
     root: { gap: 20 },
     sectionHead: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 },
     sectionTitle: { fontSize: 20, fontWeight: "800", color: t.onSurface },
+    profileCard: {
+      backgroundColor: t.surfaceLow,
+      borderRadius: 12,
+      padding: 18,
+      gap: 10
+    },
+    input: {
+      backgroundColor: t.surfaceContainer,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      color: t.onSurface,
+      fontSize: 15
+    },
+    saveRow: { alignItems: "flex-end", marginTop: 4 },
+    saveBtn: {
+      borderRadius: 999,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      borderWidth: 1
+    },
+    saveTxt: { fontWeight: "800", fontSize: 13 },
     cardLow: {
       backgroundColor: t.surfaceLow,
       borderRadius: 12,
@@ -159,6 +184,9 @@ export function StitchSettingsScreen({
   bmrValue,
   bmiLabel,
   onRecalculateCalories,
+  nickname,
+  setNickname,
+  onSaveNickname,
   onSignOut,
   showSignOut,
   useCustomFonts
@@ -178,6 +206,32 @@ export function StitchSettingsScreen({
 
   return (
     <View style={styles.root}>
+      <View style={styles.sectionHead}>
+        <Ionicons name="person-circle" size={22} color={theme.primary} />
+        <Text style={[styles.sectionTitle, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Profile</Text>
+      </View>
+      <View style={styles.profileCard}>
+        <Text style={[styles.label, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.body }]}>Username</Text>
+        <TextInput
+          style={[styles.input, useCustomFonts && { fontFamily: stitchFonts.body }]}
+          placeholder="Set your username"
+          placeholderTextColor={`${ui.muted}aa`}
+          value={nickname}
+          onChangeText={setNickname}
+          maxLength={24}
+          autoCapitalize="words"
+        />
+        <View style={styles.saveRow}>
+          <TouchableOpacity
+            style={[styles.saveBtn, { borderColor: theme.primary, backgroundColor: `${theme.primary}22` }]}
+            onPress={onSaveNickname}
+            activeOpacity={0.85}
+          >
+            <Text style={[styles.saveTxt, { color: theme.primary }]}>Save username</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <View style={styles.sectionHead}>
         <Ionicons name="color-palette" size={22} color={theme.primary} />
         <Text style={[styles.sectionTitle, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Appearance</Text>

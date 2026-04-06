@@ -1,24 +1,39 @@
-import { FOOD_DATABASE, type FoodRecord } from "./foodDatabase";
+import type { FoodRecord } from "./foodDatabase";
 
 export type FoodDetail = {
   description: string;
   photoUrl: string;
   sourceLabel: string;
+  keyIngredients: string[];
+  wellnessTip: string;
   aliases?: string[];
   photoCandidates?: string[];
 };
 
-const PHOTO_SOURCE = "Photo: Unsplash (real photography)";
+const PHOTO_SOURCE = "Photo: Unsplash (Pinterest-style food curation)";
 
-const CATEGORY_PHOTO: Record<FoodRecord["category"], string> = {
-  Fruit: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80",
-  Grain: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
-  Protein: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=80",
-  Dairy: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1200&q=80",
-  Vegetable: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-  Fat: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
-  Prepared: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
-  Other: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=1200&q=80"
+const INGREDIENTS_BY_FOOD: Record<string, string[]> = {
+  "Mediterranean Salmon Bowl": ["Salmon", "Quinoa", "Cucumber", "Tomatoes", "Feta"],
+  "Chicken Burrito Bowl": ["Chicken", "Brown Rice", "Black Beans", "Corn", "Salsa"],
+  "Steak Burrito Bowl": ["Steak", "Rice", "Beans", "Peppers", "Avocado"],
+  "Shrimp Burrito Bowl": ["Shrimp", "Rice", "Beans", "Lime", "Cabbage"],
+  "Poke Bowl (salmon)": ["Salmon", "Rice", "Seaweed", "Edamame", "Cucumber"],
+  "Poke Bowl (tuna)": ["Tuna", "Rice", "Avocado", "Seaweed", "Sesame"],
+  "Poke Bowl (chicken)": ["Chicken", "Rice", "Edamame", "Carrot", "Cucumber"],
+  "Chicken Caesar Salad": ["Chicken", "Romaine", "Parmesan", "Croutons", "Caesar Dressing"],
+  "Greek Salad": ["Tomatoes", "Cucumber", "Olives", "Feta", "Olive Oil"],
+  "Shakshuka": ["Eggs", "Tomato", "Bell Pepper", "Onion", "Paprika"],
+  "Chana Masala": ["Chickpeas", "Tomato", "Onion", "Ginger", "Cumin"],
+  "Dal Tadka": ["Lentils", "Garlic", "Cumin", "Turmeric", "Tomato"],
+  "Pad Thai": ["Rice Noodles", "Egg", "Bean Sprouts", "Peanuts", "Lime"],
+  "Pho (beef)": ["Beef Broth", "Rice Noodles", "Beef", "Herbs", "Lime"],
+  "Sushi (mixed)": ["Rice", "Fish", "Seaweed", "Cucumber", "Soy"],
+  "Chicken Teriyaki": ["Chicken", "Soy", "Ginger", "Garlic", "Rice"],
+  "Bibimbap": ["Rice", "Vegetables", "Egg", "Beef", "Gochujang"],
+  "Quinoa Salad": ["Quinoa", "Cucumber", "Tomatoes", "Herbs", "Lemon"],
+  "Minestrone Soup": ["Beans", "Tomato", "Vegetables", "Pasta", "Herbs"],
+  "Oatmeal with Banana": ["Oats", "Banana", "Milk", "Cinnamon", "Seeds"],
+  "Acai Bowl": ["Acai", "Banana", "Berries", "Granola", "Seeds"]
 };
 
 const DETAIL_HINTS: Record<string, { aliases: string[]; summary: string }> = {
@@ -126,52 +141,7 @@ const PINNED_PHOTO_BY_FOOD: Record<string, string> = {
   Mocha: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80"
 };
 
-const PHOTO_BY_TAG = {
-  burger: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80",
-  pizza: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=1200&q=80",
-  curry: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=1200&q=80",
-  sushi: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80",
-  noodles: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=1200&q=80",
-  soup: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80",
-  mexican: "https://images.unsplash.com/photo-1611250188496-e966043a0629?auto=format&fit=crop&w=1200&q=80",
-  wrap: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=1200&q=80",
-  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
-  breakfast: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=1200&q=80",
-  smoothie: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=80",
-  coffee: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
-  grain: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
-  fruit: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80",
-  protein: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=80",
-  dairy: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1200&q=80",
-  vegetable: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-  nuts: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
-  snack: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=1200&q=80"
-} as const;
-
-const PHOTO_BY_REGEX_RULE: Array<{ pattern: RegExp; url: string }> = [
-  { pattern: /\bhot dog\b/i, url: "https://images.unsplash.com/photo-1612392062798-2eaede5f4c44?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bcheeseburger\b/i, url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bhamburger|burger\b/i, url: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bpepperoni pizza\b/i, url: "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bpizza\b/i, url: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bbiryani\b/i, url: "https://images.unsplash.com/photo-1701579231305-d84d8af9a3fd?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bbutter chicken\b/i, url: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\btikka masala\b/i, url: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bcurry\b/i, url: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bsushi|nigiri|maki\b/i, url: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bpoke bowl\b/i, url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bramen\b/i, url: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bpho\b/i, url: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\byakisoba|noodle|udon|pad thai\b/i, url: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bsoup|stew|minestrone|chili|pozole\b/i, url: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\btaco|burrito|quesadilla|fajita|enchilada\b/i, url: "https://images.unsplash.com/photo-1611250188496-e966043a0629?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bshawarma|gyro|kebab|kofta|falafel|wrap|pita\b/i, url: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bcaesar|salad|tabbouleh|fattoush\b/i, url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\boatmeal|pancake|waffle|omelette|toast|breakfast|egg\b/i, url: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bsmoothie|milkshake|acai|shake\b/i, url: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\blatte|mocha|cappuccino|coffee\b/i, url: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80" },
-  { pattern: /\bfruit\b|apple|banana|orange|berry|grapes|kiwi|mango/i, url: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80" }
-];
+// Category-level fallbacks intentionally removed: every food/meal gets its own image query.
 
 const normalizeFoodName = (name: string): string =>
   name
@@ -181,34 +151,26 @@ const normalizeFoodName = (name: string): string =>
     .trim()
     .toLowerCase();
 
-const inferPhotoTag = (food: FoodRecord): keyof typeof PHOTO_BY_TAG => {
-  const n = normalizeFoodName(food.name);
-  if (/(burger|hamburger|hot dog)/.test(n)) return "burger";
-  if (/pizza/.test(n)) return "pizza";
-  if (/(biryani|curry|masala|rendang|tandoori|palak|chana|dal)/.test(n)) return "curry";
-  if (/(sushi|nigiri|maki|poke)/.test(n)) return "sushi";
-  if (/(noodle|ramen|udon|yakisoba|pad thai|pho|dumpling|congee)/.test(n)) return "noodles";
-  if (/soup|stew|chili|pozole|minestrone/.test(n)) return "soup";
-  if (/(taco|burrito|quesadilla|fajita|enchilada|tortilla)/.test(n)) return "mexican";
-  if (/(wrap|shawarma|gyro|kebab|kofta|falafel|pita)/.test(n)) return "wrap";
-  if (/salad|tabbouleh|fattoush/.test(n)) return "salad";
-  if (/(pancake|waffle|omelette|oatmeal|toast|egg|breakfast|yogurt bowl)/.test(n)) return "breakfast";
-  if (/(smoothie|milkshake|acai|shake)/.test(n)) return "smoothie";
-  if (/(latte|mocha|cappuccino|coffee)/.test(n)) return "coffee";
-  if (food.category === "Fruit") return "fruit";
-  if (food.category === "Grain") return "grain";
-  if (food.category === "Protein") return "protein";
-  if (food.category === "Dairy") return "dairy";
-  if (food.category === "Vegetable") return "vegetable";
-  if (food.category === "Fat") return "nuts";
-  if (food.category === "Other") return "snack";
-  return "grain";
+const stableHash = (input: string): number => {
+  let h = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    h = (h << 5) - h + input.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
 };
 
-const AUTO_PINNED_PHOTO_BY_FOOD: Record<string, string> = FOOD_DATABASE.reduce<Record<string, string>>((acc, food) => {
-  acc[food.name] = PHOTO_BY_TAG[inferPhotoTag(food)];
-  return acc;
-}, {});
+const foodSpecificUnsplashUrl = (foodName: string, variant: number): string => {
+  const query = encodeURIComponent(`${foodName} food meal`);
+  const sig = stableHash(`${foodName}:${variant}`) % 10000;
+  // `random/` path is more reliable than the legacy `/1200x900/?query` endpoint.
+  return `https://source.unsplash.com/random/1200x900/?${query}&sig=${sig}`;
+};
+
+const foodSpecificPicsumUrl = (foodName: string, variant: number): string => {
+  const seed = encodeURIComponent(`${foodName}-${variant}-${stableHash(foodName) % 997}`);
+  return `https://picsum.photos/seed/${seed}/1200/900`;
+};
 
 const macroFocus = (food: FoodRecord): string => {
   const map = [
@@ -236,21 +198,45 @@ const getAliasesForFood = (food: FoodRecord): string[] => {
   return Array.from(new Set([...hinted, normalized, ...parts, food.category.toLowerCase()]));
 };
 
+const inferKeyIngredients = (food: FoodRecord): string[] => {
+  const pinned = INGREDIENTS_BY_FOOD[food.name];
+  if (pinned) return pinned.slice(0, 5);
+
+  const n = normalizeFoodName(food.name);
+  if (/(bowl)/.test(n)) return ["Protein", "Whole Grain", "Leafy Greens", "Colorful Veg", "Healthy Sauce"];
+  if (/(salad)/.test(n)) return ["Leafy Greens", "Fresh Veg", "Protein", "Seeds", "Olive Oil"];
+  if (/(soup|stew|chili)/.test(n)) return ["Broth Base", "Protein", "Legumes", "Vegetables", "Herbs"];
+  if (/(wrap|gyro|shawarma|pita)/.test(n)) return ["Protein", "Flatbread", "Veggies", "Yogurt Sauce", "Herbs"];
+  if (/(sushi|nigiri|poke)/.test(n)) return ["Rice", "Seafood", "Seaweed", "Vegetables", "Sesame"];
+  if (/(curry|masala|dal|biryani)/.test(n)) return ["Protein/Legume", "Aromatics", "Spices", "Tomato/Stock", "Rice"];
+  if (food.category === "Fruit") return ["Fresh Fruit", "Vitamin C", "Hydration", "Fiber", "Antioxidants"];
+  if (food.category === "Protein") return ["Lean Protein", "Iron", "B Vitamins", "Minerals", "Amino Acids"];
+  if (food.category === "Vegetable") return ["Vegetables", "Fiber", "Micronutrients", "Phytonutrients", "Water"];
+  if (food.category === "Grain") return ["Whole Grains", "Complex Carbs", "Fiber", "Minerals", "B Vitamins"];
+  if (food.category === "Dairy") return ["Dairy Protein", "Calcium", "Probiotics", "B12", "Phosphorus"];
+  return ["Balanced Macros", "Whole Foods", "Fiber", "Micronutrients", "Flavor"];
+};
+
+const inferWellnessTip = (food: FoodRecord): string => {
+  if (food.protein_g >= 18) return "High protein choice: great for fullness and muscle recovery.";
+  if (food.carbs_g >= 30 && food.fat_g < 8) return "Carb-forward option: pair with protein for steadier energy.";
+  if (food.fat_g >= 15) return "Higher-fat meal: keep portions moderate and add greens for volume.";
+  if (food.calories < 120) return "Lighter meal: combine with protein if you need longer satiety.";
+  if (food.calories > 280) return "Energy-dense choice: adjust servings to stay within your target.";
+  return "Balanced option: fits well as part of a varied, whole-food meal plan.";
+};
+
 export const getFoodPhotoCandidates = (food: FoodRecord): string[] => {
   const candidates: string[] = [];
-
-  const pinned = PINNED_PHOTO_BY_FOOD[food.name] ?? AUTO_PINNED_PHOTO_BY_FOOD[food.name];
+  const pinned = PINNED_PHOTO_BY_FOOD[food.name];
   if (pinned) candidates.push(pinned);
-
-  for (const rule of PHOTO_BY_REGEX_RULE) {
-    if (rule.pattern.test(food.name)) {
-      candidates.push(rule.url);
-      break;
-    }
-  }
-
-  candidates.push(CATEGORY_PHOTO[food.category]);
-
+  // Per-food unique candidates (same meal name => same image set; different name => different image set).
+  candidates.push(foodSpecificUnsplashUrl(food.name, 1));
+  candidates.push(foodSpecificUnsplashUrl(food.name, 2));
+  candidates.push(foodSpecificUnsplashUrl(food.name, 3));
+  // Hard fallback: always-load image host, deterministic per food.
+  candidates.push(foodSpecificPicsumUrl(food.name, 1));
+  candidates.push(foodSpecificPicsumUrl(food.name, 2));
   return Array.from(new Set(candidates));
 };
 
@@ -267,6 +253,8 @@ export const getFoodDetail = (food: FoodRecord): FoodDetail => {
     description,
     photoUrl: candidates[0],
     sourceLabel: PHOTO_SOURCE,
+    keyIngredients: inferKeyIngredients(food),
+    wellnessTip: inferWellnessTip(food),
     aliases: getAliasesForFood(food),
     photoCandidates: candidates
   };
