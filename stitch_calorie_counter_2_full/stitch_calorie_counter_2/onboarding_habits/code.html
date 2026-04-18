@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mindful Guardian - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#dae2fc",
+                    "on-secondary": "#003824",
+                    "error": "#ffb4ab",
+                    "on-primary-fixed": "#002113",
+                    "error-container": "#93000a",
+                    "on-primary": "#003824",
+                    "surface-container-highest": "#2d3448",
+                    "surface-container": "#171f32",
+                    "secondary-fixed-dim": "#4edea3",
+                    "tertiary-container": "#00b1c8",
+                    "primary-fixed": "#6ffbbd",
+                    "surface-variant": "#2d3448",
+                    "secondary-fixed": "#6ffbbd",
+                    "surface-bright": "#31394d",
+                    "on-tertiary-container": "#003e47",
+                    "surface-dim": "#0b1325",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "on-background": "#dae2fc",
+                    "surface": "#0b1325",
+                    "on-primary-fixed-variant": "#005236",
+                    "on-surface": "#dae2fc",
+                    "inverse-on-surface": "#283044",
+                    "on-tertiary": "#00363e",
+                    "outline-variant": "#3c4a42",
+                    "tertiary-fixed": "#a1efff",
+                    "on-primary-container": "#00402a",
+                    "primary": "#4edea2",
+                    "surface-tint": "#4edea2",
+                    "tertiary": "#44d8f1",
+                    "on-error": "#690005",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#131b2e",
+                    "inverse-primary": "#006c49",
+                    "on-secondary-container": "#003e28",
+                    "secondary": "#4edea3",
+                    "primary-fixed-dim": "#4edea2",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-secondary-fixed": "#002113",
+                    "background": "#0b1325",
+                    "on-tertiary-fixed": "#001f25",
+                    "secondary-container": "#00b47c",
+                    "primary-container": "#08b77f",
+                    "outline": "#86948a",
+                    "surface-container-high": "#222a3d",
+                    "surface-container-lowest": "#060e20",
+                    "on-surface-variant": "#bbcabf"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-shift-only {
+            background-image: linear-gradient(180deg, rgba(11, 19, 37, 0.8) 0%, rgba(11, 19, 37, 0) 100%);
+        }
+        body {
+            background-color: #0b1325;
+            color: #dae2fc;
+            font-family: 'Manrope', sans-serif;
+        }
+        .sanctuary-bg {
+            background: radial-gradient(circle at 50% -20%, #171f32 0%, #0b1325 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen sanctuary-bg selection:bg-primary/30">
+<!-- Top Navigation Anchor -->
+<nav class="fixed top-0 w-full z-50 bg-[#0b1325]/60 backdrop-blur-3xl flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="text-emerald-400 font-black tracking-tighter text-xl font-['Plus_Jakarta_Sans']">Mindful Guardian</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</div>
+<span class="material-symbols-outlined text-slate-400 hover:bg-slate-800/50 p-2 rounded-full transition-opacity duration-300 active:scale-95 cursor-pointer">settings</span>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto min-h-screen flex flex-col justify-center">
+<!-- Hero Section -->
+<header class="mb-12 space-y-4">
+<div class="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase">
+                Step 3 of 5
+            </div>
+<h1 class="text-4xl md:text-5xl font-headline font-bold text-on-surface tracking-tight leading-tight">
+                Which healthy habits are most important?
+            </h1>
+<p class="text-on-surface-variant text-lg font-body leading-relaxed max-w-md">
+                Choose the focus areas that resonate with your current journey. We'll adjust your sanctuary to match.
+            </p>
+</header>
+<!-- Bento Layout for Habit Selection -->
+<div class="space-y-10">
+<!-- Recommended Section -->
+<section>
+<h2 class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-[0.2em] mb-6">Recommended for you</h2>
+<div class="flex flex-wrap gap-3">
+<!-- Habit Chip: Selected State Example -->
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-primary text-on-primary font-body font-semibold transition-all duration-300 active:scale-95 shadow-[0px_10px_20px_rgba(78,222,162,0.2)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span>Eat more protein</span>
+</button>
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-high text-on-surface font-body font-semibold hover:bg-surface-bright transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">calendar_today</span>
+<span>Plan more meals</span>
+</button>
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-high text-on-surface font-body font-semibold hover:bg-surface-bright transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">skillet</span>
+<span>Meal prep and cook</span>
+</button>
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-high text-on-surface font-body font-semibold hover:bg-surface-bright transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">eco</span>
+<span>Eat more fiber</span>
+</button>
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-high text-on-surface font-body font-semibold hover:bg-surface-bright transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">directions_run</span>
+<span>Move more</span>
+</button>
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-high text-on-surface font-body font-semibold hover:bg-surface-bright transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">fitness_center</span>
+<span>Workout more</span>
+</button>
+</div>
+</section>
+<!-- More Habits Section -->
+<section>
+<h2 class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-[0.2em] mb-6">More healthy habits</h2>
+<div class="flex flex-wrap gap-3">
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-low text-on-surface font-body font-semibold hover:bg-surface-container-high transition-all duration-300 active:scale-95 border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors">monitoring</span>
+<span>Track nutrients</span>
+</button>
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-low text-on-surface font-body font-semibold hover:bg-surface-container-high transition-all duration-300 active:scale-95 border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors">calculate</span>
+<span>Track calories</span>
+</button>
+<button class="group flex items-center gap-3 px-6 py-4 rounded-full bg-surface-container-low text-on-surface font-body font-semibold hover:bg-surface-container-high transition-all duration-300 active:scale-95 border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors">bedtime</span>
+<span>Prioritize sleep</span>
+</button>
+</div>
+</section>
+<!-- Decorative Visual Element -->
+<div class="relative w-full h-48 rounded-lg overflow-hidden mt-8 opacity-40 grayscale group hover:grayscale-0 transition-all duration-700">
+<img alt="Zen-like environment" class="w-full h-full object-cover" data-alt="Abstract cinematic overhead shot of smooth river stones on dark sand with soft atmospheric lighting and deep blue shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGg27bfhBXyAU1UzGSa0idKJoIQFw430dGWtHU-yOgOY49Z8NvEoLqpClNFe4TjQCmwQO935-Ghbbzw4dv4J5OoypyaJX6ruvjJYYxG5x-dMARBdByOIFMZx4PgNjh6eQYwbf0VklMyKQCaB5PEwU14QL3UpGDDzpjAtFvJ_9nulhKdZxyPxwWhMe98yMmPMSmxOXn0dM8lkbQW_Lkjc4lncwwX70-XYImkW6FaeQfDQqWB2HfaX7zIqHAHqjAxH2zxi6Fk8FzIzg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+</div>
+</div>
+</main>
+<!-- Navigation Footer -->
+<footer class="fixed bottom-0 left-0 w-full bg-[#31394d]/60 backdrop-blur-3xl px-6 pb-8 pt-4 z-50 flex justify-between items-center shadow-[0px_-10px_40px_rgba(0,0,0,0.4)] rounded-t-lg">
+<button class="px-8 py-3 rounded-full text-on-surface-variant font-label font-bold text-sm tracking-widest uppercase hover:text-on-surface transition-colors active:scale-95">
+            Back
+        </button>
+<div class="flex gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-surface-container-highest"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-surface-container-highest"></div>
+<div class="w-4 h-1.5 rounded-full bg-primary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-surface-container-highest"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-surface-container-highest"></div>
+</div>
+<button class="px-10 py-3 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-label font-bold text-sm tracking-widest uppercase shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95">
+            Next
+        </button>
+</footer>
+<!-- Background Atmospheric Blurs -->
+<div class="fixed top-[-10%] right-[-10%] w-[60%] h-[60%] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+<div class="fixed bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-tertiary/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+</body></html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#dae2fc",
+                    "on-secondary": "#003824",
+                    "error": "#ffb4ab",
+                    "on-primary-fixed": "#002113",
+                    "error-container": "#93000a",
+                    "on-primary": "#003824",
+                    "surface-container-highest": "#2d3448",
+                    "surface-container": "#171f32",
+                    "secondary-fixed-dim": "#4edea3",
+                    "tertiary-container": "#00b1c8",
+                    "primary-fixed": "#6ffbbd",
+                    "surface-variant": "#2d3448",
+                    "secondary-fixed": "#6ffbbd",
+                    "surface-bright": "#31394d",
+                    "on-tertiary-container": "#003e47",
+                    "surface-dim": "#0b1325",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "on-background": "#dae2fc",
+                    "surface": "#0b1325",
+                    "on-primary-fixed-variant": "#005236",
+                    "on-surface": "#dae2fc",
+                    "inverse-on-surface": "#283044",
+                    "on-tertiary": "#00363e",
+                    "outline-variant": "#3c4a42",
+                    "tertiary-fixed": "#a1efff",
+                    "on-primary-container": "#00402a",
+                    "primary": "#4edea2",
+                    "surface-tint": "#4edea2",
+                    "tertiary": "#44d8f1",
+                    "on-error": "#690005",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#131b2e",
+                    "inverse-primary": "#006c49",
+                    "on-secondary-container": "#003e28",
+                    "secondary": "#4edea3",
+                    "primary-fixed-dim": "#4edea2",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-secondary-fixed": "#002113",
+                    "background": "#0b1325",
+                    "on-tertiary-fixed": "#001f25",
+                    "secondary-container": "#00b47c",
+                    "primary-container": "#08b77f",
+                    "outline": "#86948a",
+                    "surface-container-high": "#222a3d",
+                    "surface-container-lowest": "#060e20",
+                    "on-surface-variant": "#bbcabf"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+        body {
+            background-color: #0b1325;
+            color: #dae2fc;
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0b1325]/60 backdrop-blur-3xl flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close up portrait of a young man with a peaceful expression in soft cinematic natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsMCdpk0gOw_kpbiap9tVk-4XGIOQSgRj81tI7-zlodFNMXJ5QcmK4UJ8p0JTrwC--J9D2xrZO-lYzY7pzqgZIB6qC1HPK529LEPxkZ9al8gzrUOk9tXknntfJ4BABOvjjbSdSzOUhqkviy109PYPtzbespZl4l1mK-D5cbeMvrtLz6oCvNVVkwY_9e3N5olqDoV5GCMrjSXHiITXmbejHApGfZZIySBQXgGI-UzeavpRU7UreGgy3c6cillf-JL9CEEgK3PD8sr0"/>
+</div>
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-lg tracking-tight text-emerald-400">Review Estimate</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800/50 transition-opacity duration-300 active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto space-y-8">
+<!-- Hero Estimate Card -->
+<section class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-tertiary/20 rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+<div class="relative bg-surface-container-high rounded-lg p-8 overflow-hidden">
+<div class="flex flex-col items-center text-center space-y-4">
+<div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-error-container/30 text-error text-xs font-semibold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">warning</span>
+                        Low confidence: review is required before saving.
+                    </div>
+<div class="space-y-1">
+<p class="text-on-surface-variant font-label text-sm uppercase tracking-[0.2em]">Confidence Score</p>
+<h1 class="text-6xl font-headline font-extrabold text-primary tracking-tighter tabular-nums">42%</h1>
+</div>
+<div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full w-[42%] bg-gradient-to-r from-primary to-primary-container rounded-full"></div>
+</div>
+<p class="text-on-surface-variant text-sm max-w-[280px]">Our vision model is uncertain about the portion sizes in this specific lighting.</p>
+</div>
+</div>
+</section>
+<!-- Meal Item Editor -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-headline font-bold text-on-surface">Detected Items</h2>
+<button class="text-primary text-sm font-semibold flex items-center gap-1 hover:opacity-80">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Add Item
+                </button>
+</div>
+<div class="space-y-4">
+<!-- Item 1 -->
+<div class="bg-surface-container-low rounded-lg p-5 flex items-center gap-4">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="overhead shot of a fresh garden salad with vibrant tomatoes and greens in a ceramic bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtwp45LGHUZUN8vUCFmY8VpztVAP9pjRalu8zkeyaSFoFzuR5gID6cIQC0GcLFLLRTTARucPlds1HFeZn68Zkx3zyOzEyBg1Yw28OSOTxH5KJtANRg7cucOLTBTotW19L1-9WQX6ZjFUz9Q2Kl4MykP75_Bvm49qqO8666gH03Tnxiukl-kmoWR7W11IuKjhFLYkVqBR8UKAPWk4aoH_Q7DWfijEVIkIUe8a3wulhZdYqe1Vgw4pZJ3CxwzhVNY8w94J0Qg2uh894"/>
+</div>
+<div class="flex-grow space-y-1">
+<input class="bg-transparent border-none p-0 text-on-surface font-semibold focus:ring-0 w-full block" type="text" value="Grilled Chicken Salad"/>
+<div class="flex items-center gap-3">
+<span class="text-xs text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded">250g</span>
+<span class="text-xs text-on-surface-variant">Est. High certainty</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<!-- Item 2 -->
+<div class="bg-surface-container-low rounded-lg p-5 flex items-center gap-4 ring-1 ring-error/30">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover opacity-50" data-alt="close up of creamy avocado toast on sourdough bread with seeds and microgreens" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVr9adqDNJBdNd-Q3MEc3K6TcmO2bf7ZqwD7KUxPbrRfWCHRuBmI-iHf3QH4AJVj2PqxTLpcM5eJH7nzTTDeqf4QFAnng0Fn29ZnnwzFZKYiEeBwjHZUN8vhJeUbWjmoiJBdS-XrhEHTHqdcMdS96hQ-NaV0S99PQXEO9lkKQs4C8ZsapQ4h8asBawB37knKsFSBd1Qb7n7bKNuDQLFX0rtYQ9v1LfSmYlvaC-eO6eN0IcWF52cOip7SFAcBdAlFquv5p6W44nkLM"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-error">help</span>
+</div>
+</div>
+<div class="flex-grow space-y-1">
+<input class="bg-transparent border-none p-0 text-error font-semibold focus:ring-0 w-full block" type="text" value="Creamy Sauce / Dressing"/>
+<div class="flex items-center gap-3">
+<span class="text-xs text-error/80 bg-error-container/20 px-2 py-0.5 rounded">??g</span>
+<span class="text-xs text-error/80">Ambiguous volume</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Macro Adjustment Bento -->
+<section class="space-y-4">
+<h2 class="text-xl font-headline font-bold text-on-surface">Macro Breakdown</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container p-6 rounded-lg flex flex-col justify-between aspect-square">
+<span class="text-on-surface-variant text-xs font-label uppercase tracking-widest">Calories</span>
+<div class="space-y-1">
+<span class="text-4xl font-headline font-bold text-primary tabular-nums">482</span>
+<p class="text-xs text-on-surface-variant">kcal estimated</p>
+</div>
+</div>
+<div class="grid grid-rows-3 gap-4">
+<div class="bg-surface-container-low px-4 py-3 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-sm font-semibold">Protein</span>
+</div>
+<span class="font-label text-sm tabular-nums">34g</span>
+</div>
+<div class="bg-surface-container-low px-4 py-3 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="text-sm font-semibold">Carbs</span>
+</div>
+<span class="font-label text-sm tabular-nums">18g</span>
+</div>
+<div class="bg-surface-container-low px-4 py-3 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-sm font-semibold">Fats</span>
+</div>
+<span class="font-label text-sm tabular-nums">22g</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Save Button Section -->
+<section class="pt-8 pb-12">
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold py-5 rounded-full shadow-[0px_20px_40px_rgba(78,222,162,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                Save meal
+            </button>
+<p class="text-center mt-4 text-on-surface-variant text-xs">By saving, you confirm these estimates are accurate.</p>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#31394d]/60 backdrop-blur-3xl rounded-t-[2rem] z-50 shadow-[0px_-10px_40px_rgba(0,0,0,0.4)]">
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Search</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-emerald-500/20 text-emerald-400 rounded-full px-4 py-1 transition-all duration-500 ease-out active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Log</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Plan</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300">
+<span class="material-symbols-outlined">photo_camera</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Camera</span>
+</div>
+</nav>
+</body></html>

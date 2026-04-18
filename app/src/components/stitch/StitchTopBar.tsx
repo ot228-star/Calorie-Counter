@@ -13,20 +13,34 @@ export function stitchScrollPaddingTop(insetsTop: number) {
 
 type Props = {
   onSettings: () => void;
+  onFavourites: () => void;
   /** Empty until the user sets a nickname — no default label. */
   title?: string;
   useCustomFonts?: boolean;
   themeMode?: "light" | "dark";
   primaryColor?: string;
   textColor?: string;
+  settingsActive?: boolean;
+  favouritesActive?: boolean;
 };
 
-export function StitchTopBar({ onSettings, title = "", useCustomFonts, themeMode = "dark", primaryColor, textColor }: Props) {
+export function StitchTopBar({
+  onSettings,
+  onFavourites,
+  title = "",
+  useCustomFonts,
+  themeMode = "dark",
+  primaryColor,
+  textColor,
+  settingsActive = false,
+  favouritesActive = false
+}: Props) {
   const insets = useSafeAreaInsets();
   const isLight = themeMode === "light";
   const appTheme = useAppThemeOptional();
   const accent = primaryColor ?? textColor ?? appTheme?.primary ?? "#4edea2";
   const mutedIcon = isLight ? "#475569" : "#94a3b8";
+  const activeBg = appTheme ? `${appTheme.primary}2A` : "rgba(78, 222, 162, 0.16)";
   return (
     <BlurView
       intensity={48}
@@ -42,9 +56,26 @@ export function StitchTopBar({ onSettings, title = "", useCustomFonts, themeMode
           <View style={styles.titleSpacer} />
         )}
       </View>
-      <TouchableOpacity style={styles.iconBtn} onPress={onSettings} activeOpacity={0.75}>
-        <Ionicons name="settings-outline" size={22} color={mutedIcon} />
-      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={[styles.iconBtn, favouritesActive && { backgroundColor: activeBg }]}
+          onPress={onFavourites}
+          activeOpacity={0.75}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
+        >
+          <Ionicons name={favouritesActive ? "heart" : "heart-outline"} size={22} color={favouritesActive ? accent : mutedIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.iconBtn, settingsActive && { backgroundColor: activeBg }]}
+          onPress={onSettings}
+          activeOpacity={0.75}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
+        >
+          <Ionicons name={settingsActive ? "settings" : "settings-outline"} size={22} color={settingsActive ? accent : mutedIcon} />
+        </TouchableOpacity>
+      </View>
     </BlurView>
   );
 }
@@ -85,10 +116,15 @@ const styles = StyleSheet.create({
     flex: 1
   },
   iconBtn: {
-    width: 40,
-    height: 40,
+    width: 46,
+    height: 46,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center"
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4
   }
 });

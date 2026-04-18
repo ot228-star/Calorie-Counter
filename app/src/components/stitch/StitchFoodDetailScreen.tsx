@@ -68,16 +68,6 @@ function createStyles(t: AppThemeTokens) {
     },
     sub: { fontSize: 16, color: t.onSurfaceVariant, lineHeight: 22 },
     titleRow: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 10 },
-    ratingPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      borderRadius: 999,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      backgroundColor: t.surfaceContainerHigh
-    },
-    ratingTxt: { color: t.onSurface, fontWeight: "800", fontSize: 16 },
     imgWrap: {
       borderRadius: 16,
       overflow: "hidden",
@@ -269,6 +259,8 @@ export function StitchFoodDetailScreen({
           style={[styles.heartBtn, { backgroundColor: isFavorite ? `${theme.primary}33` : theme.surfaceContainerHigh }]}
           onPress={onToggleFavorite}
           activeOpacity={0.85}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
         >
           <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? theme.primary : theme.mutedText} />
         </TouchableOpacity>
@@ -280,10 +272,6 @@ export function StitchFoodDetailScreen({
           <Text style={[styles.h1, useCustomFonts && { fontFamily: stitchFonts.display }]} numberOfLines={2}>
             {title}
           </Text>
-          <View style={styles.ratingPill}>
-            <Ionicons name="star" size={16} color={theme.primary} />
-            <Text style={styles.ratingTxt}>4.9</Text>
-          </View>
         </View>
         <Text style={[styles.sub, useCustomFonts && { fontFamily: stitchFonts.body }]}>{subtitle}</Text>
       </View>

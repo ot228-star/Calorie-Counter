@@ -15,6 +15,7 @@ type Props = {
   onSelectRegion: (id: string) => void;
   foods: FoodRecord[];
   useCustomFonts?: boolean;
+  renderFoodThumb: (food: FoodRecord) => React.ReactNode;
   onOpenDetail: (food: FoodRecord) => void;
   onAdd: (food: FoodRecord) => void;
   onAdjustPortion: (foodName: string, delta: number) => void;
@@ -157,6 +158,7 @@ export function StitchFoodSuggestionsScreen({
   onSelectRegion,
   foods,
   useCustomFonts,
+  renderFoodThumb,
   onOpenDetail,
   onAdd,
   onAdjustPortion,
@@ -197,10 +199,7 @@ export function StitchFoodSuggestionsScreen({
       <View style={{ gap: 16 }}>
         {foods.map((food) => (
           <View key={`${food.category}-${food.name}`} style={styles.card}>
-            <View style={styles.ph}>
-              <Ionicons name="image-outline" size={32} color={theme.mutedText} />
-              <Text style={[styles.phTxt, useCustomFonts && { fontFamily: stitchFonts.body }]}>No verified photo yet</Text>
-            </View>
+            <View style={styles.ph}>{renderFoodThumb(food)}</View>
             <View style={styles.cardBody}>
               <View style={styles.titleRow}>
                 <View style={{ flex: 1 }}>

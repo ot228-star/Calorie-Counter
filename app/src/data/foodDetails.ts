@@ -1,4 +1,6 @@
 import type { FoodRecord } from "./foodDatabase";
+import { FOOD_COM_PHOTO_BY_FOOD } from "./foodComPhotoMap";
+import { FOODIESFEED_PHOTO_BY_FOOD } from "./foodiesfeedPhotoMap";
 
 export type FoodDetail = {
   description: string;
@@ -10,7 +12,7 @@ export type FoodDetail = {
   photoCandidates?: string[];
 };
 
-const PHOTO_SOURCE = "Photo: Unsplash (Pinterest-style food curation)";
+const PHOTO_SOURCE = "Photo: Food.com / Foodiesfeed / Unsplash fallback";
 
 const INGREDIENTS_BY_FOOD: Record<string, string[]> = {
   "Mediterranean Salmon Bowl": ["Salmon", "Quinoa", "Cucumber", "Tomatoes", "Feta"],
@@ -151,6 +153,19 @@ const normalizeFoodName = (name: string): string =>
     .trim()
     .toLowerCase();
 
+const tokenizeFoodName = (name: string): string[] =>
+  normalizeFoodName(name)
+    .split(" ")
+    .filter(Boolean);
+
+const WHOLE_FOOD_CATEGORIES = new Set(["Fruit", "Vegetable", "Protein", "Grain", "Dairy", "Fat"]);
+const COMPLEX_MEAL_HINT = /(soup|salad|bowl|wrap|sandwich|pizza|burger|pasta|curry|masala|biryani|stir fry|stir-fry|noodle|ramen|sushi|taco|burrito|omelette|quesadilla|gyro|kebab|chili|stew|risotto|parmesan|shawarma|fajitas|enchiladas|congee|smoothie)/;
+
+const FOOD_COM_URL_USAGE_COUNT = Object.values(FOOD_COM_PHOTO_BY_FOOD).reduce<Record<string, number>>((acc, url) => {
+  acc[url] = (acc[url] ?? 0) + 1;
+  return acc;
+}, {});
+
 const stableHash = (input: string): number => {
   let h = 0;
   for (let i = 0; i < input.length; i += 1) {
@@ -226,10 +241,32 @@ const inferWellnessTip = (food: FoodRecord): string => {
   return "Balanced option: fits well as part of a varied, whole-food meal plan.";
 };
 
+const canUseFoodComPhoto = (food: FoodRecord): boolean => {
+  const foodComUrl = FOOD_COM_PHOTO_BY_FOOD[food.name];
+  if (!foodComUrl) return false;
+
+  // If one recipe photo is reused for many entries, it's likely not specific enough.
+  if ((FOOD_COM_URL_USAGE_COUNT[foodComUrl] ?? 0) > 2) return false;
+
+  const tokens = tokenizeFoodName(food.name);
+  const looksLikeComplexMeal = COMPLEX_MEAL_HINT.test(normalizeFoodName(food.name));
+  const isWholeFood = WHOLE_FOOD_CATEGORIES.has(food.category);
+
+  // Avoid forcing recipe-style photos for simple whole foods (e.g. broccoli, apple).
+  if (isWholeFood && !looksLikeComplexMeal) return false;
+  if (tokens.length <= 1 && !looksLikeComplexMeal) return false;
+
+  return true;
+};
+
 export const getFoodPhotoCandidates = (food: FoodRecord): string[] => {
   const candidates: string[] = [];
   const pinned = PINNED_PHOTO_BY_FOOD[food.name];
   if (pinned) candidates.push(pinned);
+  const foodiesfeed = FOODIESFEED_PHOTO_BY_FOOD[food.name];
+  if (foodiesfeed) candidates.push(foodiesfeed);
+  const foodCom = FOOD_COM_PHOTO_BY_FOOD[food.name];
+  if (foodCom && canUseFoodComPhoto(food)) candidates.push(foodCom);
   // Per-food unique candidates (same meal name => same image set; different name => different image set).
   candidates.push(foodSpecificUnsplashUrl(food.name, 1));
   candidates.push(foodSpecificUnsplashUrl(food.name, 2));

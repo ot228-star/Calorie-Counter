@@ -5,53 +5,63 @@ import { stitchFonts } from "../theme/stitch";
 
 const logoAsset = require("../../assets/logo-mindful-bowl.png");
 
-const textureUri =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBjO0BvIgI81aHXkbEaNIhUK-Iez4ZYQH6DOJVJRfAn89Vrr15MpV6kdl7humjZ20q3_eB5Z-wsUH99sST3AkXoKKc7qz_qa_AG_AasY0hNwYYIVlm2RtKwkngISw-VuWcx0jxIJ8NV7pykNcfWVfrrC2BW8k-3np39uqOMf67cmjNHrEazzvGhjEWkdEEgQfn7xJkzLzRtFR6f8XMcyeP7MTSxuoj6AYHv968VXVvqkqQFWXa2FlG0y--lE3Zy0YCTf3q4LdqUYIU";
-
 export function StitchLoadingScreen({ useCustomFonts = false }: { useCustomFonts?: boolean }) {
-  const pulse = useRef(new Animated.Value(1)).current;
+  const pulse = useRef(new Animated.Value(0.92)).current;
+  const progress = useRef(new Animated.Value(0.14)).current;
 
   useEffect(() => {
-    const animation = Animated.loop(
+    const pulseAnimation = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 0.92, duration: 1500, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 1, duration: 1500, useNativeDriver: true })
+        Animated.timing(pulse, { toValue: 1, duration: 1400, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0.92, duration: 1400, useNativeDriver: true })
       ])
     );
-    animation.start();
-    return () => animation.stop();
-  }, [pulse]);
+    const progressAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(progress, { toValue: 0.38, duration: 1600, useNativeDriver: false }),
+        Animated.timing(progress, { toValue: 0.52, duration: 1400, useNativeDriver: false }),
+        Animated.timing(progress, { toValue: 0.34, duration: 1200, useNativeDriver: false })
+      ])
+    );
+    pulseAnimation.start();
+    progressAnimation.start();
+    return () => {
+      pulseAnimation.stop();
+      progressAnimation.stop();
+    };
+  }, [progress, pulse]);
+
+  const progressWidth = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"]
+  });
 
   return (
     <View style={styles.container}>
-      <View style={[styles.glow, styles.glowTop]} />
-      <View style={[styles.glow, styles.glowBottom]} />
+      <View style={[styles.glow, styles.glowTop]} pointerEvents="none" />
+      <View style={[styles.glow, styles.glowBottom]} pointerEvents="none" />
+      <View style={styles.topDecorLeft} />
+      <View style={styles.topDecorRight} />
 
       <View style={styles.content}>
         <View style={styles.brandWrap}>
-          <View style={styles.outerRing} />
+          <View style={styles.outerHalo} />
           <Animated.View style={[styles.innerCircle, { transform: [{ scale: pulse }] }]}>
             <ExpoImage source={logoAsset} style={styles.logoImg} contentFit="contain" />
           </Animated.View>
-          <View style={styles.orbitRing} />
         </View>
 
         <View style={styles.textWrap}>
           <Text style={[styles.title, useCustomFonts && { fontFamily: stitchFonts.display }]}>Calorie Counter</Text>
-          <View style={styles.loadingWrap}>
-            <Text style={[styles.loadingLabel, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>Loading...</Text>
-            <Text style={[styles.subtitle, useCustomFonts && { fontFamily: stitchFonts.body }]}>Preparing your digital sanctuary</Text>
-          </View>
+          <Text style={[styles.subtitle, useCustomFonts && { fontFamily: stitchFonts.body }]}>Nourishing your journey...</Text>
         </View>
 
         <View style={styles.progressTrack}>
-          <View style={styles.progressFill} />
+          <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
         </View>
+        <Text style={[styles.loadingLabel, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>INITIALIZING SANCTUARY</Text>
+        <View style={styles.bottomDecor} />
       </View>
-
-      <Text style={[styles.footer, useCustomFonts && { fontFamily: stitchFonts.bodyMedium }]}>Precision Nutrition • Serenity Track</Text>
-
-      <ExpoImage source={{ uri: textureUri }} style={styles.texture} contentFit="cover" />
     </View>
   );
 }
@@ -61,117 +71,115 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0b1325",
+    backgroundColor: "#020c1e",
     overflow: "hidden"
   },
   glow: {
     position: "absolute",
-    width: "58%",
-    aspectRatio: 1,
+    width: 360,
+    height: 360,
     borderRadius: 999,
-    backgroundColor: "rgba(78, 222, 162, 0.13)"
+    backgroundColor: "rgba(70, 232, 168, 0.1)"
   },
   glowTop: {
-    top: "-12%",
-    left: "-12%"
+    top: -140,
+    right: -100
   },
   glowBottom: {
-    bottom: "-12%",
-    right: "-12%"
+    bottom: -140,
+    left: -120
+  },
+  topDecorLeft: {
+    position: "absolute",
+    top: 36,
+    left: 28,
+    width: 54,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(164, 180, 214, 0.18)"
+  },
+  topDecorRight: {
+    position: "absolute",
+    top: 36,
+    right: 28,
+    width: 18,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(164, 180, 214, 0.2)"
   },
   content: {
     width: "100%",
-    maxWidth: 360,
+    maxWidth: 390,
     paddingHorizontal: 24,
     alignItems: "center",
-    gap: 44,
+    gap: 26,
     zIndex: 2
   },
   brandWrap: {
-    width: 120,
-    height: 120,
+    width: 126,
+    height: 126,
     alignItems: "center",
     justifyContent: "center"
   },
-  outerRing: {
+  outerHalo: {
     position: "absolute",
-    width: 96,
-    height: 96,
+    width: 116,
+    height: 116,
     borderRadius: 999,
-    borderWidth: 2,
-    borderColor: "rgba(78, 222, 162, 0.12)"
+    backgroundColor: "rgba(78, 222, 162, 0.12)"
   },
   innerCircle: {
-    width: 72,
-    height: 72,
+    width: 82,
+    height: 82,
     borderRadius: 999,
-    backgroundColor: "rgba(8, 183, 127, 0.2)",
+    backgroundColor: "rgba(12, 192, 142, 0.24)",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden"
   },
   logoImg: {
-    width: 56,
-    height: 56
-  },
-  orbitRing: {
-    position: "absolute",
-    width: 116,
-    height: 116,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "rgba(78, 222, 162, 0.08)"
+    width: 62,
+    height: 62
   },
   textWrap: {
     alignItems: "center",
-    gap: 14
-  },
-  title: {
-    fontSize: 32,
-    color: "#dae2fc",
-    fontWeight: "800",
-    letterSpacing: -1
-  },
-  loadingWrap: {
-    alignItems: "center",
     gap: 8
   },
-  loadingLabel: {
-    color: "rgba(78, 222, 162, 0.9)",
-    fontSize: 12,
-    letterSpacing: 3.8,
-    textTransform: "uppercase",
-    fontWeight: "700"
+  title: {
+    fontSize: 50,
+    color: "#f2f6ff",
+    fontWeight: "900",
+    letterSpacing: -1
   },
   subtitle: {
-    color: "rgba(187, 202, 191, 0.62)",
-    fontSize: 14
+    color: "rgba(182, 195, 221, 0.8)",
+    fontSize: 16
   },
   progressTrack: {
-    width: 192,
+    marginTop: 42,
+    width: 228,
     height: 4,
     borderRadius: 999,
     overflow: "hidden",
-    backgroundColor: "#2d3448"
+    backgroundColor: "rgba(126, 142, 177, 0.28)"
   },
   progressFill: {
-    width: "34%",
     height: "100%",
     borderRadius: 999,
     backgroundColor: "#4edea2"
   },
-  footer: {
-    position: "absolute",
-    bottom: 48,
-    color: "rgba(218, 226, 252, 0.2)",
+  loadingLabel: {
+    color: "rgba(164, 179, 207, 0.45)",
     fontSize: 10,
-    letterSpacing: 1.8,
+    letterSpacing: 2.6,
     textTransform: "uppercase",
-    zIndex: 2
+    fontWeight: "700"
   },
-  texture: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.1,
-    zIndex: 1
+  bottomDecor: {
+    marginTop: 14,
+    width: 106,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(164, 180, 214, 0.2)"
   }
 });

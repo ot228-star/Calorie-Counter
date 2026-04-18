@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#dae2fc",
+            "on-secondary": "#003824",
+            "error": "#ffb4ab",
+            "on-primary-fixed": "#002113",
+            "error-container": "#93000a",
+            "on-primary": "#003824",
+            "surface-container-highest": "#2d3448",
+            "surface-container": "#171f32",
+            "secondary-fixed-dim": "#4edea3",
+            "tertiary-container": "#00b1c8",
+            "primary-fixed": "#6ffbbd",
+            "surface-variant": "#2d3448",
+            "secondary-fixed": "#6ffbbd",
+            "surface-bright": "#31394d",
+            "on-tertiary-container": "#003e47",
+            "surface-dim": "#0b1325",
+            "on-tertiary-fixed-variant": "#004e59",
+            "tertiary-fixed-dim": "#44d8f1",
+            "on-background": "#dae2fc",
+            "surface": "#0b1325",
+            "on-primary-fixed-variant": "#005236",
+            "on-surface": "#dae2fc",
+            "inverse-on-surface": "#283044",
+            "on-tertiary": "#00363e",
+            "outline-variant": "#3c4a42",
+            "tertiary-fixed": "#a1efff",
+            "on-primary-container": "#00402a",
+            "primary": "#4edea2",
+            "surface-tint": "#4edea2",
+            "tertiary": "#44d8f1",
+            "on-error": "#690005",
+            "on-error-container": "#ffdad6",
+            "surface-container-low": "#131b2e",
+            "inverse-primary": "#006c49",
+            "on-secondary-container": "#003e28",
+            "secondary": "#4edea3",
+            "primary-fixed-dim": "#4edea2",
+            "on-secondary-fixed-variant": "#005236",
+            "on-secondary-fixed": "#002113",
+            "background": "#0b1325",
+            "on-tertiary-fixed": "#001f25",
+            "secondary-container": "#00b47c",
+            "primary-container": "#08b77f",
+            "outline": "#86948a",
+            "surface-container-high": "#222a3d",
+            "surface-container-lowest": "#060e20",
+            "on-surface-variant": "#bbcabf"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Plus Jakarta Sans"],
+            "body": ["Manrope"],
+            "label": ["Manrope"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    body {
+      background-color: #0b1325;
+      font-family: 'Manrope', sans-serif;
+    }
+    .glass-effect {
+      backdrop-filter: blur(24px);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0b1325]/60 backdrop-blur-3xl flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a calm man with soft lighting against a dark blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAipZbSZQTh5qQYvhdUmvQopNvtMMR0b9Siv6AKpDrSIzxgM04hhWBB2L92XL5cunX7n0rk5cHkueCA4-WXwCjVq8__A57fZfga5PnMefQLBC-DCa2AVVw1w03iqFui8OD84VtMKaL7IRk8wYMmxY7c2D8ZGV8GCFz69nn21IpzyP6xg0zy_07AnGgruhP2MeiuFts9tC0neRVQ_jY5nqytXzS_aVSYlwxnzk7pYvXPeTasYXuQRUZHv6hMmfgjNOLou3hVhI71yHc"/>
+</div>
+<span class="text-emerald-400 font-['Plus_Jakarta_Sans'] font-bold text-lg tracking-tight">Mindful Guardian</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-800/50 transition-opacity duration-300 active:scale-95 text-slate-400">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto">
+<!-- Hero Section -->
+<section class="mb-8">
+<h1 class="font-headline text-display-lg font-extrabold text-on-surface tracking-tight mb-2">Food Finder</h1>
+<p class="text-on-surface-variant font-body text-body-md">Search built-in database</p>
+</section>
+<!-- Search & Filters -->
+<section class="space-y-6 mb-10">
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full bg-surface-container-low border-none rounded-2xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-high transition-all duration-300 font-body" placeholder="Search meals, foods, macros..." type="text"/>
+</div>
+<!-- Source Toggle -->
+<div class="flex bg-surface-container-low p-1 rounded-full w-fit">
+<button class="px-6 py-2 rounded-full bg-primary-container text-on-primary-container font-label text-sm font-semibold transition-all">Cloud database</button>
+<button class="px-6 py-2 rounded-full text-on-surface-variant font-label text-sm font-semibold hover:text-on-surface transition-all">Local fallback</button>
+</div>
+</section>
+<!-- Content Area: Results -->
+<div class="space-y-4">
+<!-- Result Item 1 -->
+<div class="bg-surface-container rounded-lg p-4 flex gap-4 items-center group hover:bg-surface-container-high transition-all duration-300">
+<div class="w-20 h-20 bg-surface-container-highest rounded-md flex-shrink-0 flex flex-col items-center justify-center text-[10px] text-outline text-center p-2">
+<span class="material-symbols-outlined mb-1 text-slate-500">no_photography</span>
+          No verified photo yet
+        </div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline font-bold text-on-surface truncate">Avocado &amp; Poached Egg Toast</h3>
+<span class="text-primary font-body font-bold text-sm tabular-nums">340 kcal</span>
+</div>
+<div class="flex gap-3 text-xs font-label text-on-surface-variant mb-3">
+<span>P: 14g</span>
+<span>C: 22g</span>
+<span>F: 24g</span>
+<span class="text-outline">• 1 portion</span>
+</div>
+<div class="flex gap-2">
+<button class="text-primary font-label text-xs font-bold hover:underline">View details</button>
+<span class="text-outline-variant">|</span>
+<button class="text-primary font-label text-xs font-bold hover:underline">Add</button>
+</div>
+</div>
+</div>
+<!-- Result Item 2 -->
+<div class="bg-surface-container rounded-lg p-4 flex gap-4 items-center group hover:bg-surface-container-high transition-all duration-300">
+<div class="w-20 h-20 bg-surface-container-highest rounded-md flex-shrink-0 flex flex-col items-center justify-center text-[10px] text-outline text-center p-2">
+<span class="material-symbols-outlined mb-1 text-slate-500">no_photography</span>
+          No verified photo yet
+        </div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline font-bold text-on-surface truncate">Grilled Salmon with Asparagus</h3>
+<span class="text-primary font-body font-bold text-sm tabular-nums">420 kcal</span>
+</div>
+<div class="flex gap-3 text-xs font-label text-on-surface-variant mb-3">
+<span>P: 38g</span>
+<span>C: 8g</span>
+<span>F: 26g</span>
+<span class="text-outline">• 250g</span>
+</div>
+<div class="flex gap-2">
+<button class="text-primary font-label text-xs font-bold hover:underline">View details</button>
+<span class="text-outline-variant">|</span>
+<button class="text-primary font-label text-xs font-bold hover:underline">Add</button>
+</div>
+</div>
+</div>
+<!-- State: Searching... (Hidden by default, shown for demo structure) -->
+<div class="hidden py-12 flex flex-col items-center justify-center text-on-surface-variant space-y-4">
+<div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+<p class="font-body text-sm">Searching...</p>
+</div>
+<!-- State: No foods found. (Hidden by default) -->
+<div class="hidden py-16 flex flex-col items-center justify-center text-center space-y-4">
+<div class="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center text-outline-variant">
+<span class="material-symbols-outlined text-4xl">search_off</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">No foods found.</p>
+<p class="font-body text-sm text-on-surface-variant max-w-[240px] mx-auto mt-1">Try adjusting your search or switching to local fallback.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#31394d]/60 backdrop-blur-3xl rounded-t-[2rem] z-50 shadow-[0px_-10px_40px_rgba(0,0,0,0.4)]">
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 hover:text-emerald-300 transition-all duration-500 ease-out active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-emerald-500/20 text-emerald-400 rounded-full px-4 py-1 transition-all duration-500 ease-out active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Search</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 hover:text-emerald-300 transition-all duration-500 ease-out active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Log</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 hover:text-emerald-300 transition-all duration-500 ease-out active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Plan</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 hover:text-emerald-300 transition-all duration-500 ease-out active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined">photo_camera</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase mt-1">Camera</span>
+</div>
+</nav>
+</body></html>

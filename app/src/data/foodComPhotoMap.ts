@@ -1,0 +1,22 @@
+/* Auto-generated from public Food.com recipe pages via scripts/generate_foodcom_map.js */
+export const FOOD_COM_PHOTO_BY_FOOD: Record<string, string> = {
+  "Banana": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/48/66/41/tZF6sGqHT3SutbizESHx_0S9A6222.jpg",
+  "Beef and Broccoli Stir Fry": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/99/47/6/01z114QRWGncDabUUJod_0S9A5937.jpg",
+  "Broccoli": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/99/47/6/01z114QRWGncDabUUJod_0S9A5937.jpg",
+  "Broccoli Garlic Pasta": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/11/70/31/ieo2HguHQEiy7VYnh9cT_0S9A5095.jpg",
+  "Chicken Noodle Soup": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/85/28/Kw96PfKjSEy6yNw2SKI3_Chicken-Noodle-Soup-1.png",
+  "Chicken Soup": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/85/28/Kw96PfKjSEy6yNw2SKI3_Chicken-Noodle-Soup-1.png",
+  "Chicken Tikka Masala Light": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/39/46/39/WM8rgRclQsGroxlo7eHA_0S9A3950.jpg",
+  "Homemade Chicken Noodle Soup": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/85/28/Kw96PfKjSEy6yNw2SKI3_Chicken-Noodle-Soup-1.png",
+  "Mashed Potato": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/91/72/1/fwse6E9R1CAHFHEee88A_twice-baked-mashed-potatpes-2762.jpg",
+  "Mozzarella": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/30/97/7/7GmgWw4TTUCCw7xGKQAP_0S9A6434.jpg",
+  "Pancakes": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/13/22/63/D30C2lxTy6SAflQlb61Q_VP%204%20-%20final_2.jpg",
+  "Pasta (cooked)": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/11/70/31/ieo2HguHQEiy7VYnh9cT_0S9A5095.jpg",
+  "Shakshuka": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/28/18/77/ZyG0h2VYRjei7iPFSWNI_food.com-14.jpg",
+  "Simple Oven-Baked Sea Bass": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/35/16/31/TW8kFVRNTwKckUevzMv7_sea-bass-recipe-5393.jpg",
+  "Tikka Masala": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/39/46/39/WM8rgRclQsGroxlo7eHA_0S9A3950.jpg",
+  "Tomato": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/39/46/39/WM8rgRclQsGroxlo7eHA_0S9A3950.jpg",
+  "Tuna (water)": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/24/22/21/picaUm9st.jpg",
+  "Vegan Pancakes": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/13/22/63/D30C2lxTy6SAflQlb61Q_VP%204%20-%20final_2.jpg",
+  "Waffles": "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/63/07/1/Oey61BTvKAEV0tVQz4gU_untitled-1868.jpg",
+};

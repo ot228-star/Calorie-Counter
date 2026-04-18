@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#dae2fc",
+                      "on-secondary": "#003824",
+                      "error": "#ffb4ab",
+                      "on-primary-fixed": "#002113",
+                      "error-container": "#93000a",
+                      "on-primary": "#003824",
+                      "surface-container-highest": "#2d3448",
+                      "surface-container": "#171f32",
+                      "secondary-fixed-dim": "#4edea3",
+                      "tertiary-container": "#00b1c8",
+                      "primary-fixed": "#6ffbbd",
+                      "surface-variant": "#2d3448",
+                      "secondary-fixed": "#6ffbbd",
+                      "surface-bright": "#31394d",
+                      "on-tertiary-container": "#003e47",
+                      "surface-dim": "#0b1325",
+                      "on-tertiary-fixed-variant": "#004e59",
+                      "tertiary-fixed-dim": "#44d8f1",
+                      "on-background": "#dae2fc",
+                      "surface": "#0b1325",
+                      "on-primary-fixed-variant": "#005236",
+                      "on-surface": "#dae2fc",
+                      "inverse-on-surface": "#283044",
+                      "on-tertiary": "#00363e",
+                      "outline-variant": "#3c4a42",
+                      "tertiary-fixed": "#a1efff",
+                      "on-primary-container": "#00402a",
+                      "primary": "#4edea2",
+                      "surface-tint": "#4edea2",
+                      "tertiary": "#44d8f1",
+                      "on-error": "#690005",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-low": "#131b2e",
+                      "inverse-primary": "#006c49",
+                      "on-secondary-container": "#003e28",
+                      "secondary": "#4edea3",
+                      "primary-fixed-dim": "#4edea2",
+                      "on-secondary-fixed-variant": "#005236",
+                      "on-secondary-fixed": "#002113",
+                      "background": "#0b1325",
+                      "on-tertiary-fixed": "#001f25",
+                      "secondary-container": "#00b47c",
+                      "primary-container": "#08b77f",
+                      "outline": "#86948a",
+                      "surface-container-high": "#222a3d",
+                      "surface-container-lowest": "#060e20",
+                      "on-surface-variant": "#bbcabf"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Plus Jakarta Sans"],
+                      "body": ["Manrope"],
+                      "label": ["Manrope"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0b1325;
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-effect {
+            background: rgba(49, 57, 77, 0.6);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col justify-center items-center p-6 selection:bg-primary/30">
+<!-- Hero/Branding Section -->
+<header class="w-full max-w-md text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+<div class="inline-flex items-center justify-center w-20 h-20 mb-6 rounded-3xl bg-surface-container-high shadow-2xl overflow-hidden relative group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-tertiary/10 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="photo_camera">photo_camera</span>
+</div>
+<h1 class="font-headline font-extrabold text-4xl tracking-tighter text-on-surface mb-3">Calorie Counter</h1>
+<p class="font-body text-on-surface-variant text-lg">Track calories with photos</p>
+</header>
+<!-- Main Authentication Card -->
+<main class="w-full max-w-md">
+<div class="bg-surface-container rounded-lg p-8 relative overflow-hidden transition-all duration-500 hover:shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
+<!-- Auth Toggle Tabs -->
+<div class="flex p-1 mb-8 rounded-full bg-surface-container-low w-full border border-outline-variant/10">
+<button class="flex-1 py-3 text-sm font-label font-semibold rounded-full bg-surface-container-high text-primary shadow-sm transition-all">Log In</button>
+<button class="flex-1 py-3 text-sm font-label font-semibold rounded-full text-on-surface-variant hover:text-on-surface transition-all">Sign Up</button>
+</div>
+<form class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant ml-1" for="email">Email</label>
+<div class="relative">
+<input class="w-full px-5 py-4 bg-surface-container-low border-0 rounded-2xl text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-high transition-all outline-none font-body" id="email" placeholder="hello@mindfulguardian.com" type="email"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/40 text-xl" data-icon="mail">mail</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<label class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant ml-1" for="password">Password</label>
+<button class="text-xs font-label font-semibold text-primary/80 hover:text-primary transition-colors" type="button">Forgot password?</button>
+</div>
+<div class="relative">
+<input class="w-full px-5 py-4 bg-surface-container-low border-0 rounded-2xl text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-high transition-all outline-none font-body" id="password" placeholder="••••••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/40 text-xl" data-icon="lock">lock</span>
+</div>
+<p class="text-[11px] font-label text-on-surface-variant/60 italic ml-1">Use 8+ characters for password.</p>
+</div>
+<!-- Primary Action Button -->
+<button class="group relative w-full overflow-hidden rounded-full bg-gradient-to-r from-primary to-primary-container py-4 font-headline font-bold text-on-primary shadow-lg transition-all active:scale-[0.98] hover:shadow-primary/20" type="submit">
+<div class="relative flex items-center justify-center gap-2">
+<span>Continue</span>
+<span class="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</button>
+<!-- Busy State Example (Hidden by default, shown conceptually) -->
+<button class="hidden w-full rounded-full bg-surface-container-highest py-4 font-headline font-bold text-on-surface-variant/50 cursor-not-allowed" disabled="">
+<div class="flex items-center justify-center gap-3">
+<svg class="animate-spin h-5 w-5 text-primary" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+</svg>
+<span>Please wait...</span>
+</div>
+</button>
+</form>
+<!-- Divider -->
+<div class="relative my-8">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant/10"></div>
+</div>
+<div class="relative flex justify-center text-xs font-label uppercase tracking-widest">
+<span class="px-4 bg-surface-container text-on-surface-variant/40">Or continue with</span>
+</div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-3 py-3 rounded-full bg-surface-container-low border border-outline-variant/5 hover:bg-surface-container-high transition-all text-on-surface text-sm font-label font-semibold">
+<img alt="" class="w-5 h-5" data-alt="Google colorful logo icon simplified on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzNlyqPACYI0wWOHynoVU8sC-nTAmvhSfu_Glu6I0hodZCG6iKL5EUyfdFeanIr-EQ4lNofqj6p1FdjqBpq-_X3ta46QcWtGnjIyt-QdNAmvwnzGSEBjF4lkfaHCg6howi5cJ0SagyCiOznE3sUtCVYYoG1dftokMV9R09x9dFqPCzHCk31rPNnZYIbg-al3Q5w0zMSbcY1X_XGb8AWPyNYBy-LTOTP3HQBuCgPi7n6ikBRW27wXM9XA_bpDHmeZ8MrL2LTlouxfc"/>
+<span>Google</span>
+</button>
+<button class="flex items-center justify-center gap-3 py-3 rounded-full bg-surface-container-low border border-outline-variant/5 hover:bg-surface-container-high transition-all text-on-surface text-sm font-label font-semibold">
+<svg class="w-5 h-5 text-[#1877F2]" fill="currentColor" viewbox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
+<span>Facebook</span>
+</button>
+</div>
+</div>
+<!-- Secondary CTA -->
+<p class="text-center mt-10 text-sm font-body text-on-surface-variant">
+            By continuing, you agree to our 
+            <a class="text-on-surface font-semibold underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all" href="#">Terms of Service</a>
+</p>
+</main>
+<!-- Background Decorative Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] pointer-events-none z-0"></div>
+<div class="fixed bottom-[-5%] right-[-5%] w-[30%] h-[30%] rounded-full bg-tertiary/5 blur-[100px] pointer-events-none z-0"></div>
+</body></html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#dae2fc",
+            "on-secondary": "#003824",
+            "error": "#ffb4ab",
+            "on-primary-fixed": "#002113",
+            "error-container": "#93000a",
+            "on-primary": "#003824",
+            "surface-container-highest": "#2d3448",
+            "surface-container": "#171f32",
+            "secondary-fixed-dim": "#4edea3",
+            "tertiary-container": "#00b1c8",
+            "primary-fixed": "#6ffbbd",
+            "surface-variant": "#2d3448",
+            "secondary-fixed": "#6ffbbd",
+            "surface-bright": "#31394d",
+            "on-tertiary-container": "#003e47",
+            "surface-dim": "#0b1325",
+            "on-tertiary-fixed-variant": "#004e59",
+            "tertiary-fixed-dim": "#44d8f1",
+            "on-background": "#dae2fc",
+            "surface": "#0b1325",
+            "on-primary-fixed-variant": "#005236",
+            "on-surface": "#dae2fc",
+            "inverse-on-surface": "#283044",
+            "on-tertiary": "#00363e",
+            "outline-variant": "#3c4a42",
+            "tertiary-fixed": "#a1efff",
+            "on-primary-container": "#00402a",
+            "primary": "#4edea2",
+            "surface-tint": "#4edea2",
+            "tertiary": "#44d8f1",
+            "on-error": "#690005",
+            "on-error-container": "#ffdad6",
+            "surface-container-low": "#131b2e",
+            "inverse-primary": "#006c49",
+            "on-secondary-container": "#003e28",
+            "secondary": "#4edea3",
+            "primary-fixed-dim": "#4edea2",
+            "on-secondary-fixed-variant": "#005236",
+            "on-secondary-fixed": "#002113",
+            "background": "#0b1325",
+            "on-tertiary-fixed": "#001f25",
+            "secondary-container": "#00b47c",
+            "primary-container": "#08b77f",
+            "outline": "#86948a",
+            "surface-container-high": "#222a3d",
+            "surface-container-lowest": "#060e20",
+            "on-surface-variant": "#bbcabf"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Plus Jakarta Sans"],
+            "body": ["Manrope"],
+            "label": ["Manrope"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    body {
+      background-color: #0b1325;
+      font-family: 'Manrope', sans-serif;
+    }
+    .headline-font {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .glass-effect {
+      backdrop-filter: blur(24px);
+    }
+    /* Hide scrollbar but keep functionality */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar (Suppressed if Task-Focused/Back Action implied, but here used for Global Identity) -->
+<header class="bg-[#0b1325]/60 backdrop-blur-3xl fixed top-0 w-full z-50 flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-slate-800/50 p-2 rounded-full transition-all">arrow_back</span>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold text-lg tracking-tight text-on-surface">Settings</h1>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a young man with a peaceful expression in soft moody indoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB4bXZSDX9uX6RN6y6xq4r1iWoThzQBZHLK4BP0kCxDscuNMNX8fYtGGlEJ5ZRYIvMSj-PPX9MHma75GyIWHDysW_kMgmdT7ecao_877kUPhXiDo4biFh6svkxnMpL4FgKTUZ7Dk1vXYe2mFH2lQ-ObsKc3D07iO8dzHiQo4NxBTUquNrOW4iRU_MxYOE4JudMRW8nw1TKIImonUOAaufkpAEkfaHvVHf39MiigPz6YjmWVyXkLsvw_AtGaJiUxuFu0Uk-iA3gOCM"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto space-y-10">
+<!-- Appearance Section -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">palette</span>
+<h2 class="headline-font font-bold text-xl tracking-tight">Appearance</h2>
+</div>
+<!-- Theme Mode Card -->
+<div class="bg-surface-container-low rounded-lg p-6 space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-medium text-on-surface">Theme mode</span>
+<div class="flex bg-surface-container-highest p-1 rounded-full">
+<button class="px-5 py-2 rounded-full text-sm font-semibold transition-all text-on-surface-variant hover:text-on-surface">Light</button>
+<button class="px-5 py-2 rounded-full text-sm font-semibold transition-all bg-primary text-on-primary shadow-lg">Dark</button>
+</div>
+</div>
+<div class="pt-4 space-y-3">
+<div class="flex flex-col gap-1">
+<span class="font-medium text-on-surface">Accent color helper</span>
+<p class="text-sm text-on-surface-variant">Changes icon/button color theme</p>
+</div>
+<div class="flex gap-4 pt-2">
+<button class="w-10 h-10 rounded-full bg-primary ring-2 ring-primary ring-offset-4 ring-offset-surface-container-low"></button>
+<button class="w-10 h-10 rounded-full bg-tertiary hover:scale-110 transition-transform"></button>
+<button class="w-10 h-10 rounded-full bg-secondary-container hover:scale-110 transition-transform"></button>
+<button class="w-10 h-10 rounded-full bg-error hover:scale-110 transition-transform"></button>
+</div>
+</div>
+</div>
+</section>
+<!-- BMI Calculator Section - High End Bento-ish Layout -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">calculate</span>
+<h2 class="headline-font font-bold text-xl tracking-tight">BMI calculator</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Input Form -->
+<div class="bg-surface-container rounded-lg p-6 space-y-5">
+<div class="space-y-1">
+<h3 class="font-semibold text-on-surface">Enter body data...</h3>
+<p class="text-xs text-on-surface-variant">Used to refine your daily goals</p>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Sex</label>
+<div class="flex gap-2">
+<button class="flex-1 py-3 rounded-xl bg-primary/20 border border-primary/30 text-primary font-bold text-sm">Man</button>
+<button class="flex-1 py-3 rounded-xl bg-surface-container-high text-on-surface-variant font-bold text-sm hover:bg-surface-container-highest transition-colors">Woman</button>
+</div>
+<p class="text-[10px] text-on-surface-variant italic ml-1">Optional: choose sex...</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Weight (kg)</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-high transition-all outline-none" placeholder="75" type="number"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Height (cm)</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-high transition-all outline-none" placeholder="180" type="number"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Result Card -->
+<div class="bg-surface-container-high rounded-lg p-6 flex flex-col justify-between relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">BMI result/Status</span>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="headline-font text-5xl font-black text-primary">23.1</span>
+<span class="text-on-surface-variant font-medium">kg/m²</span>
+</div>
+<div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-primary-container text-on-primary-container rounded-full text-xs font-bold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+              Healthy Weight
+            </div>
+</div>
+<div class="relative z-10 pt-8">
+<p class="text-sm text-on-surface-variant leading-relaxed">Your current BMI is within the ideal range. Maintaining this balance supports long-term metabolic health.</p>
+<button class="mt-6 w-full py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold text-sm shadow-xl active:scale-95 transition-transform">
+              Recalculate suggested calories
+            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Additional Decorative Settings Cards -->
+<section class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-6 rounded-lg space-y-2 hover:bg-surface-container transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform">notifications</span>
+<h4 class="font-bold text-on-surface">Notifications</h4>
+<p class="text-xs text-on-surface-variant">Gentle nudges for hydration and steps</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg space-y-2 hover:bg-surface-container transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform">lock</span>
+<h4 class="font-bold text-on-surface">Privacy</h4>
+<p class="text-xs text-on-surface-variant">Biometric lock and data encryption</p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Execution of JSON instructions) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#31394d]/60 backdrop-blur-3xl rounded-t-[2rem] z-50 shadow-[0px_-10px_40px_rgba(0,0,0,0.4)]">
+<a class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300" href="#">
+<span class="material-symbols-outlined mb-1">search</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300" href="#">
+<span class="material-symbols-outlined mb-1">add_circle</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300" href="#">
+<span class="material-symbols-outlined mb-1">restaurant</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase">Plan</span>
+</a>
+<!-- Settings is not explicitly in the BottomNavBar labels, but Camera is. 
+         Usually settings is a top-level choice. Let's keep it as is, but without an active tab since this is a sub-page of "Profile/Settings" -->
+<a class="flex flex-col items-center justify-center text-slate-400/80 px-4 py-1 transition-all duration-500 ease-out active:scale-90 hover:text-emerald-300" href="#">
+<span class="material-symbols-outlined mb-1">photo_camera</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-wide uppercase">Camera</span>
+</a>
+</nav>
+</body></html>

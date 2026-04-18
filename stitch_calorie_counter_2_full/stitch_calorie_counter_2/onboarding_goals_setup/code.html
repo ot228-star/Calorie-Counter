@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mindful Guardian - Goals Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#dae2fc",
+                    "on-secondary": "#003824",
+                    "error": "#ffb4ab",
+                    "on-primary-fixed": "#002113",
+                    "error-container": "#93000a",
+                    "on-primary": "#003824",
+                    "surface-container-highest": "#2d3448",
+                    "surface-container": "#171f32",
+                    "secondary-fixed-dim": "#4edea3",
+                    "tertiary-container": "#00b1c8",
+                    "primary-fixed": "#6ffbbd",
+                    "surface-variant": "#2d3448",
+                    "secondary-fixed": "#6ffbbd",
+                    "surface-bright": "#31394d",
+                    "on-tertiary-container": "#003e47",
+                    "surface-dim": "#0b1325",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "on-background": "#dae2fc",
+                    "surface": "#0b1325",
+                    "on-primary-fixed-variant": "#005236",
+                    "on-surface": "#dae2fc",
+                    "inverse-on-surface": "#283044",
+                    "on-tertiary": "#00363e",
+                    "outline-variant": "#3c4a42",
+                    "tertiary-fixed": "#a1efff",
+                    "on-primary-container": "#00402a",
+                    "primary": "#4edea2",
+                    "surface-tint": "#4edea2",
+                    "tertiary": "#44d8f1",
+                    "on-error": "#690005",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#131b2e",
+                    "inverse-primary": "#006c49",
+                    "on-secondary-container": "#003e28",
+                    "secondary": "#4edea3",
+                    "primary-fixed-dim": "#4edea2",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-secondary-fixed": "#002113",
+                    "background": "#0b1325",
+                    "on-tertiary-fixed": "#001f25",
+                    "secondary-container": "#00b47c",
+                    "primary-container": "#08b77f",
+                    "outline": "#86948a",
+                    "surface-container-high": "#222a3d",
+                    "surface-container-lowest": "#060e20",
+                    "on-surface-variant": "#bbcabf"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0b1325;
+            color: #dae2fc;
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(49, 57, 77, 0.6);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col items-center justify-start overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0b1325]/60 backdrop-blur-3xl flex flex-col px-6 py-4">
+<div class="flex justify-between items-center w-full mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="portrait of a calm young man with soft lighting and professional studio background for user profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOemEv47LbYu2GsIPmY_2IEaEUPcKmychpXTj1d1PeHn9EIQSm-vH6wbth_NAcrc_Eu6PlxSgP8W3W2fVc4dxCcbD7EGxvUe1GM7cokKBnduvH5S85JWDrxgj4vVA0Bv7ez0hbLozyjyxX8xHBKczw9U1LCEB0joie93bROZhr0CH8UG2EAwpcaZOtnWiN2fu-Hco8kbMB1jRzYmIpvUCPWEMAgQVLjcKZxv8jYAsm5d8Fc0l85GjKKXVOW3Ytm8CUsRaOrnvu3PM"/>
+</div>
+<span class="text-emerald-400 font-black tracking-tighter text-xl font-['Plus_Jakarta_Sans']">Mindful Guardian</span>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-800/50 transition-opacity duration-300 active:scale-95">
+<span class="material-symbols-outlined text-slate-400" data-icon="settings">settings</span>
+</button>
+</div>
+<!-- Progress Section -->
+<div class="w-full flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-headline font-bold text-lg tracking-tight text-emerald-400">Goals Setup</span>
+<span class="font-label text-[10px] font-semibold tracking-wide uppercase text-on-surface-variant">Step 2 of 5</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[40%] rounded-full"></div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-2xl px-6 pt-44 pb-32 flex flex-col animate-fade-in">
+<div class="space-y-4 mb-10">
+<h1 class="font-headline font-extrabold text-4xl md:text-5xl text-on-surface tracking-tight leading-tight">
+                Let's start with your goals.
+            </h1>
+<p class="text-on-surface-variant text-lg font-medium max-w-md">
+                Select up to three that matter most to you.
+            </p>
+</div>
+<!-- Bento Grid Selection -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Goal Card: Lose Weight -->
+<button class="group relative flex flex-col items-start p-6 bg-surface-container rounded-lg transition-all duration-300 hover:bg-surface-container-high border-2 border-transparent focus:border-primary/40 text-left overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl" data-icon="monitor_weight">monitor_weight</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="monitor_weight">monitor_weight</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-1">Lose weight</h3>
+<p class="text-sm text-on-surface-variant font-medium">Focus on calorie deficit and cardio.</p>
+</button>
+<!-- Goal Card: Maintain Weight -->
+<button class="group relative flex flex-col items-start p-6 bg-surface-container rounded-lg transition-all duration-300 hover:bg-surface-container-high border-2 border-transparent focus:border-primary/40 text-left overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl" data-icon="balance">balance</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="balance">balance</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-1">Maintain weight</h3>
+<p class="text-sm text-on-surface-variant font-medium">Balance your energy and lifestyle.</p>
+</button>
+<!-- Goal Card: Gain Muscle (Active State Example) -->
+<button class="group relative flex flex-col items-start p-6 bg-primary-container/20 rounded-lg transition-all duration-300 border-2 border-primary text-left overflow-hidden">
+<div class="absolute top-4 right-4">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="fitness_center">fitness_center</span>
+</div>
+<h3 class="text-xl font-bold text-primary mb-1">Gain muscle</h3>
+<p class="text-sm text-primary/80 font-medium">Prioritize protein and strength training.</p>
+</button>
+<!-- Goal Card: Modify my diet -->
+<button class="group relative flex flex-col items-start p-6 bg-surface-container rounded-lg transition-all duration-300 hover:bg-surface-container-high border-2 border-transparent focus:border-primary/40 text-left overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl" data-icon="restaurant">restaurant</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="restaurant">restaurant</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-1">Modify my diet</h3>
+<p class="text-sm text-on-surface-variant font-medium">Explore keto, vegan, or new patterns.</p>
+</button>
+<!-- Goal Card: Manage Stress -->
+<button class="group relative flex flex-col items-start p-6 bg-primary-container/20 rounded-lg transition-all duration-300 border-2 border-primary text-left overflow-hidden md:col-span-2">
+<div class="absolute top-4 right-4">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex gap-6 items-center">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="self_improvement">self_improvement</span>
+</div>
+<div>
+<h3 class="text-xl font-bold text-primary mb-1">Manage stress</h3>
+<p class="text-sm text-primary/80 font-medium">Connect nutrition with mental well-being.</p>
+</div>
+</div>
+</button>
+<!-- Simple List Fallbacks -->
+<button class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg transition-all duration-300 hover:bg-surface-container text-left group">
+<div class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="add">add</span>
+</div>
+<span class="font-semibold text-on-surface">Gain weight</span>
+</button>
+<button class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg transition-all duration-300 hover:bg-surface-container text-left group">
+<div class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="add">add</span>
+</div>
+<span class="font-semibold text-on-surface">Plan meals</span>
+</button>
+</div>
+<!-- Decorative Image Element -->
+<div class="mt-12 w-full h-48 rounded-lg overflow-hidden relative group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="abstract artistic shot of a person meditating in a dark atmospheric room with soft emerald neon highlights and smoke" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMzgSvp3qn-0uiGhfXFImPEysDIS7GzQ4zRE70mx1SnkSKvBZDlqrYK7it35Scwa-KIRCDxy-a6miS-FbHvdpTD5v0fVVtuetJsFtcguazV65UL8htQPIcgpyaf5NzBwAehBjTP1KyoriWoMzcXb9IGHWyhY6ETfrjR0yBB_h7E5zWX7mevMA3Z0kccROEU9qG7iln0_675eeatgL47XKFk6akQqicfVmdXAFX1yOzmYADA8MKKKnFiDspu4R6vGVPeiZ3uNSCKd4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-6">
+<p class="font-headline font-bold text-on-surface/90 text-sm italic">"Wellness is a journey, not a destination."</p>
+</div>
+</div>
+</main>
+<!-- Footer Navigation (Onboarding Focus) -->
+<footer class="fixed bottom-0 left-0 w-full glass-panel flex justify-between items-center px-8 pb-10 pt-6 z-50">
+<button class="font-label text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors uppercase tracking-widest flex items-center gap-2 active:scale-95">
+<span class="material-symbols-outlined text-lg" data-icon="arrow_back">arrow_back</span>
+            Back
+        </button>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary-container px-12 py-4 rounded-full font-headline font-extrabold text-lg shadow-[0px_10px_25px_rgba(8,183,127,0.3)] transition-all duration-500 hover:brightness-110 active:scale-95 flex items-center gap-3">
+            Next
+            <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</footer>
+</body></html>

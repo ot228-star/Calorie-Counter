@@ -1,6 +1,12 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Animated,
+  AppState,
+  type AppStateStatus,
   Alert,
+  Easing,
+  Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -24,6 +30,8 @@ import * as AuthSession from "expo-auth-session";
 import * as ImagePicker from "expo-image-picker";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
+import * as Notifications from "expo-notifications";
+import * as LocalAuthentication from "expo-local-authentication";
 import { Image as ExpoImage } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -55,7 +63,6 @@ import { StitchAuthScreen } from "./src/components/stitch/StitchAuthScreen";
 import { StitchBottomNav, type StitchNavId } from "./src/components/stitch/StitchBottomNav";
 import { StitchDashboard } from "./src/components/stitch/StitchDashboard";
 import { StitchTopBar, stitchScrollPaddingTop } from "./src/components/stitch/StitchTopBar";
-import { StitchSecondaryHeader } from "./src/components/stitch/StitchSecondaryHeader";
 import { StitchManualMealForm } from "./src/components/stitch/StitchManualMealForm";
 import { StitchFoodFinderScreen } from "./src/components/stitch/StitchFoodFinderScreen";
 import { StitchFoodSuggestionsScreen } from "./src/components/stitch/StitchFoodSuggestionsScreen";
@@ -68,6 +75,7 @@ import { onPrimaryByAccent, stitchDark, stitchFonts } from "./src/theme/stitch";
 import { AppThemeProvider } from "./src/theme/AppThemeContext";
 import { semanticSurfaces } from "./src/lib/themeColors";
 import { loadFavorites, saveFavorites } from "./src/lib/favoritesStorage";
+import { loadPrivacyLockEnabled, setPrivacyLockEnabled } from "./src/lib/privacyStorage";
 import {
   clearOnboardingDraft,
   clearOnboardingPending,
@@ -132,6 +140,22 @@ const habitOptions = [
 ];
 const mealPlanFrequencyOptions = ["Never", "Rarely", "Occasionally", "Frequently", "Always"];
 const ONBOARDING_STEPS_TOTAL = 5;
+const GOAL_DETAILS: Record<string, { subtitle: string; icon: keyof typeof Ionicons.glyphMap }> = {
+  "Lose weight": { subtitle: "Burn fat and improve definition", icon: "barbell-outline" },
+  "Maintain weight": { subtitle: "Keep a stable daily calorie balance", icon: "scale-outline" },
+  "Gain weight": { subtitle: "Add calories for healthy mass gain", icon: "trending-up-outline" },
+  "Gain muscle": { subtitle: "Fuel strength, growth, and recovery", icon: "flash-outline" },
+  "Modify my diet": { subtitle: "Improve food quality and consistency", icon: "nutrition-outline" },
+  "Plan meals": { subtitle: "Build a routine with less decision stress", icon: "calendar-outline" },
+  "Manage stress": { subtitle: "Support mood and energy with nutrition", icon: "heart-outline" }
+};
+const FREQUENCY_DETAILS: Record<string, string> = {
+  Never: "You mostly decide meals on the spot.",
+  Rarely: "You plan now and then, but not weekly.",
+  Occasionally: "You loosely plan part of the week.",
+  Frequently: "You often prep or decide ahead.",
+  Always: "You follow a consistent weekly meal structure."
+};
 const accentPresets: Record<AccentPresetId, { label: string; light: string; dark: string }> = {
   blue: { label: "Blue", light: "#2563eb", dark: "#3b82f6" },
   /** Stitch mint primary */
@@ -424,6 +448,9 @@ const STITCH_TAB_BAR_VISUAL = 72;
 
 export default function App() {
   const previousUserIdRef = useRef<string | null>(null);
+  const previousOnboardingStepRef = useRef<OnboardingStep>(0);
+  const onboardingStepOpacity = useRef(new Animated.Value(1)).current;
+  const onboardingStepTranslate = useRef(new Animated.Value(0)).current;
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
@@ -473,6 +500,11 @@ export default function App() {
   const [foodSource, setFoodSource] = useState<"cloud" | "local">("local");
   const [foodLoading, setFoodLoading] = useState(false);
   const [favouriteFoodNames, setFavouriteFoodNames] = useState<string[]>([]);
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean | null>(null);
+  const [privacyLockOn, setPrivacyLockOn] = useState(false);
+  const [privacyUnlocked, setPrivacyUnlocked] = useState(true);
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const isExpoGo = Constants.appOwnership === "expo";
 
   const resetProfileInputs = useCallback(() => {
     setNickname("");
@@ -550,40 +582,64 @@ export default function App() {
     const normalizedGoals = surveyGoals.map((g) => g.toLowerCase());
     const normalizedHabits = surveyHabits.map((h) => h.toLowerCase());
 
-    let activityMultiplier = 1.32;
-    if (mealPlanFrequency === "Never") activityMultiplier -= 0.04;
-    if (mealPlanFrequency === "Rarely") activityMultiplier -= 0.02;
-    if (mealPlanFrequency === "Occasionally") activityMultiplier += 0;
-    if (mealPlanFrequency === "Frequently") activityMultiplier += 0.03;
-    if (mealPlanFrequency === "Always") activityMultiplier += 0.06;
+    const frequencyActivityOffset: Record<string, number> = {
+      Never: -0.04,
+      Rarely: -0.02,
+      Occasionally: 0,
+      Frequently: 0.04,
+      Always: 0.08
+    };
+    let activityMultiplier = 1.3 + (frequencyActivityOffset[mealPlanFrequency] ?? 0);
     if (normalizedHabits.some((h) => h.includes("move more"))) activityMultiplier += 0.05;
     if (normalizedHabits.some((h) => h.includes("workout more"))) activityMultiplier += 0.09;
+    if (normalizedHabits.some((h) => h.includes("prioritize sleep"))) activityMultiplier += 0.01;
+    activityMultiplier = Math.max(1.2, Math.min(1.65, activityMultiplier));
 
-    // Goal intention score improves coupling between survey and target.
+    // Multi-goal intention score: weighted blend rather than single-goal bias.
     const loseIntent = normalizedGoals.filter((g) => g.includes("lose")).length;
     const gainIntent = normalizedGoals.filter((g) => g.includes("gain")).length;
     const maintainIntent = normalizedGoals.filter((g) => g.includes("maintain")).length;
+    const hasMuscleGoal = normalizedGoals.some((g) => g.includes("gain muscle"));
+    const hasDietGoal = normalizedGoals.some((g) => g.includes("modify my diet"));
+    const hasPlanningGoal = normalizedGoals.some((g) => g.includes("plan meals"));
+    const hasStressGoal = normalizedGoals.some((g) => g.includes("manage stress"));
+
+    const totalGoalWeight = Math.max(1, loseIntent + gainIntent + maintainIntent + (hasMuscleGoal ? 1 : 0));
+    const loseRatio = loseIntent / totalGoalWeight;
+    const gainRatio = gainIntent / totalGoalWeight;
+    const maintainRatio = maintainIntent / totalGoalWeight;
 
     let calorieAdjustment = 0;
-    calorieAdjustment += loseIntent * -120;
-    calorieAdjustment += gainIntent * 110;
-    calorieAdjustment += maintainIntent * 20;
+    calorieAdjustment += Math.round(-260 * loseRatio);
+    calorieAdjustment += Math.round(220 * gainRatio);
+    calorieAdjustment += Math.round(30 * maintainRatio);
 
-    if (normalizedGoals.some((g) => g.includes("gain muscle"))) calorieAdjustment += 140;
-    if (normalizedGoals.some((g) => g.includes("manage stress"))) calorieAdjustment += 40;
-    if (normalizedGoals.some((g) => g.includes("plan meals"))) calorieAdjustment -= 20;
-    if (normalizedGoals.some((g) => g.includes("modify my diet"))) calorieAdjustment -= 10;
+    if (hasMuscleGoal) calorieAdjustment += 110;
+    if (hasStressGoal) calorieAdjustment += 20;
+    if (hasPlanningGoal) calorieAdjustment -= 10;
+    if (hasDietGoal) calorieAdjustment -= 15;
 
-    if (normalizedHabits.some((h) => h.includes("eat more protein"))) calorieAdjustment += 80;
-    if (normalizedHabits.some((h) => h.includes("eat more fiber"))) calorieAdjustment -= 50;
+    if (normalizedHabits.some((h) => h.includes("eat more protein"))) calorieAdjustment += 75;
+    if (normalizedHabits.some((h) => h.includes("eat more fiber"))) calorieAdjustment -= 45;
     if (normalizedHabits.some((h) => h.includes("eat mindfully"))) calorieAdjustment -= 25;
-    if (normalizedHabits.some((h) => h.includes("drink more water"))) calorieAdjustment -= 20;
-    if (normalizedHabits.some((h) => h.includes("prioritize sleep"))) calorieAdjustment -= 15;
+    if (normalizedHabits.some((h) => h.includes("drink more water"))) calorieAdjustment -= 10;
+    if (normalizedHabits.some((h) => h.includes("prioritize sleep"))) calorieAdjustment -= 10;
+    if (normalizedHabits.some((h) => h.includes("track calories"))) calorieAdjustment -= 15;
+    if (normalizedHabits.some((h) => h.includes("track macros"))) calorieAdjustment -= 10;
+    if (normalizedHabits.some((h) => h.includes("plan more meals"))) calorieAdjustment -= 10;
+    if (normalizedHabits.some((h) => h.includes("meal prep"))) calorieAdjustment -= 10;
 
     // BMI-aware safety guardrails.
     const bmiEstimate = weightN / Math.pow(heightN / 100, 2);
-    if (bmiEstimate >= 30 && inferredGoalType === "lose") calorieAdjustment -= 90;
-    if (bmiEstimate < 19 && inferredGoalType !== "lose") calorieAdjustment += 120;
+    if (bmiEstimate >= 30 && inferredGoalType === "lose") calorieAdjustment -= 100;
+    if (bmiEstimate < 19 && inferredGoalType !== "lose") calorieAdjustment += 130;
+    if (bmiEstimate < 17.5) calorieAdjustment += 90;
+    if (bmiEstimate > 34) calorieAdjustment -= 90;
+
+    // Age context: avoid aggressive targets at extremes.
+    if (ageN >= 50 && inferredGoalType === "lose") calorieAdjustment += 50;
+    if (ageN <= 25 && inferredGoalType === "gain") calorieAdjustment += 40;
+    calorieAdjustment = Math.max(-450, Math.min(450, calorieAdjustment));
 
     return suggestedCalorieTarget({
       age: ageN,
@@ -660,11 +716,10 @@ export default function App() {
     if (screen === "foodFinder") return "search";
     if (screen === "manual") return "log";
     if (screen === "foodSuggestions") return "plan";
-    if (screen === "favourites") return "favourites";
     if (screen === "camera" || screen === "review") return "camera";
     if (screen === "foodDetail") {
       if (detailBackScreen === "foodSuggestions") return "plan";
-      if (detailBackScreen === "favourites") return "favourites";
+      if (detailBackScreen === "favourites") return null;
       return "search";
     }
     return null;
@@ -764,6 +819,29 @@ export default function App() {
   }, [session?.user?.id, screen, onboardingStep, age, heightCm, weightKg, biologicalSex, nickname, surveyGoals, surveyHabits, mealPlanFrequency]);
 
   useEffect(() => {
+    if (screen !== "onboarding") return;
+    const previousStep = previousOnboardingStepRef.current;
+    const direction = onboardingStep >= previousStep ? 1 : -1;
+    onboardingStepOpacity.setValue(0);
+    onboardingStepTranslate.setValue(direction * 18);
+    Animated.parallel([
+      Animated.timing(onboardingStepOpacity, {
+        toValue: 1,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true
+      }),
+      Animated.timing(onboardingStepTranslate, {
+        toValue: 0,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true
+      })
+    ]).start();
+    previousOnboardingStepRef.current = onboardingStep;
+  }, [onboardingStep, onboardingStepOpacity, onboardingStepTranslate, screen]);
+
+  useEffect(() => {
     if (!session) return;
     listMealsForToday()
       .then((savedMeals) => setMeals(savedMeals))
@@ -786,6 +864,74 @@ export default function App() {
     if (!session?.user?.id) return;
     void saveFavorites(session.user.id, favouriteFoodNames);
   }, [session?.user?.id, favouriteFoodNames]);
+
+  const attemptPrivacyUnlock = useCallback(
+    async (promptMessage = "Unlock Calorie Counter") => {
+      if (!privacyLockOn) {
+        setPrivacyUnlocked(true);
+        return true;
+      }
+      try {
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (!hasHardware || !isEnrolled) {
+          Alert.alert("Biometric unavailable", "No biometric method is set up on this device.");
+          setPrivacyUnlocked(false);
+          return false;
+        }
+        const result = await LocalAuthentication.authenticateAsync({
+          promptMessage,
+          cancelLabel: "Cancel",
+          disableDeviceFallback: false
+        });
+        setPrivacyUnlocked(result.success);
+        return result.success;
+      } catch {
+        setPrivacyUnlocked(false);
+        Alert.alert("Unlock failed", "Could not verify your identity.");
+        return false;
+      }
+    },
+    [privacyLockOn]
+  );
+
+  useEffect(() => {
+    loadPrivacyLockEnabled()
+      .then((enabled) => {
+        setPrivacyLockOn(enabled);
+        setPrivacyUnlocked(!enabled);
+      })
+      .catch(() => {
+        setPrivacyLockOn(false);
+        setPrivacyUnlocked(true);
+      });
+
+    if (isExpoGo) {
+      setNotificationsEnabled(null);
+      return;
+    }
+
+    Notifications.getPermissionsAsync()
+      .then((status) => {
+        const enabled =
+          status.granted ||
+          status.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
+          status.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED;
+        setNotificationsEnabled(enabled);
+      })
+      .catch(() => setNotificationsEnabled(null));
+  }, [isExpoGo]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (nextState) => {
+      const prev = appStateRef.current;
+      appStateRef.current = nextState;
+      if (prev.match(/inactive|background/) && nextState === "active" && privacyLockOn && session) {
+        void attemptPrivacyUnlock();
+      }
+    });
+    return () => sub.remove();
+  }, [attemptPrivacyUnlock, privacyLockOn, session]);
 
   useEffect(() => {
     if (!session?.user?.id || AUTH_DISABLED) return;
@@ -1058,6 +1204,7 @@ export default function App() {
     }
     setMeals([]);
     setOnboardingStep(0);
+    setPrivacyUnlocked(true);
     setScreen("dashboard");
   };
 
@@ -1073,6 +1220,104 @@ export default function App() {
       Alert.alert("Could not save username", String(error));
     }
   };
+
+  const handleNotificationsTilePress = useCallback(async () => {
+    if (isExpoGo) {
+      Alert.alert(
+        "Notifications unavailable in Expo Go",
+        "Remote push notifications were removed from Expo Go. Use a development build to fully test notifications."
+      );
+      return;
+    }
+    try {
+      const current = await Notifications.getPermissionsAsync();
+      const alreadyEnabled =
+        current.granted ||
+        current.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
+        current.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED;
+      if (alreadyEnabled) {
+        setNotificationsEnabled(true);
+        Alert.alert("Notifications", "Notifications are enabled.");
+        return;
+      }
+
+      const requested = await Notifications.requestPermissionsAsync();
+      const granted =
+        requested.granted ||
+        requested.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
+        requested.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED;
+      setNotificationsEnabled(granted);
+
+      if (granted) {
+        if (Platform.OS === "android") {
+          await Notifications.setNotificationChannelAsync("default", {
+            name: "default",
+            importance: Notifications.AndroidImportance.DEFAULT
+          });
+        }
+        Alert.alert("Notifications enabled", "You will now receive reminders and nudges.");
+        return;
+      }
+
+      Alert.alert("Notifications disabled", "Enable notifications in system settings if you want reminders.", [
+        { text: "Not now", style: "cancel" },
+        { text: "Open settings", onPress: () => void Linking.openSettings() }
+      ]);
+    } catch {
+      Alert.alert("Notifications error", "Could not check notification permissions.");
+    }
+  }, [isExpoGo]);
+
+  const handlePrivacyTilePress = useCallback(() => {
+    Alert.alert(
+      "Privacy controls",
+      privacyLockOn ? "Biometric app lock is enabled." : "Biometric app lock is disabled.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Test unlock",
+          onPress: () => {
+            void attemptPrivacyUnlock("Confirm your identity");
+          }
+        },
+        privacyLockOn
+          ? {
+              text: "Disable lock",
+              style: "destructive",
+              onPress: () => {
+                void (async () => {
+                  await setPrivacyLockEnabled(false);
+                  setPrivacyLockOn(false);
+                  setPrivacyUnlocked(true);
+                  Alert.alert("Privacy updated", "Biometric lock has been disabled.");
+                })();
+              }
+            }
+          : {
+              text: "Enable lock",
+              onPress: () => {
+                void (async () => {
+                  const hasHardware = await LocalAuthentication.hasHardwareAsync();
+                  const enrolled = await LocalAuthentication.isEnrolledAsync();
+                  if (!hasHardware || !enrolled) {
+                    Alert.alert("Biometric unavailable", "Set up face/fingerprint unlock on your device first.");
+                    return;
+                  }
+                  const verified = await LocalAuthentication.authenticateAsync({
+                    promptMessage: "Enable biometric app lock",
+                    cancelLabel: "Cancel"
+                  });
+                  if (!verified.success) return;
+                  await setPrivacyLockEnabled(true);
+                  setPrivacyLockOn(true);
+                  setPrivacyUnlocked(true);
+                  Alert.alert("Privacy updated", "Biometric lock is now enabled.");
+                })();
+              }
+            }
+      ]
+    );
+  }, [attemptPrivacyUnlock, privacyLockOn]);
 
   const saveCurrentMeal = async (source: Meal["source"], requestId?: string) => {
     const cleanItems = mealItems.filter((item) => item.name.trim().length > 0);
@@ -1307,323 +1552,351 @@ export default function App() {
     );
   }
 
+  if (session && privacyLockOn && !privacyUnlocked) {
+    return (
+      <AppThemeProvider value={theme}>
+        <View style={[styles.lockWrap, { backgroundColor: theme.background }]}>
+          <View style={[styles.lockCard, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
+            <Ionicons name="lock-closed" size={34} color={theme.primary} />
+            <Text style={[styles.lockTitle, { color: theme.text }, font?.display && { fontFamily: font.display }]}>App locked</Text>
+            <Text style={[styles.lockBody, { color: theme.mutedText }, font?.body && { fontFamily: font.body }]}>
+              Unlock with biometrics to continue.
+            </Text>
+            <PrimaryButton
+              title="Unlock"
+              onPress={() => {
+                void attemptPrivacyUnlock("Unlock Calorie Counter");
+              }}
+              color={theme.primary}
+              textColor={theme.onPrimary}
+              fullWidth
+            />
+          </View>
+        </View>
+      </AppThemeProvider>
+    );
+  }
+
   if (screen === "onboarding") {
     const onboardingProgressWidth: `${number}%` = `${((onboardingStep + 1) / ONBOARDING_STEPS_TOTAL) * 100}%`;
     const surveyTheme = {
-      background: "#0b141f",
-      cardBackground: "#1a2634",
-      inputBackground: "#152433",
-      text: "#ffffff",
-      mutedText: "#94a3b8",
-      border: "rgba(148, 163, 184, 0.22)"
+      background: "#030d20",
+      shell: "#071730",
+      cardBackground: "rgba(9, 29, 52, 0.92)",
+      inputBackground: "rgba(9, 24, 43, 0.96)",
+      text: "#e8eefc",
+      mutedText: "#9eb0ca",
+      border: "rgba(122, 153, 188, 0.3)"
     } as const;
+    const onboardingSuggestedTarget = calculateQuestionnaireTarget();
     return (
-      <ScrollView
-        style={{ backgroundColor: surveyTheme.background }}
-        contentContainerStyle={[styles.container, { paddingTop: 18, paddingBottom: 34 }]}
-        showsVerticalScrollIndicator={false}
-        removeClippedSubviews
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.onboardingHeader}>
-          <View style={styles.onboardingBrandSlot}>
-            {onboardingStep === 4 && nickname.trim().length > 0 ? (
-              <Text style={[styles.onboardingBrand, { color: theme.primary }, font?.display && { fontFamily: font.display }]}>
-                {nickname.trim()}
+      <View style={[styles.onboardingScreen, { backgroundColor: surveyTheme.background }]}>
+      <View style={[styles.onboardingGlow, styles.onboardingGlowTop, { backgroundColor: `${theme.primary}18` }]} pointerEvents="none" />
+      <View style={[styles.onboardingGlow, styles.onboardingGlowBottom, { backgroundColor: `${theme.primary}16` }]} pointerEvents="none" />
+        <ScrollView
+          contentContainerStyle={[styles.container, { paddingTop: 16, paddingBottom: 34 }]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          decelerationRate="normal"
+          scrollEventThrottle={16}
+        >
+          <View style={[styles.onboardingShell, { backgroundColor: surveyTheme.shell, borderColor: surveyTheme.border }]}>
+            <View style={styles.onboardingHeaderRow}>
+              <TouchableOpacity
+                style={[styles.onboardingBackCircle, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}
+                onPress={() => setOnboardingStep((prev) => Math.max(0, prev - 1) as OnboardingStep)}
+                activeOpacity={0.82}
+              >
+                <Ionicons name="arrow-back" size={20} color={surveyTheme.text} />
+              </TouchableOpacity>
+              <View style={styles.onboardingHeaderProgressWrap}>
+                <View style={[styles.onboardingStepTrack, { backgroundColor: "rgba(122, 153, 188, 0.24)" }]}>
+                  <View style={[styles.onboardingStepFill, { width: onboardingProgressWidth, backgroundColor: theme.primary }]} />
+                </View>
+              </View>
+              <Text style={[styles.onboardingStepText, { color: surveyTheme.mutedText }, font?.bodySemibold && { fontFamily: font.bodySemibold }]}>
+                Step {onboardingStep + 1} of {ONBOARDING_STEPS_TOTAL}
               </Text>
-            ) : null}
-          </View>
-          <View style={styles.onboardingStepColumn}>
-            <Text style={[styles.onboardingStepText, font?.bodySemibold && { fontFamily: font.bodySemibold }]}>
-              Step {onboardingStep + 1} of {ONBOARDING_STEPS_TOTAL}
-            </Text>
-            <View style={styles.onboardingStepTrack}>
-              <View style={[styles.onboardingStepFill, { width: onboardingProgressWidth, backgroundColor: theme.primary }]} />
             </View>
-          </View>
-        </View>
-        <View style={[styles.progressTrack, { backgroundColor: "rgba(148, 163, 184, 0.25)" }]}>
-          <View style={[styles.progressFill, { backgroundColor: theme.primary, width: onboardingProgressWidth }]} />
-        </View>
 
-        {onboardingStep === 0 && (
-          <View style={[styles.onboardingGoalsCard, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
-            <Text style={[styles.onboardingGoalsH1, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>
-              Let's start with your goals.
-            </Text>
-            <Text style={[styles.onboardingGoalsSub, { color: surveyTheme.mutedText }]}>
-              Select up to three that matter most to you.
-            </Text>
-            <View style={{ gap: 10 }}>
-              {onboardingGoalOptions.map((goal) => {
-                const selected = surveyGoals.includes(goal);
-                return (
-                  <TouchableOpacity
-                    key={goal}
-                    style={[
-                      styles.onboardingGoalRow,
-                      {
-                        borderColor: selected ? theme.primary : surveyTheme.border,
-                        backgroundColor: surveyTheme.inputBackground
-                      }
-                    ]}
-                    onPress={() => toggleGoalSelection(goal)}
-                    activeOpacity={0.88}
-                  >
-                    <Text style={[styles.onboardingGoalText, { color: surveyTheme.text }]}>{goal}</Text>
-                    <View
+            <Animated.View style={{ opacity: onboardingStepOpacity, transform: [{ translateX: onboardingStepTranslate }] }}>
+              {onboardingStep === 0 && (
+                <View style={[styles.onboardingMainCard, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+                <Text style={[styles.onboardingMainTitle, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>
+                  What are your primary goals?
+                </Text>
+                <Text style={[styles.onboardingMainSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
+                  Pick up to 3 goals so we can calibrate your energy target.
+                </Text>
+                <View style={{ gap: 10 }}>
+                  {onboardingGoalOptions.map((goal) => {
+                    const selected = surveyGoals.includes(goal);
+                    const detail = GOAL_DETAILS[goal] ?? { subtitle: "Build a sustainable nutrition routine.", icon: "sparkles-outline" as const };
+                    return (
+                      <TouchableOpacity
+                        key={goal}
+                        style={[
+                          styles.onboardingChoiceRow,
+                          {
+                            borderColor: selected ? `${theme.primary}AA` : surveyTheme.border,
+                            backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
+                          }
+                        ]}
+                        onPress={() => toggleGoalSelection(goal)}
+                        activeOpacity={0.85}
+                      >
+                        <View style={[styles.onboardingChoiceIcon, { backgroundColor: "rgba(148, 163, 184, 0.14)" }]}>
+                          <Ionicons name={detail.icon} size={20} color={selected ? theme.primary : surveyTheme.mutedText} />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.onboardingChoiceTitle, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>{goal}</Text>
+                          <Text style={[styles.onboardingChoiceSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
+                            {detail.subtitle}
+                          </Text>
+                        </View>
+                        <View
+                          style={[
+                            styles.onboardingCircleCheck,
+                            { borderColor: selected ? `${theme.primary}CC` : surveyTheme.border, backgroundColor: selected ? `${theme.primary}26` : "transparent" }
+                          ]}
+                        >
+                          {selected ? <Ionicons name="checkmark" size={15} color={theme.primary} /> : null}
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                </View>
+              )}
+
+              {onboardingStep === 1 && (
+                <View style={[styles.onboardingMainCard, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+                <Text style={[styles.onboardingMainTitle, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>
+                  Which habits matter most?
+                </Text>
+                <Text style={[styles.onboardingMainSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
+                  Choose habits you want this plan to prioritize.
+                </Text>
+                <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Recommended</Text>
+                <View style={styles.row}>
+                  {recommendedHabitOptions.map((habit) => {
+                    const selected = surveyHabits.includes(habit);
+                    return (
+                      <TouchableOpacity
+                        key={habit}
+                        style={[
+                          styles.tag,
+                          {
+                            borderColor: selected ? `${theme.primary}CC` : surveyTheme.border,
+                            backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
+                          }
+                        ]}
+                        onPress={() => toggleHabitSelection(habit)}
+                      >
+                        <Text style={[styles.tagText, { color: selected ? theme.primary : surveyTheme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>More options</Text>
+                <View style={styles.row}>
+                  {habitOptions.map((habit) => {
+                    const selected = surveyHabits.includes(habit);
+                    return (
+                      <TouchableOpacity
+                        key={habit}
+                        style={[
+                          styles.tag,
+                          {
+                            borderColor: selected ? `${theme.primary}CC` : surveyTheme.border,
+                            backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
+                          }
+                        ]}
+                        onPress={() => toggleHabitSelection(habit)}
+                      >
+                        <Text style={[styles.tagText, { color: selected ? theme.primary : surveyTheme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                </View>
+              )}
+
+              {onboardingStep === 2 && (
+                <View style={[styles.onboardingMainCard, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+                <Text style={[styles.onboardingMainTitle, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>
+                  How often do you plan meals?
+                </Text>
+                <Text style={[styles.onboardingMainSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
+                  Planning frequency changes your activity and intake estimate.
+                </Text>
+                {mealPlanFrequencyOptions.map((option) => {
+                  const selected = option === mealPlanFrequency;
+                  return (
+                    <TouchableOpacity
+                      key={option}
                       style={[
-                        styles.onboardingGoalCheck,
+                        styles.onboardingChoiceRow,
                         {
-                          borderColor: selected ? theme.primary : surveyTheme.border,
-                          backgroundColor: selected ? `${theme.primary}28` : "transparent"
+                          borderColor: selected ? `${theme.primary}AA` : surveyTheme.border,
+                          backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
                         }
                       ]}
+                      onPress={() => setMealPlanFrequency(option)}
                     >
-                      {selected ? <Ionicons name="checkmark" size={16} color={theme.primary} /> : null}
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        )}
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.onboardingChoiceTitle, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>{option}</Text>
+                        <Text style={[styles.onboardingChoiceSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
+                          {FREQUENCY_DETAILS[option]}
+                        </Text>
+                      </View>
+                      <View style={[styles.onboardingCircleCheck, { borderColor: selected ? `${theme.primary}CC` : surveyTheme.border }]}>
+                        {selected ? <View style={[styles.onboardingMealDot, { backgroundColor: theme.primary }]} /> : null}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+                </View>
+              )}
 
-        {onboardingStep === 1 && (
-          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
-            <Text style={[styles.title, { color: surveyTheme.text }]}>Which healthy habits are most important?</Text>
-            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Recommended for you</Text>
-            <View style={styles.row}>
-              {recommendedHabitOptions.map((habit) => {
-                const selected = surveyHabits.includes(habit);
-                return (
-                  <TouchableOpacity
-                    key={habit}
-                    style={[
-                      styles.tag,
-                      {
-                        borderColor: selected ? theme.primary : surveyTheme.border,
-                        backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
-                      }
-                    ]}
-                    onPress={() => toggleHabitSelection(habit)}
-                  >
-                    <Text style={[styles.tagText, { color: selected ? theme.primary : surveyTheme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>More healthy habits</Text>
-            <View style={styles.row}>
-              {habitOptions.map((habit) => {
-                const selected = surveyHabits.includes(habit);
-                return (
-                  <TouchableOpacity
-                    key={habit}
-                    style={[
-                      styles.tag,
-                      {
-                        borderColor: selected ? theme.primary : surveyTheme.border,
-                        backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
-                      }
-                    ]}
-                    onPress={() => toggleHabitSelection(habit)}
-                  >
-                    <Text style={[styles.tagText, { color: selected ? theme.primary : surveyTheme.text, fontWeight: selected ? "700" : "500" }]}>{habit}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        )}
-
-        {onboardingStep === 2 && (
-          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border, gap: 14 }]}>
-            <Text style={[styles.title, { color: surveyTheme.text, fontSize: 30 }]}>How often do you plan your meals in advance?</Text>
-            <Text style={[styles.recentMealSub, { color: surveyTheme.mutedText, fontSize: 16, lineHeight: 24 }]}>
-              We'll tailor your sanctuary experience based on your current routine and rhythmic habits.
-            </Text>
-            {mealPlanFrequencyOptions.map((option) => {
-              const selected = option === mealPlanFrequency;
-              return (
-                <TouchableOpacity
-                  key={option}
-                  style={[
-                    styles.onboardingMealOption,
-                    {
-                      borderColor: selected ? theme.primary : "transparent",
-                      backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
-                    }
-                  ]}
-                  onPress={() => setMealPlanFrequency(option)}
-                >
-                  <Text style={[styles.recentMealTitle, { color: selected ? theme.primary : surveyTheme.text, fontSize: 20 }]}>{option}</Text>
-                  <View style={[styles.onboardingMealRadio, { borderColor: selected ? theme.primary : surveyTheme.border }]}>
-                    {selected ? <View style={[styles.onboardingMealDot, { backgroundColor: theme.primary }]} /> : null}
+              {onboardingStep === 3 && (
+                <View style={[styles.onboardingMainCard, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+                <Text style={[styles.onboardingMainTitle, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>
+                  Body details for your target
+                </Text>
+                <Text style={[styles.onboardingMainSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
+                  We use these values plus your survey answers to estimate calories.
+                </Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+                  placeholderTextColor={surveyTheme.mutedText}
+                  placeholder="Age"
+                  keyboardType="numeric"
+                  value={age}
+                  onChangeText={setAge}
+                />
+                <TextInput
+                  style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+                  placeholderTextColor={surveyTheme.mutedText}
+                  placeholder="Height cm"
+                  keyboardType="numeric"
+                  value={heightCm}
+                  onChangeText={setHeightCm}
+                />
+                <TextInput
+                  style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+                  placeholderTextColor={surveyTheme.mutedText}
+                  placeholder="Weight kg"
+                  keyboardType="numeric"
+                  value={weightKg}
+                  onChangeText={setWeightKg}
+                />
+                <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Sex (for BMR estimate)</Text>
+                <View style={styles.row}>
+                  {(["man", "woman"] as const).map((value) => {
+                    const selected = biologicalSex === value;
+                    return (
+                      <TouchableOpacity
+                        key={value}
+                        style={[
+                          styles.tag,
+                          {
+                            borderColor: selected ? `${theme.primary}CC` : surveyTheme.border,
+                            backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
+                          }
+                        ]}
+                        onPress={() => setBiologicalSex(value)}
+                      >
+                        <Text style={[styles.tagText, { color: selected ? theme.primary : surveyTheme.text, fontWeight: selected ? "700" : "500" }]}>
+                          {value === "man" ? "Man" : "Woman"}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <View style={styles.row}>
+                  <View style={[styles.metricPill, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}>
+                    <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>BMI</Text>
+                    <Text style={[styles.statValue, { color: surveyTheme.text }]}>{bmiValue ?? "--"}</Text>
                   </View>
-                </TouchableOpacity>
-              );
-            })}
-            <View style={[styles.card, { backgroundColor: surveyTheme.inputBackground, borderColor: "transparent" }]}>
-              <Text style={[styles.recentMealTitle, { color: surveyTheme.text }]}>Why we ask</Text>
-              <Text style={[styles.helperText, { color: surveyTheme.mutedText, fontSize: 13, lineHeight: 20 }]}>
-                Planning builds a sanctuary of routine, reducing decision fatigue and keeping your nutritional goals within gentle reach.
-              </Text>
-            </View>
-          </View>
-        )}
+                  <View style={[styles.metricPill, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}>
+                    <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>BMR</Text>
+                    <Text style={[styles.statValue, { color: surveyTheme.text }]}>{bmrValue ?? "--"}</Text>
+                  </View>
+                </View>
+                <View style={[styles.metricPill, { borderColor: `${theme.primary}66`, backgroundColor: `${theme.primary}18` }]}>
+                  <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>Estimated target from survey</Text>
+                  <Text style={[styles.statValue, { color: surveyTheme.text }]}>{Math.round(onboardingSuggestedTarget)} kcal</Text>
+                </View>
+                </View>
+              )}
 
-        {onboardingStep === 3 && (
-          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
-            <Text style={[styles.title, { color: surveyTheme.text }]}>A few more details</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
-              placeholderTextColor={surveyTheme.mutedText}
-              placeholder="Age"
-              keyboardType="numeric"
-              value={age}
-              onChangeText={setAge}
-            />
-            <TextInput
-              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
-              placeholderTextColor={surveyTheme.mutedText}
-              placeholder="Height cm"
-              keyboardType="numeric"
-              value={heightCm}
-              onChangeText={setHeightCm}
-            />
-            <TextInput
-              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
-              placeholderTextColor={surveyTheme.mutedText}
-              placeholder="Weight kg"
-              keyboardType="numeric"
-              value={weightKg}
-              onChangeText={setWeightKg}
-            />
-            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Sex (for calorie/BMI estimate)</Text>
-            <View style={styles.row}>
-              <TouchableOpacity
-                style={[
-                  styles.tag,
-                  { borderColor: biologicalSex === "man" ? theme.primary : surveyTheme.border, backgroundColor: surveyTheme.inputBackground }
-                ]}
-                onPress={() => setBiologicalSex("man")}
-              >
-                <Text style={[styles.tagText, { color: biologicalSex === "man" ? theme.primary : surveyTheme.text, fontWeight: biologicalSex === "man" ? "700" : "500" }]}>
-                  Man
+              {onboardingStep === 4 && (
+                <View style={[styles.onboardingMainCard, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
+                <Text style={[styles.onboardingMainTitle, { color: surveyTheme.text }, font?.display && { fontFamily: font.display }]}>
+                  Finalize your profile
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.tag,
-                  { borderColor: biologicalSex === "woman" ? theme.primary : surveyTheme.border, backgroundColor: surveyTheme.inputBackground }
-                ]}
-                onPress={() => setBiologicalSex("woman")}
-              >
-                <Text
-                  style={[
-                    styles.tagText,
-                    { color: biologicalSex === "woman" ? theme.primary : surveyTheme.text, fontWeight: biologicalSex === "woman" ? "700" : "500" }
-                  ]}
-                >
-                  Woman
+                <Text style={[styles.onboardingMainSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
+                  Choose a nickname and confirm your daily target.
                 </Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
+                  placeholderTextColor={surveyTheme.mutedText}
+                  placeholder="Nickname"
+                  value={nickname}
+                  onChangeText={setNickname}
+                  maxLength={24}
+                  autoCapitalize="words"
+                />
+                <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>App accent color</Text>
+                <View style={styles.row}>
+                  {accentOrder.map((id) => {
+                    const preset = accentPresets[id];
+                    const isSelected = id === accentId;
+                    const preview = themeMode === "dark" ? preset.dark : preset.light;
+                    return (
+                      <TouchableOpacity
+                        key={id}
+                        style={[
+                          styles.colorOption,
+                          { borderColor: isSelected ? theme.primary : surveyTheme.border, backgroundColor: surveyTheme.inputBackground }
+                        ]}
+                        onPress={() => setAccentId(id)}
+                      >
+                        <View style={[styles.colorSwatch, { backgroundColor: preview }]} />
+                        <Text style={[styles.helperText, { color: surveyTheme.text, fontWeight: isSelected ? "700" : "500" }]}>{preset.label}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                </View>
+              )}
+            </Animated.View>
+
+            <View style={styles.onboardingFooter}>
+              <TouchableOpacity
+                style={[styles.onboardingBackBtn, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}
+                onPress={() => setOnboardingStep((prev) => Math.max(0, prev - 1) as OnboardingStep)}
+              >
+                <Text style={[styles.secondaryBtnText, { color: surveyTheme.text }]}>Back</Text>
               </TouchableOpacity>
-            </View>
-            <View style={styles.row}>
-              <View style={[styles.metricPill, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}>
-                <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>BMI</Text>
-                <Text style={[styles.statValue, { color: surveyTheme.text }]}>{bmiValue ?? "--"}</Text>
-              </View>
-              <View style={[styles.metricPill, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}>
-                <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>BMR</Text>
-                <Text style={[styles.statValue, { color: surveyTheme.text }]}>{bmrValue ?? "--"}</Text>
-              </View>
-            </View>
-            <PrimaryButton
-              title="Suggest target"
-              color={theme.primary}
-              textColor={theme.onPrimary}
-              onPress={() => {
-                const suggested = calculateQuestionnaireTarget();
-                setTargetCalories(suggested);
-              }}
-            />
-            <TextInput
-              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
-              placeholderTextColor={surveyTheme.mutedText}
-              placeholder="Daily calorie target"
-              keyboardType="numeric"
-              value={String(targetCalories)}
-              onChangeText={(v) => setTargetCalories(Number(v || 0))}
-            />
-            <Text style={[styles.fieldLabel, { color: surveyTheme.mutedText }]}>Choose your app color theme</Text>
-            <View style={styles.row}>
-              {accentOrder.map((id) => {
-                const preset = accentPresets[id];
-                const isSelected = id === accentId;
-                const preview = themeMode === "dark" ? preset.dark : preset.light;
-                return (
-                  <TouchableOpacity
-                    key={id}
-                    style={[styles.colorOption, { borderColor: isSelected ? theme.primary : surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}
-                    onPress={() => setAccentId(id)}
-                  >
-                    <View style={[styles.colorSwatch, { backgroundColor: preview }]} />
-                    <Text style={[styles.helperText, { color: surveyTheme.text, fontWeight: isSelected ? "700" : "500" }]}>{preset.label}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+              <PrimaryButton
+                title={onboardingStep === 4 ? "Finish onboarding" : "Next"}
+                color={theme.primary}
+                textColor={theme.onPrimary}
+                onPress={() => {
+                  if (onboardingStep === 4) {
+                    void finishOnboarding();
+                    return;
+                  }
+                  setOnboardingStep((prev) => Math.min(4, prev + 1) as OnboardingStep);
+                }}
+              />
             </View>
           </View>
-        )}
-
-        {onboardingStep === 4 && (
-          <View style={[styles.card, { backgroundColor: surveyTheme.cardBackground, borderColor: surveyTheme.border }]}>
-            <Text style={[styles.title, { color: surveyTheme.text }]}>One last thing</Text>
-            <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>
-              Pick a nickname. We will use it in the app header.
-            </Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
-              placeholderTextColor={surveyTheme.mutedText}
-              placeholder="Nickname"
-              value={nickname}
-              onChangeText={setNickname}
-              maxLength={24}
-              autoCapitalize="words"
-            />
-            {nickname.trim().length > 0 ? (
-              <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>Preview: {nickname.trim()}</Text>
-            ) : (
-              <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>
-                Your nickname will show in the app header after you finish.
-              </Text>
-            )}
-          </View>
-        )}
-
-        <View style={styles.onboardingFooter}>
-          <TouchableOpacity
-            style={[styles.onboardingBackBtn, { borderColor: surveyTheme.border, backgroundColor: surveyTheme.inputBackground }]}
-            onPress={() => setOnboardingStep((prev) => Math.max(0, prev - 1) as OnboardingStep)}
-          >
-            <Text style={[styles.secondaryBtnText, { color: surveyTheme.text }]}>Back</Text>
-          </TouchableOpacity>
-          <PrimaryButton
-            title={onboardingStep === 4 ? "Finish onboarding" : "Next"}
-            color={theme.primary}
-            textColor={theme.onPrimary}
-            onPress={() => {
-              if (onboardingStep === 4) {
-                void finishOnboarding();
-                return;
-              }
-              setOnboardingStep((prev) => Math.min(4, prev + 1) as OnboardingStep);
-            }}
-          />
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 
@@ -1646,32 +1919,31 @@ export default function App() {
       case "camera":
         void openPhotoPicker();
         return;
-      case "favourites":
-        setScreen("favourites");
-        return;
       default:
     }
   };
 
-  const showSecondaryHeader = screen === "settings";
-  const showMainTopBar = screen !== "settings" && screen !== "foodDetail";
+  const showMainTopBar = screen !== "foodDetail";
+  const notificationsHint =
+    isExpoGo
+      ? "Use development build for push"
+      : notificationsEnabled == null
+      ? "Tap to check push permission"
+      : notificationsEnabled
+      ? "Enabled on this device"
+      : "Disabled. Tap to enable";
+  const privacyHint = privacyLockOn ? "Biometric app lock is enabled" : "Biometric app lock is disabled";
 
   return (
     <AppThemeProvider value={theme}>
     <View style={[styles.appShell, { backgroundColor: shellBg }]}>
-      {showSecondaryHeader ? (
-        <StitchSecondaryHeader
-          title="Settings"
-          onBack={() => setScreen("dashboard")}
-          useCustomFonts={Boolean(font)}
-          themeMode={themeMode}
-          primaryColor={theme.primary}
-          textColor={theme.primary}
-        />
-      ) : showMainTopBar ? (
+      {showMainTopBar ? (
         <StitchTopBar
           title={headerBrandTitle}
+          onFavourites={() => setScreen("favourites")}
           onSettings={() => setScreen("settings")}
+          favouritesActive={screen === "favourites"}
+          settingsActive={screen === "settings"}
           useCustomFonts={Boolean(font)}
           themeMode={themeMode}
           primaryColor={theme.primary}
@@ -1682,10 +1954,11 @@ export default function App() {
         style={{ backgroundColor: shellBg }}
         contentContainerStyle={[styles.container, { paddingTop: scrollPadTop, paddingBottom: scrollBottomPad }]}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         overScrollMode="never"
-        decelerationRate="fast"
+        decelerationRate="normal"
+        scrollEventThrottle={16}
       >
       {screen === "dashboard" && (
         <StitchDashboard
@@ -1788,6 +2061,15 @@ export default function App() {
           onSelectRegion={(id) => setSelectedCuisineRegion(id as CuisineRegionId)}
           foods={suggestedRegionalFoods}
           useCustomFonts={Boolean(font)}
+          renderFoodThumb={(food) => (
+            <FallbackImage
+              uris={getFoodPhotoCandidates(food)}
+              style={{ width: "100%", height: "100%" }}
+              placeholderText="No verified photo yet"
+              urlMaxWidth={560}
+              priority="low"
+            />
+          )}
           onOpenDetail={(food) => openFoodDetail(food, "foodSuggestions")}
           onAdd={(food) => addFoodToMeal(food, getPortionValue(food.name))}
           onAdjustPortion={adjustPortionValue}
@@ -1868,6 +2150,10 @@ export default function App() {
           nickname={nickname}
           setNickname={setNickname}
           onSaveNickname={() => void handleSaveNickname()}
+          onOpenNotifications={() => void handleNotificationsTilePress()}
+          onOpenPrivacy={() => void handlePrivacyTilePress()}
+          notificationsHint={notificationsHint}
+          privacyHint={privacyHint}
           onRecalculateCalories={() => {
             const suggested = calculateQuestionnaireTarget();
             setTargetCalories(suggested);
@@ -1914,37 +2200,79 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
+  lockWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24
+  },
+  lockCard: {
+    width: "100%",
+    maxWidth: 360,
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 18,
+    gap: 12,
+    alignItems: "center"
+  },
+  lockTitle: {
+    fontSize: 30,
+    fontWeight: "900",
+    letterSpacing: -0.5
+  },
+  lockBody: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 4
+  },
   container: {
     padding: 18,
     gap: 14
   },
-  onboardingHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 4
-  },
-  onboardingBrandSlot: {
+  onboardingScreen: {
     flex: 1,
-    minHeight: 32,
+    overflow: "hidden"
+  },
+  onboardingGlow: {
+    position: "absolute",
+    width: 320,
+    height: 320,
+    borderRadius: 999
+  },
+  onboardingGlowTop: {
+    top: -120,
+    right: -90
+  },
+  onboardingGlowBottom: {
+    bottom: -140,
+    left: -120
+  },
+  onboardingShell: {
+    borderWidth: 1,
+    borderRadius: 32,
+    padding: 16,
+    gap: 14
+  },
+  onboardingHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12
+  },
+  onboardingBackCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 999,
+    borderWidth: 1,
+    alignItems: "center",
     justifyContent: "center"
   },
-  onboardingBrand: {
-    fontSize: 22,
-    fontWeight: "900",
-    letterSpacing: -0.4
-  },
-  onboardingStepColumn: {
-    alignItems: "flex-end",
-    gap: 6,
-    minWidth: 112
+  onboardingHeaderProgressWrap: {
+    flex: 1
   },
   onboardingStepTrack: {
-    width: 56,
+    width: "100%",
     height: 6,
     borderRadius: 999,
-    backgroundColor: "rgba(134, 148, 138, 0.3)",
     overflow: "hidden"
   },
   onboardingStepFill: {
@@ -1953,10 +2281,60 @@ const styles = StyleSheet.create({
   },
   onboardingStepText: {
     fontSize: 11,
-    color: "#b4c0d8",
     textTransform: "uppercase",
     letterSpacing: 1.1,
     fontWeight: "700"
+  },
+  onboardingMainCard: {
+    borderRadius: 24,
+    borderWidth: 1,
+    padding: 18,
+    gap: 12
+  },
+  onboardingMainTitle: {
+    fontSize: 42,
+    fontWeight: "900",
+    letterSpacing: -1.1,
+    lineHeight: 46
+  },
+  onboardingMainSub: {
+    fontSize: 15,
+    lineHeight: 24,
+    fontWeight: "500",
+    marginBottom: 4
+  },
+  onboardingChoiceRow: {
+    borderWidth: 1,
+    borderRadius: 22,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  onboardingChoiceIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  onboardingChoiceTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    letterSpacing: -0.4
+  },
+  onboardingChoiceSub: {
+    fontSize: 13,
+    lineHeight: 18
+  },
+  onboardingCircleCheck: {
+    width: 30,
+    height: 30,
+    borderRadius: 999,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center"
   },
   onboardingMealOption: {
     borderWidth: 1,
@@ -1981,7 +2359,7 @@ const styles = StyleSheet.create({
     borderRadius: 999
   },
   onboardingFooter: {
-    marginTop: 8,
+    marginTop: 6,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

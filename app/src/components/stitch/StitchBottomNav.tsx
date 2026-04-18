@@ -7,7 +7,7 @@ import { useAppTheme } from "../../theme/AppThemeContext";
 import { mixHex } from "../../lib/themeColors";
 import { stitchFonts } from "../../theme/stitch";
 
-export type StitchNavId = "home" | "search" | "log" | "plan" | "favourites" | "camera";
+export type StitchNavId = "home" | "search" | "log" | "plan" | "camera";
 
 type Tab = {
   id: StitchNavId;
@@ -22,7 +22,6 @@ const TABS: Tab[] = [
   { id: "search", label: "Search", icon: "search-outline", iconActive: "search" },
   { id: "log", label: "Log", icon: "add-circle-outline", iconActive: "add-circle", emphasizeCenter: true },
   { id: "plan", label: "Plan", icon: "restaurant-outline", iconActive: "restaurant" },
-  { id: "favourites", label: "Fav", icon: "heart-outline", iconActive: "heart" },
   { id: "camera", label: "Camera", icon: "camera-outline", iconActive: "camera" }
 ];
 
@@ -54,6 +53,8 @@ export function StitchBottomNav({ active, onSelect, useCustomFonts }: Props) {
               style={[styles.item, isActive && { backgroundColor: activeBg }]}
               onPress={() => onSelect(tab.id)}
               activeOpacity={0.8}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
             >
               <Ionicons name={iconName} size={iconSize} color={iconColor} />
               <Text
@@ -95,15 +96,15 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-around",
-    alignItems: "flex-start"
+    alignItems: "center"
   },
   item: {
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     borderRadius: 999,
-    minWidth: 56
+    minWidth: 62
   },
   label: {
     fontSize: 10,

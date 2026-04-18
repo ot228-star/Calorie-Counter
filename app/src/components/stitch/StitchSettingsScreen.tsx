@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import type { AppThemeTokens } from "../../theme/AppThemeContext";
@@ -30,6 +30,10 @@ type Props = {
   nickname: string;
   setNickname: (name: string) => void;
   onSaveNickname: () => void;
+  onOpenNotifications: () => void;
+  onOpenPrivacy: () => void;
+  notificationsHint?: string;
+  privacyHint?: string;
   onSignOut?: () => void;
   showSignOut?: boolean;
   useCustomFonts?: boolean;
@@ -187,6 +191,10 @@ export function StitchSettingsScreen({
   nickname,
   setNickname,
   onSaveNickname,
+  onOpenNotifications,
+  onOpenPrivacy,
+  notificationsHint,
+  privacyHint,
   onSignOut,
   showSignOut,
   useCustomFonts
@@ -349,19 +357,21 @@ export function StitchSettingsScreen({
       <View style={styles.grid2}>
         <TouchableOpacity
           style={[styles.tile, { backgroundColor: ui.card }]}
-          onPress={() => Alert.alert("Notifications", "Coming soon.")}
+          onPress={onOpenNotifications}
           activeOpacity={0.85}
         >
           <Ionicons name="notifications-outline" size={24} color={theme.tertiary} />
           <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Notifications</Text>
           <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
-            Gentle nudges for hydration and steps
+            {notificationsHint ?? "Manage reminders and push permissions"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={() => Alert.alert("Privacy", "Coming soon.")} activeOpacity={0.85}>
+        <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenPrivacy} activeOpacity={0.85}>
           <Ionicons name="lock-closed-outline" size={24} color={theme.primary} />
           <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Privacy</Text>
-          <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>Biometric lock and data encryption</Text>
+          <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+            {privacyHint ?? "Biometric lock and security controls"}
+          </Text>
         </TouchableOpacity>
       </View>
 
