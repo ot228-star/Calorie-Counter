@@ -1,0 +1,12 @@
+{
+  "name": "calorie-counter",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Expo app lives in ./app. From this folder run npm start, or: npx expo start app",
+  "scripts": {
+    "start": "npx expo start app",
+    "android": "npx expo run:android app",
+    "typecheck": "npm --prefix app run typecheck",
+    "lint": "npm --prefix app run lint"
+  }
+}
