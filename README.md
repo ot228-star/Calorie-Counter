@@ -2,6 +2,12 @@
 
 Mobile-first calorie counter app for fast food logging with photo estimation and manual correction.
 
+**Repository:** [github.com/ot228-star/Calorie-Counter](https://github.com/ot228-star/Calorie-Counter)
+
+```bash
+git clone https://github.com/ot228-star/Calorie-Counter.git
+```
+
 ## Scope
 
 - Android-first MVP in 4-6 weeks
