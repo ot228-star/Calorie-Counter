@@ -52,7 +52,7 @@ export function StitchLoadingScreen({ useCustomFonts = false }: { useCustomFonts
         </View>
 
         <View style={styles.textWrap}>
-          <Text style={[styles.title, useCustomFonts && { fontFamily: stitchFonts.display }]}>Calorie Counter</Text>
+          <Text style={[styles.title, useCustomFonts && { fontFamily: stitchFonts.display }]}>Inertia</Text>
           <Text style={[styles.subtitle, useCustomFonts && { fontFamily: stitchFonts.body }]}>Nourishing your journey...</Text>
         </View>
 

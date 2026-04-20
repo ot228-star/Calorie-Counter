@@ -254,7 +254,7 @@ export function StitchFoodDetailScreen({
         <TouchableOpacity style={styles.circleBtn} onPress={onBack} activeOpacity={0.85} delayPressIn={0} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="arrow-back" size={22} color={theme.primary} />
         </TouchableOpacity>
-        <Text style={[styles.brand, { color: theme.primary }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Calorie Counter</Text>
+        <Text style={[styles.brand, { color: theme.primary }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Inertia</Text>
         <TouchableOpacity
           style={[styles.heartBtn, { backgroundColor: isFavorite ? `${theme.primary}33` : theme.surfaceContainerHigh }]}
           onPress={onToggleFavorite}

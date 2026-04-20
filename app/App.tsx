@@ -809,7 +809,7 @@ export default function App() {
   }, [session?.user?.id, favouriteFoodNames]);
 
   const attemptPrivacyUnlock = useCallback(
-    async (promptMessage = "Unlock Calorie Counter") => {
+    async (promptMessage = "Unlock Inertia") => {
       if (!privacyLockOn) {
         setPrivacyUnlocked(true);
         return true;
@@ -1221,8 +1221,8 @@ export default function App() {
 
   const handleSupportTilePress = useCallback(async () => {
     const to = "strive.fitness.contact@gmail.com";
-    const gmailUrl = `googlegmail://co?to=${encodeURIComponent(to)}&subject=${encodeURIComponent("Calorie Counter Support")}`;
-    const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent("Calorie Counter Support")}`;
+    const gmailUrl = `googlegmail://co?to=${encodeURIComponent(to)}&subject=${encodeURIComponent("Inertia Support")}`;
+    const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent("Inertia Support")}`;
 
     try {
       const canOpenGmail = await Linking.canOpenURL(gmailUrl);
@@ -1485,7 +1485,7 @@ export default function App() {
             <PrimaryButton
               title="Unlock"
               onPress={() => {
-                void attemptPrivacyUnlock("Unlock Calorie Counter");
+                void attemptPrivacyUnlock("Unlock Inertia");
               }}
               color={theme.primary}
               textColor={theme.onPrimary}
