@@ -7,7 +7,7 @@ import { useAppTheme } from "../../theme/AppThemeContext";
 import { mixHex } from "../../lib/themeColors";
 import { stitchFonts } from "../../theme/stitch";
 
-export type StitchNavId = "home" | "search" | "log" | "plan" | "camera";
+export type StitchNavId = "home" | "plan" | "log" | "camera" | "settings";
 
 type Tab = {
   id: StitchNavId;
@@ -19,10 +19,10 @@ type Tab = {
 
 const TABS: Tab[] = [
   { id: "home", label: "Home", icon: "home-outline", iconActive: "home" },
-  { id: "search", label: "Search", icon: "search-outline", iconActive: "search" },
-  { id: "log", label: "Log", icon: "add-circle-outline", iconActive: "add-circle", emphasizeCenter: true },
   { id: "plan", label: "Plan", icon: "restaurant-outline", iconActive: "restaurant" },
-  { id: "camera", label: "Camera", icon: "camera-outline", iconActive: "camera" }
+  { id: "log", label: "Log", icon: "add-circle-outline", iconActive: "add-circle", emphasizeCenter: true },
+  { id: "camera", label: "Camera", icon: "camera-outline", iconActive: "camera" },
+  { id: "settings", label: "Settings", icon: "settings-outline", iconActive: "settings" }
 ];
 
 type Props = {
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 999,
-    minWidth: 62
+    minWidth: 52
   },
   label: {
     fontSize: 10,

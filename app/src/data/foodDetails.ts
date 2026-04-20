@@ -1,6 +1,4 @@
 import type { FoodRecord } from "./foodDatabase";
-import { FOOD_COM_PHOTO_BY_FOOD } from "./foodComPhotoMap";
-import { FOODIESFEED_PHOTO_BY_FOOD } from "./foodiesfeedPhotoMap";
 
 export type FoodDetail = {
   description: string;
@@ -12,7 +10,7 @@ export type FoodDetail = {
   photoCandidates?: string[];
 };
 
-const PHOTO_SOURCE = "Photo: Food.com / Foodiesfeed / Unsplash fallback";
+const PHOTO_SOURCE = "Catalog image (Supabase)";
 
 const INGREDIENTS_BY_FOOD: Record<string, string[]> = {
   "Mediterranean Salmon Bowl": ["Salmon", "Quinoa", "Cucumber", "Tomatoes", "Feta"],
@@ -24,14 +22,14 @@ const INGREDIENTS_BY_FOOD: Record<string, string[]> = {
   "Poke Bowl (chicken)": ["Chicken", "Rice", "Edamame", "Carrot", "Cucumber"],
   "Chicken Caesar Salad": ["Chicken", "Romaine", "Parmesan", "Croutons", "Caesar Dressing"],
   "Greek Salad": ["Tomatoes", "Cucumber", "Olives", "Feta", "Olive Oil"],
-  "Shakshuka": ["Eggs", "Tomato", "Bell Pepper", "Onion", "Paprika"],
+  Shakshuka: ["Eggs", "Tomato", "Bell Pepper", "Onion", "Paprika"],
   "Chana Masala": ["Chickpeas", "Tomato", "Onion", "Ginger", "Cumin"],
   "Dal Tadka": ["Lentils", "Garlic", "Cumin", "Turmeric", "Tomato"],
   "Pad Thai": ["Rice Noodles", "Egg", "Bean Sprouts", "Peanuts", "Lime"],
   "Pho (beef)": ["Beef Broth", "Rice Noodles", "Beef", "Herbs", "Lime"],
   "Sushi (mixed)": ["Rice", "Fish", "Seaweed", "Cucumber", "Soy"],
   "Chicken Teriyaki": ["Chicken", "Soy", "Ginger", "Garlic", "Rice"],
-  "Bibimbap": ["Rice", "Vegetables", "Egg", "Beef", "Gochujang"],
+  Bibimbap: ["Rice", "Vegetables", "Egg", "Beef", "Gochujang"],
   "Quinoa Salad": ["Quinoa", "Cucumber", "Tomatoes", "Herbs", "Lemon"],
   "Minestrone Soup": ["Beans", "Tomato", "Vegetables", "Pasta", "Herbs"],
   "Oatmeal with Banana": ["Oats", "Banana", "Milk", "Cinnamon", "Seeds"],
@@ -51,100 +49,6 @@ const DETAIL_HINTS: Record<string, { aliases: string[]; summary: string }> = {
   "Rice with Chicken": { aliases: ["chicken rice", "rice bowl"], summary: "A balanced rice-and-chicken meal common in home cooking and meal prep." }
 };
 
-// Deterministic pinned photos for high-frequency foods/meals.
-const PINNED_PHOTO_BY_FOOD: Record<string, string> = {
-  "Hot Dog": "https://images.unsplash.com/photo-1612392062798-2eaede5f4c44?auto=format&fit=crop&w=1200&q=80",
-  Hamburger: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80",
-  Cheeseburger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Burger": "https://images.unsplash.com/photo-1606755962773-d324e2d53f8b?auto=format&fit=crop&w=1200&q=80",
-  "Margherita Pizza": "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=1200&q=80",
-  "Pepperoni Pizza": "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=1200&q=80",
-  "Vegetable Pizza": "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=1200&q=80",
-  "Rice with Chicken": "https://images.unsplash.com/photo-1604908177225-3b8a6a4f7f42?auto=format&fit=crop&w=1200&q=80",
-  "Chicken and Rice Bowl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Biryani": "https://images.unsplash.com/photo-1701579231305-d84d8af9a3fd?auto=format&fit=crop&w=1200&q=80",
-  "Beef Biryani": "https://images.unsplash.com/photo-1690989321640-8f4f0da8228a?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Curry with Rice": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=1200&q=80",
-  "Butter Chicken": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=1200&q=80",
-  "Tikka Masala": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=1200&q=80",
-  "Chana Masala": "https://images.unsplash.com/photo-1666001061315-932b3fdf30a8?auto=format&fit=crop&w=1200&q=80",
-  "Dal Tadka": "https://images.unsplash.com/photo-1626508035297-0cd27b2c6f82?auto=format&fit=crop&w=1200&q=80",
-  "Pad Thai": "https://images.unsplash.com/photo-1637806930600-37fa8892069d?auto=format&fit=crop&w=1200&q=80",
-  "Pho (beef)": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1200&q=80",
-  "Sushi (mixed)": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
-  "Sushi Roll (salmon)": "https://images.unsplash.com/photo-1617196038435-58e4d5f13d0a?auto=format&fit=crop&w=1200&q=80",
-  "Sushi Roll (avocado)": "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=1200&q=80",
-  "Salmon Nigiri": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80",
-  "Tuna Nigiri": "https://images.unsplash.com/photo-1615361200141-f45040f367be?auto=format&fit=crop&w=1200&q=80",
-  "Ramen (prepared)": "https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Yakisoba": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Dumplings": "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=1200&q=80",
-  "Fried Rice (chicken)": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
-  "Fried Rice (vegetable)": "https://images.unsplash.com/photo-1635321593217-40050ad13c74?auto=format&fit=crop&w=1200&q=80",
-  "Noodles with Chicken": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=1200&q=80",
-  "Spaghetti Bolognese": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=1200&q=80",
-  Lasagna: "https://images.unsplash.com/photo-1619895092538-128341789043?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Alfredo Pasta": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?auto=format&fit=crop&w=1200&q=80",
-  "Pasta Primavera": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1200&q=80",
-  "Pesto Pasta": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1200&q=80",
-  "Grilled Chicken Wrap": "https://images.unsplash.com/photo-1662116765994-1e4200c43589?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Shawarma Wrap": "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=1200&q=80",
-  "Falafel Wrap": "https://images.unsplash.com/photo-1592415486689-125cbbfcbee2?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Pita Pocket": "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=1200&q=80",
-  "Hummus with Pita": "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Kebab": "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=1200&q=80",
-  "Beef Kofta": "https://images.unsplash.com/photo-1572441713132-51c75654db73?auto=format&fit=crop&w=1200&q=80",
-  "Greek Salad": "https://images.unsplash.com/photo-1551248429-40975aa4de74?auto=format&fit=crop&w=1200&q=80",
-  "Caesar Salad with Chicken": "https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Caesar Salad": "https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=1200&q=80",
-  "Quinoa Salad": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
-  "Cobb Salad": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
-  "Fruit Salad": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=1200&q=80",
-  "Lentil Soup": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=80",
-  "Tomato Soup": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Soup": "https://images.unsplash.com/photo-1604908177443-4f6f3f5b1f9f?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Noodle Soup": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Tortilla Soup": "https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?auto=format&fit=crop&w=1200&q=80",
-  "Miso Soup": "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=1200&q=80",
-  "Beef Chili": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=80",
-  "Turkey Chili": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Fajitas": "https://images.unsplash.com/photo-1604467715878-83e57e8bc129?auto=format&fit=crop&w=1200&q=80",
-  "Beef Fajitas": "https://images.unsplash.com/photo-1604467715878-83e57e8bc129?auto=format&fit=crop&w=1200&q=80",
-  "Beef Taco": "https://images.unsplash.com/photo-1611250188496-e966043a0629?auto=format&fit=crop&w=1200&q=80",
-  "Beef Burrito": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Quesadilla": "https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Burrito Bowl": "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1200&q=80",
-  "Steak Burrito Bowl": "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1200&q=80",
-  "Shrimp Burrito Bowl": "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1200&q=80",
-  "Chicken Gyro": "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=1200&q=80",
-  "Lamb Gyro": "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=1200&q=80",
-  "Poke Bowl (salmon)": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80",
-  "Poke Bowl (tuna)": "https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80",
-  "Poke Bowl (chicken)": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
-  "Breakfast Burrito": "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=80",
-  "Scrambled Eggs with Toast": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=1200&q=80",
-  "Fried Egg Sandwich": "https://images.unsplash.com/photo-1550507992-eb63ffee0847?auto=format&fit=crop&w=1200&q=80",
-  "Oatmeal with Banana": "https://images.unsplash.com/photo-1517673400267-0251440c45dc?auto=format&fit=crop&w=1200&q=80",
-  "Yogurt with Granola": "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=1200&q=80",
-  "Greek Yogurt Bowl": "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=1200&q=80",
-  Pancakes: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=1200&q=80",
-  Waffles: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=1200&q=80",
-  Omelette: "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=1200&q=80",
-  "Protein Pancakes": "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=1200&q=80",
-  "Egg and Avocado Toast": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1200&q=80",
-  "Acai Bowl": "https://images.unsplash.com/photo-1490323948794-cc6dde6e8f5b?auto=format&fit=crop&w=1200&q=80",
-  "Banana Smoothie": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=80",
-  "Berry Smoothie": "https://images.unsplash.com/photo-1505252585461-04db1eb84625?auto=format&fit=crop&w=1200&q=80",
-  "Green Smoothie": "https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&w=1200&q=80",
-  "Milkshake (vanilla)": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=1200&q=80",
-  "Chocolate Milk": "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=1200&q=80",
-  "Iced Latte": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=1200&q=80",
-  Cappuccino: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
-  Mocha: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80"
-};
-
-// Category-level fallbacks intentionally removed: every food/meal gets its own image query.
-
 const normalizeFoodName = (name: string): string =>
   name
     .replace(/\(.*?\)/g, " ")
@@ -153,39 +57,7 @@ const normalizeFoodName = (name: string): string =>
     .trim()
     .toLowerCase();
 
-const tokenizeFoodName = (name: string): string[] =>
-  normalizeFoodName(name)
-    .split(" ")
-    .filter(Boolean);
-
 const WHOLE_FOOD_CATEGORIES = new Set(["Fruit", "Vegetable", "Protein", "Grain", "Dairy", "Fat"]);
-const COMPLEX_MEAL_HINT = /(soup|salad|bowl|wrap|sandwich|pizza|burger|pasta|curry|masala|biryani|stir fry|stir-fry|noodle|ramen|sushi|taco|burrito|omelette|quesadilla|gyro|kebab|chili|stew|risotto|parmesan|shawarma|fajitas|enchiladas|congee|smoothie)/;
-
-const FOOD_COM_URL_USAGE_COUNT = Object.values(FOOD_COM_PHOTO_BY_FOOD).reduce<Record<string, number>>((acc, url) => {
-  acc[url] = (acc[url] ?? 0) + 1;
-  return acc;
-}, {});
-
-const stableHash = (input: string): number => {
-  let h = 0;
-  for (let i = 0; i < input.length; i += 1) {
-    h = (h << 5) - h + input.charCodeAt(i);
-    h |= 0;
-  }
-  return Math.abs(h);
-};
-
-const foodSpecificUnsplashUrl = (foodName: string, variant: number): string => {
-  const query = encodeURIComponent(`${foodName} food meal`);
-  const sig = stableHash(`${foodName}:${variant}`) % 10000;
-  // `random/` path is more reliable than the legacy `/1200x900/?query` endpoint.
-  return `https://source.unsplash.com/random/1200x900/?${query}&sig=${sig}`;
-};
-
-const foodSpecificPicsumUrl = (foodName: string, variant: number): string => {
-  const seed = encodeURIComponent(`${foodName}-${variant}-${stableHash(foodName) % 997}`);
-  return `https://picsum.photos/seed/${seed}/1200/900`;
-};
 
 const macroFocus = (food: FoodRecord): string => {
   const map = [
@@ -241,40 +113,97 @@ const inferWellnessTip = (food: FoodRecord): string => {
   return "Balanced option: fits well as part of a varied, whole-food meal plan.";
 };
 
-const canUseFoodComPhoto = (food: FoodRecord): boolean => {
-  const foodComUrl = FOOD_COM_PHOTO_BY_FOOD[food.name];
-  if (!foodComUrl) return false;
-
-  // If one recipe photo is reused for many entries, it's likely not specific enough.
-  if ((FOOD_COM_URL_USAGE_COUNT[foodComUrl] ?? 0) > 2) return false;
-
-  const tokens = tokenizeFoodName(food.name);
-  const looksLikeComplexMeal = COMPLEX_MEAL_HINT.test(normalizeFoodName(food.name));
-  const isWholeFood = WHOLE_FOOD_CATEGORIES.has(food.category);
-
-  // Avoid forcing recipe-style photos for simple whole foods (e.g. broccoli, apple).
-  if (isWholeFood && !looksLikeComplexMeal) return false;
-  if (tokens.length <= 1 && !looksLikeComplexMeal) return false;
-
-  return true;
+/** Short plan-card tagline keyed by exact `FoodRecord.name` where we want a specific note. */
+const PLAN_TAGLINE_BY_NAME: Record<string, string> = {
+  "Mediterranean Salmon Bowl": "Omega-3 · whole grains",
+  "Chicken Burrito Bowl": "Meal-prep friendly bowl",
+  "Steak Burrito Bowl": "Hearty · higher sat fat",
+  "Shrimp Burrito Bowl": "Lean seafood · fresh veg",
+  "Poke Bowl (salmon)": "Raw fish · sushi rice",
+  "Poke Bowl (tuna)": "Lean tuna · avocado fat",
+  "Poke Bowl (chicken)": "Mild · customizable",
+  "Chicken Caesar Salad": "Classic salad · dressing adds fat",
+  "Greek Salad": "Mediterranean veg · feta",
+  Shakshuka: "Eggs · tomato iron",
+  "Chana Masala": "Fiber-rich legumes",
+  "Dal Tadka": "Comfort lentils · spices",
+  "Pad Thai": "Sweet-savory noodles",
+  "Pho (beef)": "Broth-forward · lower fat",
+  "Sushi (mixed)": "Varied fish · rice carbs",
+  "Chicken Teriyaki": "Sweet glaze · pair veg",
+  Bibimbap: "Korean mixed rice bowl",
+  "Quinoa Salad": "Complete protein grain",
+  "Minestrone Soup": "Veg-heavy · broth volume",
+  "Oatmeal with Banana": "Slow carbs · breakfast",
+  "Acai Bowl": "Antioxidants · topping sugar",
+  "Hot Dog": "Processed meat · moderate",
+  Hamburger: "Grill classic · bun carbs",
+  Cheeseburger: "Higher sat fat · indulgent",
+  "Chicken Biryani": "Spiced rice · big flavor",
+  "Butter Chicken": "Creamy · higher kcal",
+  "Tikka Masala": "Tomato-cream curry",
+  "Rice with Chicken": "Simple balanced plate"
 };
+
+const taglineFromNamePattern = (food: FoodRecord): string | null => {
+  const n = normalizeFoodName(food.name);
+  if (/(smoothie|shake|milkshake)/.test(n)) return "Liquid calories · watch sugar";
+  if (/(coffee|latte|cappuccino|mocha)/.test(n)) return "Caffeine · milk sugar";
+  if (/(pizza)/.test(n)) return "Cheese · refined crust";
+  if (/(burger|sandwich|wrap|gyro|shawarma)/.test(n)) return "Handheld · sauce adds kcal";
+  if (/(taco|burrito|quesadilla|enchilada|fajita)/.test(n)) return "Tex-Mex · beans & rice";
+  if (/(ramen|pho|noodle|pad thai|yakisoba)/.test(n)) return "Noodle bowl · broth or oil";
+  if (/(curry|masala|biryani|dal|tikka)/.test(n)) return "Spiced sauce · often creamy";
+  if (/(soup|chili|stew|minestrone)/.test(n)) return "High volume · watch sodium";
+  if (/(salad)/.test(n)) return "Veg volume · dressing fat";
+  if (/(poke|sushi|nigiri|sashimi)/.test(n)) return "Seafood · rice or raw";
+  if (/(bowl)/.test(n)) return "Build-your macros bowl";
+  if (/(pancake|waffle|french toast)/.test(n)) return "Breakfast carbs · syrup";
+  if (/(oatmeal|porridge|congee)/.test(n)) return "Warm grains · steady fuel";
+  if (/(egg|omelette|scrambled)/.test(n)) return "Protein + fat breakfast";
+  if (/(ice cream|gelato|frozen)/.test(n)) return "Treat · high sugar/fat";
+  if (/(chocolate|candy|dessert|cake|pie|cookie)/.test(n)) return "Dessert energy density";
+  if (food.category === "Fruit") return "Whole fruit · fiber & water";
+  if (food.category === "Vegetable") return "Low kcal · micronutrients";
+  if (food.category === "Protein" && food.fat_g < 5) return "Lean protein anchor";
+  if (food.category === "Protein" && food.fat_g >= 12) return "Fatty cut · rich flavor";
+  if (food.category === "Grain") return "Starch base · portion matters";
+  if (food.category === "Dairy") return "Calcium · protein varies";
+  if (food.category === "Fat") return "Calorie-dense · small amounts";
+  if (food.category === "Prepared") return "Restaurant-style · estimate";
+  return null;
+};
+
+const taglineFromMacros = (food: FoodRecord): string => {
+  if (food.protein_g >= 20) return "Protein-forward pick";
+  if (food.carbs_g >= 35 && food.fat_g < 10) return "Carb energy source";
+  if (food.fat_g >= 18) return "Higher-fat choice";
+  if (food.calories <= 50 && WHOLE_FOOD_CATEGORIES.has(food.category)) return "Very light per 100g";
+  if (food.calories >= 400) return "Very dense per 100g";
+  if (food.calories < 100) return "Light per portion basis";
+  return "Balanced macro spread";
+};
+
+export function getFoodPlanTagline(food: FoodRecord): string {
+  const named = PLAN_TAGLINE_BY_NAME[food.name];
+  if (named) return named;
+  const pattern = taglineFromNamePattern(food);
+  if (pattern) return pattern;
+  return taglineFromMacros(food);
+}
 
 export const getFoodPhotoCandidates = (food: FoodRecord): string[] => {
   const candidates: string[] = [];
-  const pinned = PINNED_PHOTO_BY_FOOD[food.name];
-  if (pinned) candidates.push(pinned);
-  const foodiesfeed = FOODIESFEED_PHOTO_BY_FOOD[food.name];
-  if (foodiesfeed) candidates.push(foodiesfeed);
-  const foodCom = FOOD_COM_PHOTO_BY_FOOD[food.name];
-  if (foodCom && canUseFoodComPhoto(food)) candidates.push(foodCom);
-  // Per-food unique candidates (same meal name => same image set; different name => different image set).
-  candidates.push(foodSpecificUnsplashUrl(food.name, 1));
-  candidates.push(foodSpecificUnsplashUrl(food.name, 2));
-  candidates.push(foodSpecificUnsplashUrl(food.name, 3));
-  // Hard fallback: always-load image host, deterministic per food.
-  candidates.push(foodSpecificPicsumUrl(food.name, 1));
-  candidates.push(foodSpecificPicsumUrl(food.name, 2));
-  return Array.from(new Set(candidates));
+  const rejected = food.image_review_status === "rejected";
+  if (!rejected) {
+    const primary = food.image_url?.trim();
+    if (primary) candidates.push(primary);
+    for (const u of food.image_urls ?? []) {
+      const t = typeof u === "string" ? u.trim() : "";
+      if (t.length > 0 && !candidates.includes(t)) candidates.push(t);
+    }
+  }
+  return candidates;
 };
 
 export const getFoodDetail = (food: FoodRecord): FoodDetail => {
@@ -286,10 +215,11 @@ export const getFoodDetail = (food: FoodRecord): FoodDetail => {
     food
   )} ${calorieDensity(food.calories)}`;
   const candidates = getFoodPhotoCandidates(food);
+  const attribution = food.photo_attribution?.trim();
   return {
     description,
-    photoUrl: candidates[0],
-    sourceLabel: PHOTO_SOURCE,
+    photoUrl: candidates[0] ?? "",
+    sourceLabel: attribution || PHOTO_SOURCE,
     keyIngredients: inferKeyIngredients(food),
     wellnessTip: inferWellnessTip(food),
     aliases: getAliasesForFood(food),
@@ -304,4 +234,3 @@ export const getFoodSearchBlob = (food: FoodRecord): string => {
     .join(" ")
     .toLowerCase();
 };
-

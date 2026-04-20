@@ -3,10 +3,19 @@
   "private": true,
   "version": "1.0.0",
   "description": "Expo app lives in ./app. From this folder run npm start, or: npx expo start app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ot228-star/Calorie-Counter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ot228-star/Calorie-Counter/issues"
+  },
   "scripts": {
     "start": "npm --prefix app run start",
     "android": "npm --prefix app run android",
     "typecheck": "npm --prefix app run typecheck",
-    "lint": "npm --prefix app run lint"
+    "lint": "npm --prefix app run lint",
+    "catalog:seed": "node scripts/build-food-catalog-seed.mjs",
+    "catalog:validate-urls": "node scripts/validate-food-catalog-urls.mjs supabase/seed/food_catalog_seed.sql"
   }
 }

@@ -1,5 +1,8 @@
 import { EXTRA_FOODS } from "./extraFoods";
 
+export type FoodImageReviewStatus = "pending" | "approved" | "rejected";
+
+/** Local + cloud `public.foods` row shape (image fields absent when not synced). */
 export type FoodRecord = {
   name: string;
   category: string;
@@ -7,6 +10,12 @@ export type FoodRecord = {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
+  image_url?: string | null;
+  image_urls?: string[] | null;
+  photo_source?: string | null;
+  photo_attribution?: string | null;
+  slug?: string | null;
+  image_review_status?: FoodImageReviewStatus | null;
 };
 
 // Values are approximate per 100g edible portion.

@@ -2,6 +2,12 @@
 
 Mobile-first calorie counter app for fast food logging with photo estimation and manual correction.
 
+**Repository:** [github.com/ot228-star/Calorie-Counter](https://github.com/ot228-star/Calorie-Counter)
+
+```bash
+git clone https://github.com/ot228-star/Calorie-Counter.git
+```
+
 ## Scope
 
 - Android-first MVP in 4-6 weeks
@@ -34,9 +40,9 @@ Copy `.env.example` to `.env` in the **repo root** (next to `README.md`) and set
 npm run start
 ```
 
-### 4) Apply Supabase migration
+### 4) Apply Supabase migrations
 
-Run SQL in `supabase/migrations/001_init.sql` against your Supabase project.
+Run SQL in order against your Supabase project: `supabase/migrations/001_init.sql`, then `002_food_catalog.sql`, then `003_food_images_and_catalog_meta.sql`. Optionally run `supabase/seed/food_catalog_seed.sql` after regenerating it with `npm run catalog:seed`. See [docs/food-catalog.md](docs/food-catalog.md) for the single-catalog and imagery workflow.
 
 ## Current MVP Features
 
