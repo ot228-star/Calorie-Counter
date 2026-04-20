@@ -579,9 +579,10 @@ export default function App() {
       return 2200;
     }
 
-    const normalizedGoals = surveyGoals.map((g) => g.toLowerCase());
+    const selectedGoal = surveyGoals[0]?.toLowerCase() ?? "";
     const normalizedHabits = surveyHabits.map((h) => h.toLowerCase());
 
+    // Activity multiplier from meal planning frequency and habits.
     const frequencyActivityOffset: Record<string, number> = {
       Never: -0.04,
       Rarely: -0.02,
@@ -595,30 +596,23 @@ export default function App() {
     if (normalizedHabits.some((h) => h.includes("prioritize sleep"))) activityMultiplier += 0.01;
     activityMultiplier = Math.max(1.2, Math.min(1.65, activityMultiplier));
 
-    // Multi-goal intention score: weighted blend rather than single-goal bias.
-    const loseIntent = normalizedGoals.filter((g) => g.includes("lose")).length;
-    const gainIntent = normalizedGoals.filter((g) => g.includes("gain")).length;
-    const maintainIntent = normalizedGoals.filter((g) => g.includes("maintain")).length;
-    const hasMuscleGoal = normalizedGoals.some((g) => g.includes("gain muscle"));
-    const hasDietGoal = normalizedGoals.some((g) => g.includes("modify my diet"));
-    const hasPlanningGoal = normalizedGoals.some((g) => g.includes("plan meals"));
-    const hasStressGoal = normalizedGoals.some((g) => g.includes("manage stress"));
-
-    const totalGoalWeight = Math.max(1, loseIntent + gainIntent + maintainIntent + (hasMuscleGoal ? 1 : 0));
-    const loseRatio = loseIntent / totalGoalWeight;
-    const gainRatio = gainIntent / totalGoalWeight;
-    const maintainRatio = maintainIntent / totalGoalWeight;
-
+    // Direct goal-based calorie adjustment (single-choice goal).
     let calorieAdjustment = 0;
-    calorieAdjustment += Math.round(-260 * loseRatio);
-    calorieAdjustment += Math.round(220 * gainRatio);
-    calorieAdjustment += Math.round(30 * maintainRatio);
+    if (selectedGoal.includes("lose weight")) {
+      calorieAdjustment = -200;
+    } else if (selectedGoal.includes("gain weight")) {
+      calorieAdjustment = 180;
+    } else if (selectedGoal.includes("gain muscle")) {
+      calorieAdjustment = 250;
+    } else if (selectedGoal.includes("modify my diet")) {
+      calorieAdjustment = -50;
+    } else if (selectedGoal.includes("plan meals")) {
+      calorieAdjustment = 0;
+    } else if (selectedGoal.includes("manage stress")) {
+      calorieAdjustment = 30;
+    }
 
-    if (hasMuscleGoal) calorieAdjustment += 110;
-    if (hasStressGoal) calorieAdjustment += 20;
-    if (hasPlanningGoal) calorieAdjustment -= 10;
-    if (hasDietGoal) calorieAdjustment -= 15;
-
+    // Habit-based fine-tuning.
     if (normalizedHabits.some((h) => h.includes("eat more protein"))) calorieAdjustment += 75;
     if (normalizedHabits.some((h) => h.includes("eat more fiber"))) calorieAdjustment -= 45;
     if (normalizedHabits.some((h) => h.includes("eat mindfully"))) calorieAdjustment -= 25;
@@ -1477,12 +1471,8 @@ export default function App() {
     setScreen("foodDetail");
   };
 
-  const toggleGoalSelection = (goal: string) => {
-    setSurveyGoals((prev) => {
-      if (prev.includes(goal)) return prev.filter((g) => g !== goal);
-      if (prev.length >= 3) return prev;
-      return [...prev, goal];
-    });
+  const selectGoal = (goal: string) => {
+    setSurveyGoals([goal]);
   };
 
   const toggleHabitSelection = (habit: string) => {
@@ -1627,7 +1617,7 @@ export default function App() {
                   What are your primary goals?
                 </Text>
                 <Text style={[styles.onboardingMainSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
-                  Pick up to 3 goals so we can calibrate your energy target.
+                  Choose your primary goal to calibrate your energy target.
                 </Text>
                 <View style={{ gap: 10 }}>
                   {onboardingGoalOptions.map((goal) => {
@@ -1643,7 +1633,7 @@ export default function App() {
                             backgroundColor: selected ? `${theme.primary}22` : surveyTheme.inputBackground
                           }
                         ]}
-                        onPress={() => toggleGoalSelection(goal)}
+                        onPress={() => selectGoal(goal)}
                         activeOpacity={0.85}
                       >
                         <View style={[styles.onboardingChoiceIcon, { backgroundColor: "rgba(148, 163, 184, 0.14)" }]}>
@@ -1658,10 +1648,10 @@ export default function App() {
                         <View
                           style={[
                             styles.onboardingCircleCheck,
-                            { borderColor: selected ? `${theme.primary}CC` : surveyTheme.border, backgroundColor: selected ? `${theme.primary}26` : "transparent" }
+                            { borderColor: selected ? theme.primary : surveyTheme.border, backgroundColor: selected ? theme.primary : "transparent" }
                           ]}
                         >
-                          {selected ? <Ionicons name="checkmark" size={15} color={theme.primary} /> : null}
+                          {selected ? <View style={{ width: 10, height: 10, borderRadius: 999, backgroundColor: theme.onPrimary }} /> : null}
                         </View>
                       </TouchableOpacity>
                     );
@@ -1840,6 +1830,12 @@ export default function App() {
                 <Text style={[styles.onboardingMainSub, { color: surveyTheme.mutedText }, font?.body && { fontFamily: font.body }]}>
                   Choose a nickname and confirm your daily target.
                 </Text>
+                <View style={[styles.metricPill, { borderColor: `${theme.primary}66`, backgroundColor: `${theme.primary}18`, marginBottom: 12 }]}>
+                  <Text style={[styles.helperText, { color: surveyTheme.mutedText }]}>Your goal</Text>
+                  <Text style={[styles.statValue, { color: surveyTheme.text }]}>{surveyGoals[0] ?? "Not selected"}</Text>
+                  <Text style={[styles.helperText, { color: surveyTheme.mutedText, marginTop: 8 }]}>Calculated daily target</Text>
+                  <Text style={[styles.statValue, { color: theme.primary, fontSize: 28 }]}>{Math.round(onboardingSuggestedTarget)} kcal</Text>
+                </View>
                 <TextInput
                   style={[styles.input, { backgroundColor: surveyTheme.inputBackground, borderColor: surveyTheme.border, color: surveyTheme.text }]}
                   placeholderTextColor={surveyTheme.mutedText}
