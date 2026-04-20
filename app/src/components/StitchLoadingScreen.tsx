@@ -3,7 +3,7 @@ import { Animated, StyleSheet, Text, View } from "react-native";
 import { Image as ExpoImage } from "expo-image";
 import { stitchFonts } from "../theme/stitch";
 
-const logoAsset = require("../../assets/logo-mindful-bowl.png");
+const logoAsset = require("../../assets/logo-calorie-counter.png");
 
 export function StitchLoadingScreen({ useCustomFonts = false }: { useCustomFonts?: boolean }) {
   const pulse = useRef(new Animated.Value(0.92)).current;

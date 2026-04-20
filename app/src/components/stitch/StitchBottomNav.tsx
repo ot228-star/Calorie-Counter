@@ -53,6 +53,7 @@ export function StitchBottomNav({ active, onSelect, useCustomFonts }: Props) {
               style={[styles.item, isActive && { backgroundColor: activeBg }]}
               onPress={() => onSelect(tab.id)}
               activeOpacity={0.8}
+              delayPressIn={0}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
             >

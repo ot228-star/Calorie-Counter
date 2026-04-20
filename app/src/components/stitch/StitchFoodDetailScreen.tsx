@@ -251,7 +251,7 @@ export function StitchFoodDetailScreen({
   return (
     <View style={styles.root}>
       <View style={styles.topBar}>
-        <TouchableOpacity style={styles.circleBtn} onPress={onBack} activeOpacity={0.85} hitSlop={8}>
+        <TouchableOpacity style={styles.circleBtn} onPress={onBack} activeOpacity={0.85} delayPressIn={0} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="arrow-back" size={22} color={theme.primary} />
         </TouchableOpacity>
         <Text style={[styles.brand, { color: theme.primary }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Calorie Counter</Text>
@@ -259,6 +259,7 @@ export function StitchFoodDetailScreen({
           style={[styles.heartBtn, { backgroundColor: isFavorite ? `${theme.primary}33` : theme.surfaceContainerHigh }]}
           onPress={onToggleFavorite}
           activeOpacity={0.85}
+          delayPressIn={0}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
         >
@@ -323,14 +324,14 @@ export function StitchFoodDetailScreen({
         <Text style={[styles.servingText, useCustomFonts && { fontFamily: stitchFonts.body }]}>1 serving = 100g</Text>
       </View>
       <View style={styles.stepper}>
-        <TouchableOpacity style={styles.stepBtn} onPress={() => adjustServings(-0.5)} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.stepBtn} onPress={() => adjustServings(-0.5)} activeOpacity={0.8} delayPressIn={0}>
           <Ionicons name="remove" size={22} color={theme.onSurface} />
         </TouchableOpacity>
         <View style={styles.stepMid}>
           <Text style={[styles.stepNum, useCustomFonts && { fontFamily: stitchFonts.display }]}>{servings.toFixed(1)}</Text>
           <Text style={styles.stepLbl}>Servings</Text>
         </View>
-        <TouchableOpacity style={[styles.stepBtn, { backgroundColor: `${theme.primary}28` }]} onPress={() => adjustServings(0.5)} activeOpacity={0.8}>
+        <TouchableOpacity style={[styles.stepBtn, { backgroundColor: `${theme.primary}28` }]} onPress={() => adjustServings(0.5)} activeOpacity={0.8} delayPressIn={0}>
           <Ionicons name="add" size={22} color={theme.primary} />
         </TouchableOpacity>
       </View>
@@ -356,7 +357,7 @@ export function StitchFoodDetailScreen({
       </View>
 
       {onLogToDay ? (
-        <TouchableOpacity onPress={() => onLogToDay(servings)} activeOpacity={0.92} style={styles.logOuter}>
+        <TouchableOpacity onPress={() => onLogToDay(servings)} activeOpacity={0.92} delayPressIn={0} style={styles.logOuter}>
           <LinearGradient colors={grad} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.logBtn}>
             <Ionicons name="add-circle-outline" size={20} color={theme.onPrimary} />
             <Text style={[styles.logTxt, { color: theme.onPrimary }, useCustomFonts && { fontFamily: stitchFonts.display }]}>

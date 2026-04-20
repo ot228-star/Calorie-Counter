@@ -272,7 +272,7 @@ export function StitchDashboard({
             <Row styles={styles} icon="restaurant-outline" label="Food" value={String(consumedCalories)} accent />
             <Row styles={styles} icon="cube-outline" label="Meals" value={String(mealsLogged)} />
           </View>
-          <TouchableOpacity style={styles.quickLog} onPress={onQuickLog} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.quickLog} onPress={onQuickLog} activeOpacity={0.85} delayPressIn={0}>
             <Ionicons name="add" size={22} color={theme.primary} />
             <Text style={[styles.quickLogTxt, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>Quick Log</Text>
           </TouchableOpacity>
@@ -303,7 +303,7 @@ export function StitchDashboard({
           <Text style={[styles.emptySub, useCustomFonts && { fontFamily: stitchFonts.body }]}>
             Start by logging your first meal of the day.
           </Text>
-          <TouchableOpacity onPress={onLogBreakfast} activeOpacity={0.9} style={styles.ctaWrap}>
+          <TouchableOpacity onPress={onLogBreakfast} activeOpacity={0.9} style={styles.ctaWrap} delayPressIn={0}>
             <LinearGradient colors={grad} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.ctaBtn}>
               <Text style={[styles.ctaTxt, useCustomFonts && { fontFamily: stitchFonts.display }]}>Log My Breakfast</Text>
             </LinearGradient>
@@ -321,7 +321,7 @@ export function StitchDashboard({
               </View>
               <View style={styles.mealRight}>
                 <Text style={[styles.kcal, useCustomFonts && { fontFamily: stitchFonts.display }]}>{m.calories}</Text>
-                <TouchableOpacity onPress={() => onDeleteMeal(m.id)} hitSlop={12}>
+                <TouchableOpacity onPress={() => onDeleteMeal(m.id)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} delayPressIn={0} activeOpacity={0.7}>
                   <Text style={[styles.delete, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>Delete</Text>
                 </TouchableOpacity>
               </View>

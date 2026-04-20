@@ -61,7 +61,7 @@ export function StitchCameraScreen({ photoUri, onEstimate, useCustomFonts }: Pro
           </View>
         )}
       </View>
-      <TouchableOpacity onPress={onEstimate} activeOpacity={0.92} style={{ borderRadius: 999, overflow: "hidden" }}>
+      <TouchableOpacity onPress={onEstimate} activeOpacity={0.92} delayPressIn={0} style={{ borderRadius: 999, overflow: "hidden" }}>
         <LinearGradient colors={grad} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.cta}>
           <Ionicons name="sparkles" size={20} color={theme.onPrimary} />
           <Text style={[styles.ctaTxt, useCustomFonts && { fontFamily: stitchFonts.display }]}>Estimate calories</Text>

@@ -47,7 +47,7 @@ export function StitchAuthScreen({
     >
       <View style={styles.hero}>
         <LinearGradient colors={["rgba(78,222,162,0.15)", "rgba(68,216,241,0.08)"]} style={styles.heroIconGrad}>
-          <Image source={require("../../../assets/logo-mindful-bowl.png")} style={styles.heroLogo} contentFit="contain" />
+          <Image source={require("../../../assets/logo-calorie-counter.png")} style={styles.heroLogo} contentFit="contain" />
         </LinearGradient>
         <Text style={[styles.brand, useCustomFonts && { fontFamily: stitchFonts.display }]}>Calorie Counter</Text>
         <Text style={[styles.tag, useCustomFonts && { fontFamily: stitchFonts.body }]}>Track calories with photos</Text>

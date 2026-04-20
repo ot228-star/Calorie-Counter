@@ -62,6 +62,7 @@ export function StitchTopBar({
           style={[styles.iconBtn, favouritesActive && { backgroundColor: activeBg }]}
           onPress={onFavourites}
           activeOpacity={0.75}
+          delayPressIn={0}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
         >
@@ -72,6 +73,7 @@ export function StitchTopBar({
             style={[styles.iconBtn, settingsActive && { backgroundColor: activeBg }]}
             onPress={onSettings}
             activeOpacity={0.75}
+            delayPressIn={0}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
           >

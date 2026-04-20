@@ -298,6 +298,7 @@ const PrimaryButton = ({
     style={[styles.primaryBtn, { backgroundColor: color ?? "#2563eb" }, fullWidth ? styles.primaryBtnFull : null]}
     onPress={onPress}
     activeOpacity={0.7}
+    delayPressIn={0}
   >
     <Text style={[styles.primaryBtnText, textColor ? { color: textColor } : null]}>{title}</Text>
   </TouchableOpacity>
@@ -1218,6 +1219,30 @@ export default function App() {
     );
   }, [attemptPrivacyUnlock, privacyLockOn]);
 
+  const handleSupportTilePress = useCallback(async () => {
+    const to = "strive.fitness.contact@gmail.com";
+    const gmailUrl = `googlegmail://co?to=${encodeURIComponent(to)}&subject=${encodeURIComponent("Calorie Counter Support")}`;
+    const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent("Calorie Counter Support")}`;
+
+    try {
+      const canOpenGmail = await Linking.canOpenURL(gmailUrl);
+      if (canOpenGmail) {
+        await Linking.openURL(gmailUrl);
+        return;
+      }
+
+      const canOpenMail = await Linking.canOpenURL(mailtoUrl);
+      if (canOpenMail) {
+        await Linking.openURL(mailtoUrl);
+        return;
+      }
+
+      Alert.alert("Support unavailable", `No email app found. Contact us at ${to}.`);
+    } catch {
+      Alert.alert("Support unavailable", `Could not open email app. Contact us at ${to}.`);
+    }
+  }, []);
+
   const saveCurrentMeal = async (source: Meal["source"], requestId?: string) => {
     const cleanItems = mealItems.filter((item) => item.name.trim().length > 0);
     if (!cleanItems.length) {
@@ -1495,6 +1520,9 @@ export default function App() {
           keyboardDismissMode="on-drag"
           decelerationRate="normal"
           scrollEventThrottle={16}
+          disableIntervalMomentum
+          bounces={Platform.OS === "ios"}
+          overScrollMode="never"
         >
           <View style={[styles.onboardingShell, { backgroundColor: surveyTheme.shell, borderColor: surveyTheme.border }]}>
             <View style={styles.onboardingHeaderRow}>
@@ -1858,6 +1886,8 @@ export default function App() {
         overScrollMode="never"
         decelerationRate="normal"
         scrollEventThrottle={16}
+        disableIntervalMomentum
+        bounces={Platform.OS === "ios"}
       >
       {screen === "dashboard" && (
         <StitchDashboard
@@ -2024,8 +2054,10 @@ export default function App() {
           onSaveNickname={() => void handleSaveNickname()}
           onOpenNotifications={() => void handleNotificationsTilePress()}
           onOpenPrivacy={() => void handlePrivacyTilePress()}
+          onOpenSupport={() => void handleSupportTilePress()}
           notificationsHint={notificationsHint}
           privacyHint={privacyHint}
+          supportHint="Open Gmail to contact support"
           onRecalculateCalories={() => {
             const suggested = calculateQuestionnaireTarget();
             setTargetCalories(suggested);

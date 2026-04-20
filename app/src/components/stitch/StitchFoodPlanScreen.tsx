@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import type { FoodRecord } from "../../data/foodDatabase";
@@ -7,6 +7,9 @@ import { useAppTheme } from "../../theme/AppThemeContext";
 import { mixHex } from "../../lib/themeColors";
 import { stitchFonts } from "../../theme/stitch";
 import { Ionicons } from "@expo/vector-icons";
+
+const INITIAL_DISPLAY_COUNT = 10;
+const LOAD_MORE_COUNT = 10;
 
 type Props = {
   foodSearch: string;
@@ -148,7 +151,17 @@ function createStyles(t: AppThemeTokens) {
       borderRadius: 999,
       minWidth: 108
     },
-    addTxt: { color: t.onPrimary, fontWeight: "800", fontSize: 12 }
+    addTxt: { color: t.onPrimary, fontWeight: "800", fontSize: 12 },
+    loadMoreBtn: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 14,
+      borderRadius: 12,
+      backgroundColor: t.surfaceContainerHigh,
+      marginTop: 4
+    },
+    loadMoreTxt: { color: t.primary, fontWeight: "700", fontSize: 14 },
+    countHint: { color: t.onSurfaceVariant, fontSize: 11, textAlign: "center", marginTop: 6 }
   });
 }
 
@@ -228,13 +241,14 @@ function FoodPlanRow({
         </View>
       </View>
       <View style={styles.actionsRow}>
-        <TouchableOpacity style={styles.ghostBtn} onPress={() => onOpenDetail(food)} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.ghostBtn} onPress={() => onOpenDetail(food)} activeOpacity={0.85} delayPressIn={0}>
           <Text style={[styles.ghostTxt, useCustomFonts && { fontFamily: stitchFonts.body }]}>Details</Text>
         </TouchableOpacity>
         {!portionOpen ? (
           <TouchableOpacity
             onPress={() => setPortionOpen(true)}
             activeOpacity={0.9}
+            delayPressIn={0}
             style={{ flex: 1, borderRadius: 999, overflow: "hidden" }}
           >
             <LinearGradient colors={grad} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.addGrad}>
@@ -245,7 +259,7 @@ function FoodPlanRow({
         ) : (
           <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8 }}>
             <View style={styles.portionRow}>
-              <TouchableOpacity style={styles.pbtn} onPress={() => onAdjustPortion(food.name, -0.25)}>
+              <TouchableOpacity style={styles.pbtn} onPress={() => onAdjustPortion(food.name, -0.25)} delayPressIn={0} activeOpacity={0.7}>
                 <Text style={styles.pbtnTxt}>-</Text>
               </TouchableOpacity>
               <TextInput
@@ -254,7 +268,7 @@ function FoodPlanRow({
                 value={portionValue(food.name)}
                 onChangeText={(v) => onPortionChange(food.name, v)}
               />
-              <TouchableOpacity style={styles.pbtn} onPress={() => onAdjustPortion(food.name, 0.25)}>
+              <TouchableOpacity style={styles.pbtn} onPress={() => onAdjustPortion(food.name, 0.25)} delayPressIn={0} activeOpacity={0.7}>
                 <Text style={styles.pbtnTxt}>+</Text>
               </TouchableOpacity>
             </View>
@@ -264,6 +278,7 @@ function FoodPlanRow({
                 setPortionOpen(false);
               }}
               activeOpacity={0.9}
+              delayPressIn={0}
               style={{ flex: 1, borderRadius: 999, overflow: "hidden" }}
             >
               <LinearGradient colors={grad} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.addGrad}>
@@ -302,6 +317,17 @@ export function StitchFoodPlanScreen({
   const grad = [theme.primary, theme.primaryContainer] as const;
   const ph = `${theme.mutedText}73`;
 
+  const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
+
+  // Reset display count when region or search changes
+  useEffect(() => {
+    setDisplayCount(INITIAL_DISPLAY_COUNT);
+  }, [selectedRegion, foodSearch]);
+
+  const visibleFoods = useMemo(() => foods.slice(0, displayCount), [foods, displayCount]);
+  const hasMore = foods.length > displayCount;
+  const remaining = foods.length - displayCount;
+
   return (
     <View style={styles.root}>
       <View style={styles.hero}>
@@ -322,7 +348,13 @@ export function StitchFoodPlanScreen({
         />
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.chipScroll}
+        decelerationRate="fast"
+        scrollEventThrottle={16}
+      >
         {regionOrder.map((id) => {
           const active = selectedRegion === id;
           return (
@@ -331,6 +363,7 @@ export function StitchFoodPlanScreen({
               style={[styles.chip, active && styles.chipOn]}
               onPress={() => onSelectRegion(id)}
               activeOpacity={0.85}
+              delayPressIn={0}
             >
               <Text style={[styles.chipTxt, active && styles.chipTxtOn, useCustomFonts && { fontFamily: stitchFonts.body }]}>
                 {regionLabels[id]}
@@ -356,7 +389,7 @@ export function StitchFoodPlanScreen({
       ) : null}
 
       <View style={{ gap: 10 }}>
-        {foods.map((food) => (
+        {visibleFoods.map((food) => (
           <FoodPlanRow
             key={`${food.category}-${food.name}`}
             food={food}
@@ -373,6 +406,25 @@ export function StitchFoodPlanScreen({
             onPortionChange={onPortionChange}
           />
         ))}
+
+        {hasMore && (
+          <TouchableOpacity
+            style={styles.loadMoreBtn}
+            onPress={() => setDisplayCount((prev) => prev + LOAD_MORE_COUNT)}
+            activeOpacity={0.85}
+            delayPressIn={0}
+          >
+            <Text style={[styles.loadMoreTxt, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>
+              Load More ({remaining} remaining)
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {!foodLoading && foods.length > 0 && (
+          <Text style={[styles.countHint, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+            Showing {visibleFoods.length} of {foods.length} foods
+          </Text>
+        )}
       </View>
     </View>
   );

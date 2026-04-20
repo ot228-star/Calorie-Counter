@@ -32,8 +32,10 @@ type Props = {
   onSaveNickname: () => void;
   onOpenNotifications: () => void;
   onOpenPrivacy: () => void;
+  onOpenSupport: () => void;
   notificationsHint?: string;
   privacyHint?: string;
+  supportHint?: string;
   onSignOut?: () => void;
   showSignOut?: boolean;
   useCustomFonts?: boolean;
@@ -193,8 +195,10 @@ export function StitchSettingsScreen({
   onSaveNickname,
   onOpenNotifications,
   onOpenPrivacy,
+  onOpenSupport,
   notificationsHint,
   privacyHint,
+  supportHint,
   onSignOut,
   showSignOut,
   useCustomFonts
@@ -234,6 +238,7 @@ export function StitchSettingsScreen({
             style={[styles.saveBtn, { borderColor: theme.primary, backgroundColor: `${theme.primary}22` }]}
             onPress={onSaveNickname}
             activeOpacity={0.85}
+            delayPressIn={0}
           >
             <Text style={[styles.saveTxt, { color: theme.primary }]}>Save username</Text>
           </TouchableOpacity>
@@ -344,7 +349,7 @@ export function StitchSettingsScreen({
           <Text style={[styles.para, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
             Your BMI informs calorie suggestions alongside your goals.
           </Text>
-          <TouchableOpacity onPress={onRecalculateCalories} activeOpacity={0.92} style={{ borderRadius: 999, overflow: "hidden", marginTop: 12 }}>
+          <TouchableOpacity onPress={onRecalculateCalories} activeOpacity={0.92} delayPressIn={0} style={{ borderRadius: 999, overflow: "hidden", marginTop: 12 }}>
             <LinearGradient colors={grad} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.recalc}>
               <Text style={[styles.recalcTxt, useCustomFonts && { fontFamily: stitchFonts.display }]}>
                 Recalculate suggested calories
@@ -359,6 +364,7 @@ export function StitchSettingsScreen({
           style={[styles.tile, { backgroundColor: ui.card }]}
           onPress={onOpenNotifications}
           activeOpacity={0.85}
+          delayPressIn={0}
         >
           <Ionicons name="notifications-outline" size={24} color={theme.tertiary} />
           <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Notifications</Text>
@@ -366,7 +372,7 @@ export function StitchSettingsScreen({
             {notificationsHint ?? "Manage reminders and push permissions"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenPrivacy} activeOpacity={0.85}>
+        <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenPrivacy} activeOpacity={0.85} delayPressIn={0}>
           <Ionicons name="lock-closed-outline" size={24} color={theme.primary} />
           <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Privacy</Text>
           <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
@@ -374,9 +380,16 @@ export function StitchSettingsScreen({
           </Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenSupport} activeOpacity={0.85} delayPressIn={0}>
+        <Ionicons name="mail-outline" size={24} color={theme.primary} />
+        <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Support</Text>
+        <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+          {supportHint ?? "Contact support via email"}
+        </Text>
+      </TouchableOpacity>
 
       {showSignOut && onSignOut ? (
-        <TouchableOpacity style={[styles.signOut, { borderColor: theme.danger }]} onPress={onSignOut} activeOpacity={0.85}>
+        <TouchableOpacity style={[styles.signOut, { borderColor: theme.danger }]} onPress={onSignOut} activeOpacity={0.85} delayPressIn={0}>
           <Text style={[styles.signOutTxt, { color: theme.danger }]}>Sign out</Text>
         </TouchableOpacity>
       ) : null}

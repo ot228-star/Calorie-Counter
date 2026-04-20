@@ -6,17 +6,17 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "platforms": ["android"],
-    "icon": "./assets/logo-mindful-bowl.png",
+    "icon": "./assets/logo-calorie-counter.png",
     "splash": {
-      "image": "./assets/logo-mindful-bowl.png",
+      "image": "./assets/logo-calorie-counter.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#0a1628"
     },
     "android": {
       "package": "com.ot228star.caloriecounter",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo-mindful-bowl.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/logo-calorie-counter.png",
+        "backgroundColor": "#0a1628"
       }
     }
   }
