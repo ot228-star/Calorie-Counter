@@ -12,7 +12,8 @@ export function stitchScrollPaddingTop(insetsTop: number) {
 }
 
 type Props = {
-  onSettings: () => void;
+  /** When omitted, the settings icon is hidden (e.g. settings lives in bottom nav). */
+  onSettings?: () => void;
   onFavourites: () => void;
   /** Empty until the user sets a nickname — no default label. */
   title?: string;
@@ -66,15 +67,17 @@ export function StitchTopBar({
         >
           <Ionicons name={favouritesActive ? "heart" : "heart-outline"} size={22} color={favouritesActive ? accent : mutedIcon} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.iconBtn, settingsActive && { backgroundColor: activeBg }]}
-          onPress={onSettings}
-          activeOpacity={0.75}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
-        >
-          <Ionicons name={settingsActive ? "settings" : "settings-outline"} size={22} color={settingsActive ? accent : mutedIcon} />
-        </TouchableOpacity>
+        {onSettings ? (
+          <TouchableOpacity
+            style={[styles.iconBtn, settingsActive && { backgroundColor: activeBg }]}
+            onPress={onSettings}
+            activeOpacity={0.75}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            pressRetentionOffset={{ top: 14, bottom: 14, left: 14, right: 14 }}
+          >
+            <Ionicons name={settingsActive ? "settings" : "settings-outline"} size={22} color={settingsActive ? accent : mutedIcon} />
+          </TouchableOpacity>
+        ) : null}
       </View>
     </BlurView>
   );

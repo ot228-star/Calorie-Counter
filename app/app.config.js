@@ -21,6 +21,8 @@ module.exports = {
       EXPO_PUBLIC_ENV: process.env.EXPO_PUBLIC_ENV ?? "development",
       // Set to "true" only for local UI testing without signing in (skips Supabase session gate).
       EXPO_PUBLIC_AUTH_DISABLED: process.env.EXPO_PUBLIC_AUTH_DISABLED ?? "false",
+      // Set to "false" after `public.foods` rows include image_url so production never uses random placeholder hosts.
+      EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES: process.env.EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES ?? "true",
     },
   },
 };

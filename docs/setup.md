@@ -8,14 +8,15 @@
 
 ## Supabase
 
-1. Create tables by running `supabase/migrations/001_init.sql`.
-2. Create storage bucket `meal-images`.
-3. Deploy edge functions:
+1. Create tables by running `supabase/migrations/001_init.sql`, then `002_food_catalog.sql`, then `003_food_images_and_catalog_meta.sql` for food imagery columns.
+2. (Optional) Seed or refresh `public.foods` with `npm run catalog:seed` and execute `supabase/seed/food_catalog_seed.sql`. See [food-catalog.md](./food-catalog.md).
+3. Create storage bucket `meal-images`.
+4. Deploy edge functions:
    - `estimate-meal`
    - `daily-summary`
    - `analytics-events`
    - `cleanup-images`
-4. Configure function secrets:
+5. Configure function secrets:
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`

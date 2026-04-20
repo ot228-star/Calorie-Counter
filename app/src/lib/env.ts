@@ -4,6 +4,8 @@ type Extra = {
   EXPO_PUBLIC_SUPABASE_URL?: string;
   EXPO_PUBLIC_SUPABASE_ANON_KEY?: string;
   EXPO_PUBLIC_ENV?: string;
+  /** When not `"false"`, allow legacy placeholder image hosts for foods without DB URLs. */
+  EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES?: string;
 };
 
 function extra(): Extra {
@@ -20,6 +22,23 @@ export function getSupabaseConfig(): { url: string; anonKey: string } {
     (typeof fromExtra.EXPO_PUBLIC_SUPABASE_ANON_KEY === "string" ? fromExtra.EXPO_PUBLIC_SUPABASE_ANON_KEY : "") ||
     (typeof process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY === "string" ? process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY : "");
   return { url: url.trim(), anonKey: anonKey.trim() };
+}
+
+/**
+ * Legacy random Unsplash Source + Picsum fallbacks in foodDetails.
+ * Default true until the cloud catalog is fully seeded; set EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES=false in production.
+ */
+export function allowPlaceholderFoodImages(): boolean {
+  const fromExtra = extra();
+  const raw =
+    (typeof fromExtra.EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES === "string"
+      ? fromExtra.EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES
+      : "") ||
+    (typeof process.env.EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES === "string"
+      ? process.env.EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES
+      : "");
+  if (!raw.trim()) return true;
+  return raw.trim().toLowerCase() !== "false";
 }
 
 export function assertSupabaseConfigured(): void {

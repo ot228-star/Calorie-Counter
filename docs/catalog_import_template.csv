@@ -1,0 +1,2 @@
+name,category,calories,protein_g,carbs_g,fat_g,image_url,image_urls_json,photo_source,photo_attribution,slug,image_review_status
+"Example Food","Prepared",100,5,12,3,"https://images.unsplash.com/photo-example","[]","Unsplash","Photo by Example on Unsplash","example-food","approved"

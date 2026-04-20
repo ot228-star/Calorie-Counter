@@ -14,6 +14,8 @@
     "start": "npm --prefix app run start",
     "android": "npm --prefix app run android",
     "typecheck": "npm --prefix app run typecheck",
-    "lint": "npm --prefix app run lint"
+    "lint": "npm --prefix app run lint",
+    "catalog:seed": "node scripts/build-food-catalog-seed.mjs",
+    "catalog:validate-urls": "node scripts/validate-food-catalog-urls.mjs supabase/seed/food_catalog_seed.sql"
   }
 }

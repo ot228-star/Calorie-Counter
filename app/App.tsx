@@ -30,7 +30,6 @@ import * as AuthSession from "expo-auth-session";
 import * as ImagePicker from "expo-image-picker";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
-import * as Notifications from "expo-notifications";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Image as ExpoImage } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
@@ -53,7 +52,7 @@ import {
 } from "./src/services/auth";
 import { trackEvent } from "./src/services/analytics";
 import { FOOD_DATABASE, type FoodRecord } from "./src/data/foodDatabase";
-import { getFoodDetail, getFoodPhotoCandidates, getFoodSearchBlob } from "./src/data/foodDetails";
+import { getFoodDetail, getFoodPhotoCandidates, getFoodPlanTagline, getFoodSearchBlob } from "./src/data/foodDetails";
 import { searchFoods } from "./src/services/foodFinder";
 import { mapPhotoUrisForMaxWidth } from "./src/lib/photoUrls";
 import { suggestedCalorieTarget, summaryFromMeals } from "./src/lib/calculations";
@@ -64,8 +63,7 @@ import { StitchBottomNav, type StitchNavId } from "./src/components/stitch/Stitc
 import { StitchDashboard } from "./src/components/stitch/StitchDashboard";
 import { StitchTopBar, stitchScrollPaddingTop } from "./src/components/stitch/StitchTopBar";
 import { StitchManualMealForm } from "./src/components/stitch/StitchManualMealForm";
-import { StitchFoodFinderScreen } from "./src/components/stitch/StitchFoodFinderScreen";
-import { StitchFoodSuggestionsScreen } from "./src/components/stitch/StitchFoodSuggestionsScreen";
+import { StitchFoodPlanScreen } from "./src/components/stitch/StitchFoodPlanScreen";
 import { StitchFoodDetailScreen } from "./src/components/stitch/StitchFoodDetailScreen";
 import { StitchFavouritesScreen } from "./src/components/stitch/StitchFavouritesScreen";
 import { StitchCameraScreen } from "./src/components/stitch/StitchCameraScreen";
@@ -87,17 +85,18 @@ import {
   setOnboardingDone,
   setOnboardingPending
 } from "./src/lib/onboardingStorage";
+import { importExpoNotifications } from "./src/lib/expoNotifications";
 
 WebBrowser.maybeCompleteAuthSession();
 
-type Screen = "onboarding" | "dashboard" | "manual" | "foodFinder" | "foodSuggestions" | "foodDetail" | "favourites" | "camera" | "review" | "settings";
+type Screen = "onboarding" | "dashboard" | "manual" | "foodPlan" | "foodDetail" | "favourites" | "camera" | "review" | "settings";
 type ThemeMode = "light" | "dark";
 type OnboardingStep = 0 | 1 | 2 | 3 | 4;
 type AccentPresetId = "blue" | "emerald" | "violet" | "rose" | "orange";
 type UiPaletteId = "midnight" | "forest" | "ocean" | "graphite" | "sunrise";
 type CuisineRegionId = "global" | "northAmerican" | "mediterranean" | "southAsian" | "eastAsian" | "latinAmerican" | "middleEastern";
 type BiologicalSex = "man" | "woman";
-type DetailBackScreen = "foodFinder" | "foodSuggestions" | "favourites";
+type DetailBackScreen = "foodPlan" | "favourites";
 type DetailContent = {
   title: string;
   subtitle: string;
@@ -307,14 +306,12 @@ const PrimaryButton = ({
 const FallbackImage = memo(function FallbackImage({
   uris,
   style,
-  placeholderText,
   urlMaxWidth,
   priority = "normal"
 }: {
   uris: string[];
   style: object;
-  placeholderText?: string;
-  /** Smaller CDN width for list rows — same photo, less decode lag (Unsplash `w=`). */
+  /** Smaller CDN width for list rows — same photo, less decode lag when supported by the URL. */
   urlMaxWidth?: number;
   priority?: "low" | "normal" | "high";
 }) {
@@ -333,12 +330,7 @@ const FallbackImage = memo(function FallbackImage({
   }, [displayUris]);
 
   if (safeUris.length === 0 || allFailed) {
-    return (
-      <View style={[style, styles.photoPlaceholder]}>
-        <Ionicons name="image-outline" size={22} color="#94a3b8" />
-        <Text style={styles.photoPlaceholderText}>{placeholderText ?? "Verified photo unavailable"}</Text>
-      </View>
-    );
+    return <View style={[style, styles.photoEmpty]} />;
   }
 
   return (
@@ -399,32 +391,6 @@ const makeOAuthRedirectUri = () =>
   AuthSession.makeRedirectUri({
     path: "auth"
   });
-
-// #region agent log
-const debugAuthLog = (
-  runId: string,
-  hypothesisId: string,
-  location: string,
-  message: string,
-  data: Record<string, unknown>
-) => {
-  const payload = {
-    sessionId: "cb1042",
-    runId,
-    hypothesisId,
-    location,
-    message,
-    data,
-    timestamp: Date.now()
-  };
-  fetch("http://127.0.0.1:7674/ingest/91667c52-214f-4910-9e0b-879c9d1cae4d", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "cb1042" },
-    body: JSON.stringify(payload)
-  }).catch(() => {});
-  console.log("[AUTH_DEBUG_CB1042]", JSON.stringify(payload));
-};
-// #endregion
 
 const palettes = {
   light: {
@@ -491,7 +457,7 @@ export default function App() {
   const [surveyHabits, setSurveyHabits] = useState<string[]>([]);
   const [mealPlanFrequency, setMealPlanFrequency] = useState("Occasionally");
   const [selectedCuisineRegion, setSelectedCuisineRegion] = useState<CuisineRegionId>(inferCuisineRegion);
-  const [detailBackScreen, setDetailBackScreen] = useState<DetailBackScreen>("foodFinder");
+  const [detailBackScreen, setDetailBackScreen] = useState<DetailBackScreen>("foodPlan");
   const [detailContent, setDetailContent] = useState<DetailContent | null>(null);
   const [detailFood, setDetailFood] = useState<FoodRecord | null>(null);
   const [foodSearch, setFoodSearch] = useState("");
@@ -651,21 +617,24 @@ export default function App() {
       calorieAdjustment
     });
   }, [age, heightCm, weightKg, biologicalSex, inferredGoalType, mealPlanFrequency, surveyHabits, surveyGoals]);
-  const suggestedRegionalFoods = useMemo(() => {
-    const keywords = cuisineRegionPresets[selectedCuisineRegion].keywords;
-    const matched = FOOD_DATABASE.filter((food) => keywords.some((keyword) => food.name.toLowerCase().includes(keyword.toLowerCase())));
-    const unique = Array.from(new Map(matched.map((food) => [food.name, food])).values());
-    if (unique.length > 0) return unique.slice(0, 20);
-    return FOOD_DATABASE.filter((food) => food.category === "Prepared").slice(0, 20);
-  }, [selectedCuisineRegion]);
-  const searchableFoodResults = useMemo(() => {
-    const q = foodSearch.trim().toLowerCase();
+  /** Unified Plan catalog: cloud + local, optional cuisine filter, optional search. */
+  const planFoodsForScreen = useMemo(() => {
     const merged = Array.from(new Map([...foodResults, ...FOOD_DATABASE].map((food) => [food.name, food])).values());
-    if (!q) return merged.slice(0, 120);
-
+    const base =
+      selectedCuisineRegion === "global"
+        ? merged
+        : merged.filter((food) =>
+            cuisineRegionPresets[selectedCuisineRegion].keywords.some((keyword) =>
+              food.name.toLowerCase().includes(keyword.toLowerCase())
+            )
+          );
+    const q = foodSearch.trim().toLowerCase();
+    if (!q) {
+      return [...base].sort((a, b) => a.name.localeCompare(b.name));
+    }
     const numericQuery = Number(q);
     const hasNumericQuery = !Number.isNaN(numericQuery);
-    const scored = merged
+    return base
       .map((food) => {
         const text = getFoodSearchBlob(food);
         let score = 0;
@@ -678,10 +647,8 @@ export default function App() {
       })
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score || a.food.name.localeCompare(b.food.name))
-      .slice(0, 120)
       .map((item) => item.food);
-    return scored;
-  }, [foodResults, foodSearch]);
+  }, [foodResults, foodSearch, selectedCuisineRegion]);
 
   const toPositiveIntOrNull = useCallback((value: string) => {
     const n = Number(value);
@@ -713,14 +680,13 @@ export default function App() {
 
   const stitchNavActive = useMemo((): StitchNavId | null => {
     if (screen === "dashboard") return "home";
-    if (screen === "foodFinder") return "search";
+    if (screen === "foodPlan") return "plan";
     if (screen === "manual") return "log";
-    if (screen === "foodSuggestions") return "plan";
+    if (screen === "settings") return "settings";
     if (screen === "camera" || screen === "review") return "camera";
     if (screen === "foodDetail") {
-      if (detailBackScreen === "foodSuggestions") return "plan";
-      if (detailBackScreen === "favourites") return null;
-      return "search";
+      if (detailBackScreen === "foodPlan") return "plan";
+      return null;
     }
     return null;
   }, [screen, detailBackScreen]);
@@ -738,12 +704,6 @@ export default function App() {
   useEffect(() => {
     getSession()
       .then(async (existingSession) => {
-        // #region agent log
-        debugAuthLog("run-1", "H1-H5", "App.tsx:getSession.then", "initial_session_read", {
-          hasSession: Boolean(existingSession),
-          hasUser: Boolean(existingSession?.user?.id)
-        });
-        // #endregion
         setSession(existingSession);
         if (existingSession?.user?.id && !AUTH_DISABLED) {
           const pending = await hasOnboardingPending(existingSession.user.id);
@@ -765,11 +725,6 @@ export default function App() {
         }
       })
       .catch(() => {
-        // #region agent log
-        debugAuthLog("run-1", "H4-H5", "App.tsx:getSession.catch", "initial_session_error", {
-          hasSession: false
-        });
-        // #endregion
         setSession(null);
       })
       .finally(() => {
@@ -779,13 +734,6 @@ export default function App() {
     const {
       data: { subscription }
     } = authClient.auth.onAuthStateChange((event, nextSession) => {
-      // #region agent log
-      debugAuthLog("run-1", "H2-H5", "App.tsx:onAuthStateChange", "auth_state_event", {
-        event,
-        hasNextSession: Boolean(nextSession),
-        hasNextUser: Boolean(nextSession?.user?.id)
-      });
-      // #endregion
       if (nextSession) {
         setSession(nextSession);
         // Do not change `screen` here — login vs signup vs resume is handled in auth handlers
@@ -911,15 +859,23 @@ export default function App() {
       return;
     }
 
-    Notifications.getPermissionsAsync()
-      .then((status) => {
+    void (async () => {
+      const Notifications = await importExpoNotifications();
+      if (!Notifications) {
+        setNotificationsEnabled(null);
+        return;
+      }
+      try {
+        const status = await Notifications.getPermissionsAsync();
         const enabled =
           status.granted ||
           status.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
           status.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED;
         setNotificationsEnabled(enabled);
-      })
-      .catch(() => setNotificationsEnabled(null));
+      } catch {
+        setNotificationsEnabled(null);
+      }
+    })();
   }, [isExpoGo]);
 
   useEffect(() => {
@@ -989,22 +945,9 @@ export default function App() {
     }
     setAuthBusy(true);
     try {
-      // #region agent log
-      debugAuthLog("run-1", "H1", "App.tsx:handleEmailAuth.start", "email_auth_start", {
-        mode: authMode,
-        emailValid: emailLooksValid,
-        passwordLen: password.length
-      });
-      // #endregion
       if (authMode === "signup") {
         const { data, error } = await signUpWithEmail(email.trim(), password);
         if (error) throw error;
-        // #region agent log
-        debugAuthLog("run-1", "H1-H2", "App.tsx:handleEmailAuth.signup", "signup_result", {
-          hasSession: Boolean(data.session),
-          hasUser: Boolean(data.user?.id)
-        });
-        // #endregion
         if (data.session) {
           try {
             await persistProfile(data.session.user.id, inferredGoalType, calculateQuestionnaireTarget());
@@ -1024,12 +967,6 @@ export default function App() {
       } else {
         const { data, error } = await signInWithEmail(email.trim(), password);
         if (error) throw error;
-        // #region agent log
-        debugAuthLog("run-1", "H1-H2", "App.tsx:handleEmailAuth.login", "login_result", {
-          hasSession: Boolean(data.session),
-          hasUser: Boolean(data.user?.id)
-        });
-        // #endregion
         if (data.session) {
           await clearOnboardingPending(data.session.user.id);
           setSession(data.session);
@@ -1039,12 +976,6 @@ export default function App() {
         }
       }
     } catch (error) {
-      // #region agent log
-      debugAuthLog("run-1", "H1-H4", "App.tsx:handleEmailAuth.catch", "email_auth_error", {
-        errorType: error instanceof Error ? error.name : "unknown",
-        errorMessage: error instanceof Error ? error.message : String(error)
-      });
-      // #endregion
       const msg = error instanceof Error ? error.message : String(error);
       setAuthError(
         msg.includes("Unexpected character")
@@ -1086,20 +1017,6 @@ export default function App() {
       if (!data?.url) throw new Error("Could not start OAuth.");
 
       const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-      const resultUrl = (result as { url?: string }).url ?? "";
-      const parsedForLog = resultUrl ? parseOAuthCallback(resultUrl) : null;
-      // #region agent log
-      debugAuthLog("run-1", "H3-H4", "App.tsx:handleOAuth.result", "oauth_browser_result", {
-        provider,
-        resultType: result.type,
-        hasResultUrl: Boolean(resultUrl),
-        resultUrlHost: resultUrl.split("/")[2] ?? "",
-        hasCode: Boolean(parsedForLog?.code),
-        hasAccessToken: Boolean(parsedForLog?.accessToken),
-        hasRefreshToken: Boolean(parsedForLog?.refreshToken),
-        oauthError: parsedForLog?.error ?? null
-      });
-      // #endregion
       if (result.type !== "success") return;
       if (result.url.includes("localhost:3000")) {
         throw new Error(
@@ -1116,13 +1033,6 @@ export default function App() {
       if (parsed.code) {
         const { data: exchangeData, error: exchangeError } = await authClient.auth.exchangeCodeForSession(parsed.code);
         if (exchangeError) throw exchangeError;
-        // #region agent log
-        debugAuthLog("run-1", "H3-H4", "App.tsx:handleOAuth.exchange", "oauth_code_exchange", {
-          usedCodeFlow: true,
-          hasSession: Boolean(exchangeData.session),
-          hasUser: Boolean(exchangeData.session?.user?.id)
-        });
-        // #endregion
         if (!exchangeData.session) {
           throw new Error("OAuth code exchange did not return a session.");
         }
@@ -1132,13 +1042,6 @@ export default function App() {
           refresh_token: parsed.refreshToken ?? ""
         });
         if (setSessionError) throw setSessionError;
-        // #region agent log
-        debugAuthLog("run-1", "H3-H4", "App.tsx:handleOAuth.token", "oauth_token_set_session", {
-          usedCodeFlow: false,
-          hadAccessToken: Boolean(parsed.accessToken),
-          hadRefreshToken: Boolean(parsed.refreshToken)
-        });
-        // #endregion
       } else {
         console.warn(
           "OAuth callback could not be parsed (no code or access_token). URL shape:",
@@ -1149,12 +1052,6 @@ export default function App() {
         );
       }
       const { data: sessionData } = await authClient.auth.getSession();
-      // #region agent log
-      debugAuthLog("run-1", "H2-H4-H5", "App.tsx:handleOAuth.getSession", "oauth_post_session_read", {
-        hasSession: Boolean(sessionData.session),
-        hasUser: Boolean(sessionData.session?.user?.id)
-      });
-      // #endregion
       if (sessionData.session) {
         const u = sessionData.session.user;
         setSession(sessionData.session);
@@ -1230,6 +1127,14 @@ export default function App() {
       return;
     }
     try {
+      const Notifications = await importExpoNotifications();
+      if (!Notifications) {
+        Alert.alert(
+          "Notifications unavailable",
+          "Use a development build instead of Expo Go to enable push notifications."
+        );
+        return;
+      }
       const current = await Notifications.getPermissionsAsync();
       const alreadyEnabled =
         current.granted ||
@@ -1368,7 +1273,7 @@ export default function App() {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       quality: 0.7
     });
 
@@ -1907,17 +1812,17 @@ export default function App() {
       case "home":
         setScreen("dashboard");
         return;
-      case "search":
-        setScreen("foodFinder");
+      case "plan":
+        setScreen("foodPlan");
         return;
       case "log":
         setScreen("manual");
         return;
-      case "plan":
-        setScreen("foodSuggestions");
-        return;
       case "camera":
         void openPhotoPicker();
+        return;
+      case "settings":
+        setScreen("settings");
         return;
       default:
     }
@@ -1941,9 +1846,7 @@ export default function App() {
         <StitchTopBar
           title={headerBrandTitle}
           onFavourites={() => setScreen("favourites")}
-          onSettings={() => setScreen("settings")}
           favouritesActive={screen === "favourites"}
-          settingsActive={screen === "settings"}
           useCustomFonts={Boolean(font)}
           themeMode={themeMode}
           primaryColor={theme.primary}
@@ -2027,50 +1930,28 @@ export default function App() {
         </View>
       )}
 
-      {screen === "foodFinder" && (
-        <StitchFoodFinderScreen
+      {screen === "foodPlan" && (
+        <StitchFoodPlanScreen
           foodSearch={foodSearch}
           onSearchChange={setFoodSearch}
           foodSource={foodSource}
           foodLoading={foodLoading}
-          foods={searchableFoodResults}
-          useCustomFonts={Boolean(font)}
-          renderFoodThumb={(food) => (
-            <FallbackImage
-              uris={getFoodPhotoCandidates(food)}
-              style={{ width: "100%", height: "100%" }}
-              placeholderText="No verified photo yet"
-              urlMaxWidth={560}
-              priority="low"
-            />
-          )}
-          getDescription={(food) => getFoodDetail(food).description}
-          onOpenDetail={(food) => openFoodDetail(food, "foodFinder")}
-          onAdd={(food) => addFoodToMeal(food, getPortionValue(food.name))}
-          onAdjustPortion={adjustPortionValue}
-          portionValue={(name) => foodPortions[name] ?? "1"}
-          onPortionChange={setPortionValue}
-        />
-      )}
-
-      {screen === "foodSuggestions" && (
-        <StitchFoodSuggestionsScreen
           regionOrder={cuisineRegionOrder}
           regionLabels={cuisineRegionLabels}
           selectedRegion={selectedCuisineRegion}
           onSelectRegion={(id) => setSelectedCuisineRegion(id as CuisineRegionId)}
-          foods={suggestedRegionalFoods}
+          foods={planFoodsForScreen}
           useCustomFonts={Boolean(font)}
+          getPlanTagline={getFoodPlanTagline}
           renderFoodThumb={(food) => (
             <FallbackImage
               uris={getFoodPhotoCandidates(food)}
               style={{ width: "100%", height: "100%" }}
-              placeholderText="No verified photo yet"
               urlMaxWidth={560}
               priority="low"
             />
           )}
-          onOpenDetail={(food) => openFoodDetail(food, "foodSuggestions")}
+          onOpenDetail={(food) => openFoodDetail(food, "foodPlan")}
           onAdd={(food) => addFoodToMeal(food, getPortionValue(food.name))}
           onAdjustPortion={adjustPortionValue}
           portionValue={(name) => foodPortions[name] ?? "1"}
@@ -2095,12 +1976,7 @@ export default function App() {
             if (detailFood) toggleFavouriteFood(detailFood.name);
           }}
           imageSlot={
-            <FallbackImage
-              uris={detailContent.photoCandidates}
-              style={{ width: "100%", height: 280 }}
-              placeholderText="No verified photo for this item yet"
-              urlMaxWidth={1080}
-            />
+            <FallbackImage uris={detailContent.photoCandidates} style={{ width: "100%", height: 280 }} urlMaxWidth={1080} />
           }
           onBack={() => {
             setDetailFood(null);
@@ -2701,20 +2577,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 8
   },
-  photoPlaceholder: {
-    borderWidth: 1,
-    borderColor: "#94a3b8",
-    borderStyle: "dashed",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingHorizontal: 10
-  },
-  photoPlaceholderText: {
-    fontSize: 12,
-    color: "#64748b",
-    textAlign: "center"
+  photoEmpty: {
+    backgroundColor: "rgba(148, 163, 184, 0.12)"
   },
   warning: {
     color: "#b45309",
