@@ -4,7 +4,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --offline",
     "android": "expo run:android",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit"

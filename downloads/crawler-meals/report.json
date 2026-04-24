@@ -1,0 +1,166 @@
+{
+  "totalMeals": 345,
+  "mealsWithExistingImages": 328,
+  "attemptedMeals": 17,
+  "providers": [
+    "google",
+    "bing",
+    "duckduckgo"
+  ],
+  "downloaded": 17,
+  "failed": 0,
+  "removedBadFiles": [
+    "beef-meatballs-with-sauce.jpg",
+    "butter.jpg",
+    "cottage-cheese.jpg",
+    "grapes.jpg",
+    "hummus-with-pita.jpg",
+    "mac-and-cheese.jpg",
+    "noodles-with-chicken.jpg",
+    "parmesan.jpg",
+    "peach.jpg",
+    "pizza-cheese.jpg",
+    "spinach-berry-salad.jpg",
+    "steak-with-rice.jpg",
+    "stuffed-bell-pepper.jpg",
+    "vegetable-pizza.jpg"
+  ],
+  "results": [
+    {
+      "ok": true,
+      "meal": "Asparagus",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\asparagus.jpg",
+      "source": "https://i.pinimg.com/originals/19/7d/3e/197d3e5a9e588b2ca1fdaf0a0791a8cd.jpg",
+      "bytes": 75485,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Avocado Toast",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\avocado-toast.jpg",
+      "source": "https://dirtydishesmessykisses.com/wp-content/uploads/2024/11/avocado-toast-recipe-1730592523.jpeg",
+      "bytes": 226302,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Beef Chili",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\beef-chili.jpg",
+      "source": "https://img.restaurantguru.com/r075-Skyline-Chili-menu-2021-09-25.jpg",
+      "bytes": 136562,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Beef Meatballs with Sauce",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\beef-meatballs-with-sauce.webp",
+      "source": "https://neilarecipes.com/wp-content/uploads/2024/09/traditional-spicy-meatballs-sweet-sour-tomato-sauce-restaurant-menu-dieting-cookbook-recipe-top-view-min.webp",
+      "bytes": 188454,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Butter",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\butter.jpg",
+      "source": "https://img.restaurantguru.com/r067-menu-Bacon-and-Butter-2022-10.jpg",
+      "bytes": 90048,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Cottage Cheese",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\cottage-cheese.jpg",
+      "source": "https://www.proteinrichrecipes.com/wp-content/uploads/2025/10/mini-cottage-cheese-cheesecake-removed-from-ramekin-and-plated-on-a-white-dish-topped-with-fresh-blueberries.jpg",
+      "bytes": 119335,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Grapes",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\grapes.jpg",
+      "source": "https://img.restaurantguru.com/r285-Vine-Restaurant-The-Grapes-menu.jpg",
+      "bytes": 227640,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Hummus with Pita",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\hummus-with-pita.jpg",
+      "source": "https://img.restaurantguru.com/rcc9-Hummus-and-Pita-Grill-menu.jpg",
+      "bytes": 130701,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Mac and Cheese",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\mac-and-cheese.jpg",
+      "source": "https://www.foodanddrinkresources.com/wp-content/uploads/2016/11/mac-cheese-restaurant-menu-ideas.jpg",
+      "bytes": 211164,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Noodles with Chicken",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\noodles-with-chicken.jpg",
+      "source": "https://allthenoodles.com/wp-content/uploads/2024/10/yaki-soba-with-chicken-in-plated-msn.jpg",
+      "bytes": 299123,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Parmesan",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\parmesan.jpg",
+      "source": "https://thetastyflavors.com/wp-content/uploads/2025/11/Flux_Schnell_A_beautifully_plated_Chicken_Parmesan_dish_crispy_2-1-768x768.jpg",
+      "bytes": 89445,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Peach",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\peach.jpg",
+      "source": "https://img.restaurantguru.com/r74d-Peachs-Restaurant-menu.jpg",
+      "bytes": 234605,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Pizza Cheese",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\pizza-cheese.jpg",
+      "source": "https://manhattan.dinedirect.io/assets/img/menu/Chicago_Deep_Pizza_Cheese.jpg",
+      "bytes": 200872,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Spinach Berry Salad",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\spinach-berry-salad.jpg",
+      "source": "https://cdn.momsdish.com/wp-content/uploads/2021/09/Berry-Spinach-Salad-Recipe-07-1200x1800.jpg",
+      "bytes": 350480,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Steak with Rice",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\steak-with-rice.jpg",
+      "source": "https://get.pxhere.com/photo/table-restaurant-dish-meal-food-produce-plate-breakfast-meat-lunch-cuisine-delicious-steak-pork-chop-nutrition-tasty-food-photography-fatty-plated-food-rib-eye-steak-sirloin-steak-meat-and-chips-island-food-tinos-island-dish-pork-dish-1380997.jpg",
+      "bytes": 96258,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Stuffed Bell Pepper",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\stuffed-bell-pepper.jpg",
+      "source": "https://dailydishrecipe.com/storage/2025/03/easy_stuffed_bell_peppers_recipe_1alYN_NlVIye40xucPb5LIcz9cosOmblj.jpg",
+      "bytes": 305753,
+      "provider": "bing"
+    },
+    {
+      "ok": true,
+      "meal": "Vegetable Pizza",
+      "file": "C:\\Users\\dat\\Calorie-Counter\\downloads\\crawler-meals\\vegetable-pizza.jpg",
+      "source": "https://get.pxhere.com/photo/table-restaurant-dish-meal-food-salad-produce-vegetable-plate-seafood-healthy-lunch-cuisine-chicken-eating-nutrition-dinner-serving-sense-697023.jpg",
+      "bytes": 89223,
+      "provider": "bing"
+    }
+  ]
+}

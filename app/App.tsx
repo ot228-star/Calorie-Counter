@@ -7,6 +7,7 @@ import {
   Easing,
   Linking,
   Platform,
+  Share,
   ScrollView,
   StyleSheet,
   Text,
@@ -1243,6 +1244,43 @@ export default function App() {
     }
   }, []);
 
+  const handleShareAppPress = useCallback(async () => {
+    const appName = "Inertia";
+    const androidPackage = Constants.expoConfig?.android?.package;
+    const appLink = androidPackage
+      ? `https://play.google.com/store/apps/details?id=${androidPackage}`
+      : "https://play.google.com/store/apps";
+    try {
+      await Share.share({
+        message: `${appName} helps track calories and meals quickly. Try it here: ${appLink}`
+      });
+    } catch {
+      Alert.alert("Share unavailable", "Could not open the share menu right now.");
+    }
+  }, []);
+
+  const handleRateAppPress = useCallback(async () => {
+    const androidPackage = Constants.expoConfig?.android?.package;
+    const playStoreUrl = androidPackage
+      ? `https://play.google.com/store/apps/details?id=${androidPackage}`
+      : "https://play.google.com/store/apps";
+    try {
+      const canOpen = await Linking.canOpenURL(playStoreUrl);
+      if (!canOpen) {
+        Alert.alert("Store unavailable", "Could not open the app store link.");
+        return;
+      }
+      await Linking.openURL(playStoreUrl);
+    } catch {
+      Alert.alert("Store unavailable", "Could not open the app store link.");
+    }
+  }, []);
+
+  const handleAboutPress = useCallback(() => {
+    const version = Constants.expoConfig?.version ?? "Unknown";
+    Alert.alert("About Inertia", `Version: ${version}\n\nCalorie tracking, meal planning, and nutrition logging.`);
+  }, []);
+
   const saveCurrentMeal = async (source: Meal["source"], requestId?: string) => {
     const cleanItems = mealItems.filter((item) => item.name.trim().length > 0);
     if (!cleanItems.length) {
@@ -1843,7 +1881,7 @@ export default function App() {
         setScreen("manual");
         return;
       case "camera":
-        void openPhotoPicker();
+        Alert.alert("Camera Feature Coming Soon", "Camera Feature Coming Soon");
         return;
       case "settings":
         setScreen("settings");
@@ -2055,9 +2093,15 @@ export default function App() {
           onOpenNotifications={() => void handleNotificationsTilePress()}
           onOpenPrivacy={() => void handlePrivacyTilePress()}
           onOpenSupport={() => void handleSupportTilePress()}
+          onShareApp={() => void handleShareAppPress()}
+          onRateApp={() => void handleRateAppPress()}
+          onOpenAbout={() => void handleAboutPress()}
           notificationsHint={notificationsHint}
           privacyHint={privacyHint}
           supportHint="Open Gmail to contact support"
+          shareHint="Share Inertia with friends"
+          rateHint="Rate Inertia in Google Play"
+          aboutHint="View app version and product info"
           onRecalculateCalories={() => {
             const suggested = calculateQuestionnaireTarget();
             setTargetCalories(suggested);

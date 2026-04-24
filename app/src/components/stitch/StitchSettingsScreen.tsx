@@ -33,9 +33,15 @@ type Props = {
   onOpenNotifications: () => void;
   onOpenPrivacy: () => void;
   onOpenSupport: () => void;
+  onShareApp: () => void;
+  onRateApp: () => void;
+  onOpenAbout: () => void;
   notificationsHint?: string;
   privacyHint?: string;
   supportHint?: string;
+  shareHint?: string;
+  rateHint?: string;
+  aboutHint?: string;
   onSignOut?: () => void;
   showSignOut?: boolean;
   useCustomFonts?: boolean;
@@ -196,9 +202,15 @@ export function StitchSettingsScreen({
   onOpenNotifications,
   onOpenPrivacy,
   onOpenSupport,
+  onShareApp,
+  onRateApp,
+  onOpenAbout,
   notificationsHint,
   privacyHint,
   supportHint,
+  shareHint,
+  rateHint,
+  aboutHint,
   onSignOut,
   showSignOut,
   useCustomFonts
@@ -385,6 +397,39 @@ export function StitchSettingsScreen({
         <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Support</Text>
         <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
           {supportHint ?? "Contact support via email"}
+        </Text>
+      </TouchableOpacity>
+      <View style={styles.grid2}>
+        <TouchableOpacity
+          style={[styles.tile, { backgroundColor: ui.card }]}
+          onPress={onShareApp}
+          activeOpacity={0.85}
+          delayPressIn={0}
+        >
+          <Ionicons name="share-social-outline" size={24} color={theme.primary} />
+          <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Share app</Text>
+          <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+            {shareHint ?? "Send app link to friends"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tile, { backgroundColor: ui.card }]}
+          onPress={onRateApp}
+          activeOpacity={0.85}
+          delayPressIn={0}
+        >
+          <Ionicons name="star-outline" size={24} color={theme.primary} />
+          <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Rate app</Text>
+          <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+            {rateHint ?? "Leave feedback in the store"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenAbout} activeOpacity={0.85} delayPressIn={0}>
+        <Ionicons name="information-circle-outline" size={24} color={theme.primary} />
+        <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>About</Text>
+        <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+          {aboutHint ?? "App version and quick info"}
         </Text>
       </TouchableOpacity>
 

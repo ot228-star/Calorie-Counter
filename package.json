@@ -17,5 +17,9 @@
     "lint": "npm --prefix app run lint",
     "catalog:seed": "node scripts/build-food-catalog-seed.mjs",
     "catalog:validate-urls": "node scripts/validate-food-catalog-urls.mjs supabase/seed/food_catalog_seed.sql"
+  },
+  "devDependencies": {
+    "playwright": "^1.59.1",
+    "sharp": "^0.34.5"
   }
 }
