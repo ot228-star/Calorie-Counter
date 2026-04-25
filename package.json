@@ -1,25 +1,50 @@
 {
-  "name": "calorie-counter",
-  "private": true,
+  "name": "calorie-counter-app",
   "version": "1.0.0",
-  "description": "Expo app lives in ./app. From this folder run npm start, or: npx expo start app",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ot228-star/Calorie-Counter.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ot228-star/Calorie-Counter/issues"
-  },
+  "private": true,
+  "main": "index.js",
   "scripts": {
-    "start": "npm --prefix app run start",
-    "android": "npm --prefix app run android",
-    "typecheck": "npm --prefix app run typecheck",
-    "lint": "npm --prefix app run lint",
+    "start": "expo start --offline",
+    "android": "expo run:android",
     "catalog:seed": "node scripts/build-food-catalog-seed.mjs",
-    "catalog:validate-urls": "node scripts/validate-food-catalog-urls.mjs supabase/seed/food_catalog_seed.sql"
+    "catalog:validate-urls": "node scripts/validate-food-catalog-urls.mjs supabase/seed/food_catalog_seed.sql",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@expo-google-fonts/manrope": "^0.4.2",
+    "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
+    "@expo/vector-icons": "^15.1.1",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.57.0",
+    "expo": "~54.0.0",
+    "expo-auth-session": "~7.0.8",
+    "expo-blur": "~15.0.8",
+    "expo-camera": "~17.0.10",
+    "expo-constants": "~18.0.13",
+    "expo-crypto": "~15.0.8",
+    "expo-font": "~14.0.11",
+    "expo-image": "~3.0.11",
+    "expo-image-manipulator": "~14.0.8",
+    "expo-image-picker": "~17.0.10",
+    "expo-linear-gradient": "~15.0.8",
+    "expo-local-authentication": "~17.0.8",
+    "expo-notifications": "~0.32.16",
+    "expo-web-browser": "~15.0.8",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0"
   },
   "devDependencies": {
+    "@types/react": "~19.1.10",
+    "babel-preset-expo": "~54.0.10",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.35.0",
     "playwright": "^1.59.1",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "typescript": "^5.9.0"
+  },
+  "overrides": {
+    "react": "19.1.0"
   }
 }

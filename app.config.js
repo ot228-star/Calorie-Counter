@@ -2,10 +2,6 @@
 const path = require("path");
 
 try {
-  // Repo root .env (Expo CLI cwd is usually `app/`, so default .env there misses parent)
-  require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
-} catch (_) {}
-try {
   require("dotenv").config({ path: path.join(__dirname, ".env") });
 } catch (_) {}
 

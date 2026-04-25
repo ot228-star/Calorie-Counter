@@ -17,7 +17,7 @@ git clone https://github.com/ot228-star/Calorie-Counter.git
 
 ## Project Structure
 
-- `app/` mobile client
+- `src/`, `App.tsx`, Expo config files in repo root
 - `supabase/` database migrations and edge functions
 - `docs/` requirements and technical specs
 
@@ -26,13 +26,12 @@ git clone https://github.com/ot228-star/Calorie-Counter.git
 ### 1) Install app dependencies
 
 ```bash
-cd app
 npm install
 ```
 
 ### 2) Configure environment
 
-Copy `.env.example` to `.env` in the **repo root** (next to `README.md`) and set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`. The Expo app (`app/app.config.js`) loads that file automatically so you do not need to duplicate it under `app/` unless you prefer it.
+Copy `.env.example` to `.env` in the **repo root** (next to `README.md`) and set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`. The Expo app (`app.config.js`) loads that file automatically.
 
 ### 3) Run app
 
