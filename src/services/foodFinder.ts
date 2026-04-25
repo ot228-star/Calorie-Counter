@@ -1,5 +1,6 @@
 import { FOOD_DATABASE, type FoodImageReviewStatus, type FoodRecord } from "../data/foodDatabase";
 import { getSupabaseConfig } from "../lib/env";
+import { authClient } from "./auth";
 
 type SearchResult = {
   foods: FoodRecord[];
@@ -61,13 +62,18 @@ export const searchFoods = async (query: string): Promise<SearchResult> => {
   }
 
   try {
-    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/foods?select=${FOODS_SELECT}&order=name.asc&limit=80`;
+    const {
+      data: { session }
+    } = await authClient.auth.getSession();
+    const accessToken = session?.access_token ?? anonKey;
+    // We merge cloud rows over local rows in App.tsx; use a high enough cap to cover full catalog.
+    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/foods?select=${FOODS_SELECT}&order=name.asc&limit=500`;
     const queryPart = q ? `&name=ilike.*${encodeURIComponent(q)}*` : "";
     const response = await fetch(`${endpoint}${queryPart}`, {
       method: "GET",
       headers: {
         apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     if (!response.ok) throw new Error("Cloud search request failed");

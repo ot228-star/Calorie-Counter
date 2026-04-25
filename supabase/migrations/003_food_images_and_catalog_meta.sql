@@ -12,7 +12,7 @@ alter table public.foods
 
 comment on column public.foods.image_url is 'Primary hero image (HTTPS). Prefer stable CDN URLs.';
 comment on column public.foods.image_urls is 'Ordered alternates for client fallback chains (JSON array of strings).';
-comment on column public.foods.photo_attribution is 'License / credit line for UI (e.g. Unsplash photographer link).';
+comment on column public.foods.photo_attribution is 'License / credit line for UI (e.g. photographer or source link).';
 comment on column public.foods.slug is 'Optional stable id for renames; not required for MVP.';
 comment on column public.foods.image_review_status is 'Editorial gate: rejected rows should be ignored by the client for imagery.';
 

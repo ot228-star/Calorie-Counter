@@ -13,8 +13,8 @@ import { chromium } from "playwright";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
-const MEALS_FILE = path.join(ROOT, "app", "src", "components", "stitch", "StitchAllFoodsScreen.tsx");
-const FIX_LIST_FILE = path.join(ROOT, "app", "src", "components", "stitch", "StitchCrawlerFixList.tsx");
+const MEALS_FILE = path.join(ROOT, "src", "components", "stitch", "StitchAllFoodsScreen.tsx");
+const FIX_LIST_FILE = path.join(ROOT, "src", "components", "stitch", "StitchCrawlerFixList.tsx");
 const OUT_DIR = path.join(ROOT, "downloads", "crawler-meals");
 const REPORT_PATH = path.join(OUT_DIR, "report.json");
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

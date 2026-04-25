@@ -6,8 +6,10 @@
  *
  * Optional env:
  *   SUPABASE_PROJECT_REF=qgnzcqwonmlijdvnbqjd
- *   SUPABASE_BUCKET=crawler-meals
+ *   SUPABASE_BUCKET=meals
  *   SUPABASE_PREFIX=          (e.g. "foods/")
+ *   LOCAL_IMAGES_DIR=C:/Users/dat/Downloads/downloads/crawler-meals
+ *   OUT_SQL_PATH=supabase/seed/food_image_links.sql
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -15,12 +17,16 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
-const DATA_DIR = path.join(ROOT, "app", "src", "data");
-const DOWNLOADS_DIR = path.join(ROOT, "downloads", "crawler-meals");
-const OUT_SQL = path.join(ROOT, "supabase", "seed", "food_image_links.sql");
+const DATA_DIR = path.join(ROOT, "src", "data");
+const DOWNLOADS_DIR = process.env.LOCAL_IMAGES_DIR
+  ? path.resolve(process.env.LOCAL_IMAGES_DIR)
+  : path.join(ROOT, "downloads", "crawler-meals");
+const OUT_SQL = process.env.OUT_SQL_PATH
+  ? path.resolve(ROOT, process.env.OUT_SQL_PATH)
+  : path.join(ROOT, "supabase", "seed", "food_image_links.sql");
 
 const PROJECT_REF = process.env.SUPABASE_PROJECT_REF || "qgnzcqwonmlijdvnbqjd";
-const BUCKET = process.env.SUPABASE_BUCKET || "crawler-meals";
+const BUCKET = process.env.SUPABASE_BUCKET || "meals";
 const PREFIX = process.env.SUPABASE_PREFIX || "";
 
 const FOOD_ROW_RE =
@@ -85,10 +91,21 @@ function main() {
   lines.push(`-- Project ref: ${PROJECT_REF}`);
   lines.push(`-- Bucket: ${BUCKET}`);
   lines.push(`-- Prefix: ${PREFIX || "(none)"}`);
+  lines.push(`-- Local images dir: ${DOWNLOADS_DIR}`);
   lines.push(`-- Matched images: ${updates.length}`);
   lines.push(`-- Missing images: ${missing.length}`);
   lines.push("");
   lines.push("begin;");
+  lines.push("");
+  lines.push("-- Clean legacy crawler-meals URLs before relinking.");
+  lines.push("update public.foods");
+  lines.push("set");
+  lines.push("  image_url = null,");
+  lines.push("  image_urls = '[]'::jsonb,");
+  lines.push("  photo_source = null,");
+  lines.push("  photo_attribution = null,");
+  lines.push("  image_review_status = 'pending'");
+  lines.push("where image_url ilike '%/crawler-meals/%';");
   lines.push("");
   for (const u of updates) {
     lines.push("update public.foods");
@@ -96,7 +113,7 @@ function main() {
     lines.push(`  image_url = ${sqlStr(u.url)},`);
     lines.push("  image_urls = '[]'::jsonb,");
     lines.push("  photo_source = 'supabase-storage',");
-    lines.push("  photo_attribution = 'crawler upload',");
+    lines.push("  photo_attribution = 'supabase meals upload',");
     lines.push("  image_review_status = 'approved'");
     lines.push(`where name = ${sqlStr(u.name)};`);
     lines.push("");

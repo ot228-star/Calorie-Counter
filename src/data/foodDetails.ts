@@ -1,4 +1,5 @@
 import type { FoodRecord } from "./foodDatabase";
+import { getSupabaseConfig } from "../lib/env";
 
 export type FoodDetail = {
   description: string;
@@ -145,6 +146,48 @@ const PLAN_TAGLINE_BY_NAME: Record<string, string> = {
   "Rice with Chicken": "Simple balanced plate"
 };
 
+const appendCandidate = (list: string[], value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return;
+  if (!list.includes(trimmed)) list.push(trimmed);
+};
+
+const appendSupabaseUrlVariants = (list: string[], url: string) => {
+  const objectMatch = url.match(/^(https:\/\/[^/]+)\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/i);
+  if (objectMatch) {
+    const [, host, bucket, objectPath] = objectMatch;
+    const bucketLower = bucket.toLowerCase();
+    const configuredHost = getSupabaseConfig().url.trim().replace(/\/$/, "");
+    const hosts = configuredHost && configuredHost !== host ? [host, configuredHost] : [host];
+    const bucketAliases = Array.from(new Set([bucket, bucketLower]));
+    for (const h of hosts) {
+      for (const b of bucketAliases) {
+        appendCandidate(list, `${h}/storage/v1/object/public/${b}/${objectPath}`);
+        appendCandidate(list, `${h}/storage/v1/render/image/public/${b}/${objectPath}`);
+      }
+    }
+    return;
+  }
+
+  const renderMatch = url.match(/^(https:\/\/[^/]+)\/storage\/v1\/render\/image\/public\/([^/]+)\/(.+)$/i);
+  if (renderMatch) {
+    const [, host, bucket, objectPath] = renderMatch;
+    const bucketLower = bucket.toLowerCase();
+    const configuredHost = getSupabaseConfig().url.trim().replace(/\/$/, "");
+    const hosts = configuredHost && configuredHost !== host ? [host, configuredHost] : [host];
+    const bucketAliases = Array.from(new Set([bucket, bucketLower]));
+    for (const h of hosts) {
+      for (const b of bucketAliases) {
+        appendCandidate(list, `${h}/storage/v1/render/image/public/${b}/${objectPath}`);
+        appendCandidate(list, `${h}/storage/v1/object/public/${b}/${objectPath}`);
+      }
+    }
+    return;
+  }
+
+  appendCandidate(list, url);
+};
+
 const taglineFromNamePattern = (food: FoodRecord): string | null => {
   const n = normalizeFoodName(food.name);
   if (/(smoothie|shake|milkshake)/.test(n)) return "Liquid calories · watch sugar";
@@ -197,10 +240,10 @@ export const getFoodPhotoCandidates = (food: FoodRecord): string[] => {
   const rejected = food.image_review_status === "rejected";
   if (!rejected) {
     const primary = food.image_url?.trim();
-    if (primary) candidates.push(primary);
+    if (primary) appendSupabaseUrlVariants(candidates, primary);
     for (const u of food.image_urls ?? []) {
       const t = typeof u === "string" ? u.trim() : "";
-      if (t.length > 0 && !candidates.includes(t)) candidates.push(t);
+      if (t.length > 0) appendSupabaseUrlVariants(candidates, t);
     }
   }
   return candidates;
