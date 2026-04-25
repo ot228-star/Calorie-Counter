@@ -615,7 +615,8 @@ export default function App() {
   }, [age, heightCm, weightKg, biologicalSex, inferredGoalType, mealPlanFrequency, surveyHabits, surveyGoals]);
   /** Unified Plan catalog: cloud + local, optional cuisine filter, optional search. */
   const planFoodsForScreen = useMemo(() => {
-    const merged = Array.from(new Map([...foodResults, ...FOOD_DATABASE].map((food) => [food.name, food])).values());
+    // Build from local first, then let cloud rows override by name so image_url/image_urls are not dropped.
+    const merged = Array.from(new Map([...FOOD_DATABASE, ...foodResults].map((food) => [food.name, food])).values());
     const base =
       selectedCuisineRegion === "global"
         ? merged
