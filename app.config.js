@@ -10,7 +10,7 @@ const appJson = require("./app.json");
 module.exports = {
   expo: {
     ...appJson.expo,
-    plugins: [...(appJson.expo.plugins ?? []), "expo-font"],
+    plugins: Array.from(new Set([...(appJson.expo.plugins ?? []), "expo-font", "expo-web-browser"])),
     extra: {
       EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL ?? "",
       EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
