@@ -12,7 +12,6 @@ export const CRAWLER_MEALS = [
   "Beef and Broccoli Stir Fry",
   "Beef Biryani",
   "Beef Bulgogi Bowl",
-  "Beef Burrito",
   "Beef Enchiladas",
   "Beef Fajitas",
   "Beef Kofta",

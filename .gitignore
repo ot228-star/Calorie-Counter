@@ -1,16 +1,13 @@
 # Node / Expo
 node_modules/
-app/node_modules/
-app/.expo/
-app/.expo-shared/
-app/dist/
+.expo/
+.expo-shared/
+dist/
 
 # Env files
 .env
 .env.*
 !.env.example
-app/.env
-app/.env.*
 
 # OS / Editor
 .DS_Store

@@ -2,7 +2,7 @@
 
 The app treats **`public.foods`** in Supabase as the canonical catalog for cloud search: macros (calories, protein, carbs, fat) plus curated **`image_url`** / **`image_urls`** after migration `003_food_images_and_catalog_meta.sql`.
 
-The bundled [`app/src/data/foodDatabase.ts`](../app/src/data/foodDatabase.ts) remains the offline fallback when Supabase is missing, empty, or unreachable. Client-side maps in [`app/src/data/foodDetails.ts`](../app/src/data/foodDetails.ts) (pinned Unsplash, Foodiesfeed, Food.com) are used only **after** server-provided URLs, unless `EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES` is enabled for legacy random hosts.
+The bundled [`src/data/foodDatabase.ts`](../src/data/foodDatabase.ts) remains the offline fallback when Supabase is missing, empty, or unreachable. Client-side maps in [`src/data/foodDetails.ts`](../src/data/foodDetails.ts) (pinned Unsplash, Foodiesfeed, Food.com) are used only **after** server-provided URLs, unless `EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES` is enabled for legacy random hosts.
 
 ## Migrations (order)
 
@@ -37,8 +37,8 @@ For manual curation or spreadsheet workflows, see [`docs/catalog_import_template
 
 ## Client behavior
 
-- [`app/src/services/foodFinder.ts`](../app/src/services/foodFinder.ts) selects image columns from PostgREST and normalizes `image_urls` JSON.
-- [`getFoodPhotoCandidates`](../app/src/data/foodDetails.ts) prepends **`image_url`** and **`image_urls`** when `image_review_status` is not `rejected`.
+- [`src/services/foodFinder.ts`](../src/services/foodFinder.ts) selects image columns from PostgREST and normalizes `image_urls` JSON.
+- [`getFoodPhotoCandidates`](../src/data/foodDetails.ts) prepends **`image_url`** and **`image_urls`** when `image_review_status` is not `rejected`.
 - Set **`EXPO_PUBLIC_ALLOW_PLACEHOLDER_FOOD_IMAGES=false`** in production `.env` once every displayed food has a curated URL in the database (or bundled asset), so Unsplash Source and Picsum are never used.
 
 ## Licenses and attribution

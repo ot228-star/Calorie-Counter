@@ -37,21 +37,20 @@
    - Paste the Web client **Client ID** and **Client secret** from step 1.
 
 3. **Supabase** → Authentication → **URL Configuration** → **Redirect URLs**:
-   - Add `caloriecounter://**` (matches `scheme` in `app/app.json` and Expo AuthSession).
+   - Add `caloriecounter://**` (matches `scheme` in `app.json` and Expo AuthSession).
    - Add `exp://**` if you test in **Expo Go** (or add the exact URI printed in Metro when you tap “Continue with Google”: look for `OAuth redirect URI:` in the device/log output).
 
 4. App env: ensure `.env` has valid `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`, and **do not** set `EXPO_PUBLIC_AUTH_DISABLED=true` while testing sign-in.
 
-5. The app uses **PKCE** (`flowType: "pkce"` in `app/src/services/auth.ts`) so the OAuth callback carries a `code` in the **query string**. The default implicit flow puts tokens in the **URL hash**, which some in-app browsers omit when returning to the app, leading to “missing access token and code.”
+5. The app uses **PKCE** (`flowType: "pkce"` in `src/services/auth.ts`) so the OAuth callback carries a `code` in the **query string**. The default implicit flow puts tokens in the **URL hash**, which some in-app browsers omit when returning to the app, leading to “missing access token and code.”
 
 6. Restart Expo after changing `.env`.
 
 ## Mobile App
 
-1. `cd app`
-2. `npm install`
-3. Set env vars in `.env`.
-4. `npm run start`
+1. `npm install`
+2. Set env vars in `.env`.
+3. `npm run start`
 
 ## Developer Ownership
 

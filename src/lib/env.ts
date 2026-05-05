@@ -45,7 +45,7 @@ export function assertSupabaseConfigured(): void {
   const { url, anonKey } = getSupabaseConfig();
   if (!url || !anonKey) {
     throw new Error(
-      "Supabase is not configured. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY to the project root .env (or app/.env), then restart Expo with a clean cache: npx expo start -c"
+      "Supabase is not configured. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY to the project root .env, then restart Expo with a clean cache: npx expo start -c"
     );
   }
 
