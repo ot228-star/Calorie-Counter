@@ -60,7 +60,7 @@ export const estimateMealFromImage = async (imageUrl: string, mealType: Meal["me
   return JSON.parse(raw) as EstimateResult;
 };
 
-export const saveMeal = async (meal: Meal, requestId?: string) => {
+export const saveMeal = async (meal: Meal, requestId?: string): Promise<string> => {
   assertSupabaseConfigured();
   const totals = sumItems(meal.items);
   const rb = restBaseUrl();
@@ -103,12 +103,14 @@ export const saveMeal = async (meal: Meal, requestId?: string) => {
   });
 
   if (requestId) {
-    await requestJson<unknown>(`${rb}/estimation_requests?id=eq.${requestId}`, {
+    await requestJson<unknown>(`${rb}/estimation_requests?id=eq.${encodeURIComponent(requestId)}`, {
       method: "PATCH",
       headers,
       body: JSON.stringify({ status: "succeeded" }),
     });
   }
+
+  return mealId;
 };
 
 export const listMealsForToday = async (): Promise<Meal[]> => {
@@ -148,7 +150,7 @@ export const listMealsForToday = async (): Promise<Meal[]> => {
       fat_g: number;
       estimation_confidence: number | null;
     }>
-  >(`${rb}/meal_items?select=*&meal_id=in.(${ids.join(",")})`, {
+  >(`${rb}/meal_items?select=*&meal_id=in.(${ids.map(encodeURIComponent).join(",")})`, {
     method: "GET",
     headers,
   });
@@ -179,7 +181,11 @@ export const deleteMealById = async (mealId: string) => {
   assertSupabaseConfigured();
   const rb = restBaseUrl();
   const headers = await apiHeaders();
-  await requestJson<unknown>(`${rb}/meals?id=eq.${mealId}`, {
+  await requestJson<unknown>(`${rb}/meal_items?meal_id=eq.${encodeURIComponent(mealId)}`, {
+    method: "DELETE",
+    headers,
+  });
+  await requestJson<unknown>(`${rb}/meals?id=eq.${encodeURIComponent(mealId)}`, {
     method: "DELETE",
     headers,
   });
@@ -227,7 +233,7 @@ export const getProfile = async (userId: string): Promise<{
       goal_type: "lose" | "maintain" | "gain" | null;
       daily_calorie_target: number | null;
     }>
-  >(`${restBaseUrl()}/profiles?select=display_name,age,height_cm,weight_kg,goal_type,daily_calorie_target&id=eq.${userId}&limit=1`, {
+  >(`${restBaseUrl()}/profiles?select=display_name,age,height_cm,weight_kg,goal_type,daily_calorie_target&id=eq.${encodeURIComponent(userId)}&limit=1`, {
     method: "GET",
     headers
   });

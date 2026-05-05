@@ -22,7 +22,6 @@ type Props = {
   uiPaletteOrder: UiPaletteId[];
   uiPalettes: Record<UiPaletteId, { label: string; light: { background: string }; dark: { background: string } }>;
   biologicalSex: "man" | "woman" | null;
-  setBiologicalSex: (s: "man" | "woman") => void;
   bmiValue: number | null;
   bmrValue: number | null;
   bmiLabel: string;
@@ -45,10 +44,14 @@ type Props = {
   onSignOut?: () => void;
   showSignOut?: boolean;
   useCustomFonts?: boolean;
+  onOpenPrivacyPolicy?: () => void;
+  onOpenTerms?: () => void;
+  onExportData?: () => void;
+  onDeleteAccount?: () => void;
+  showDeleteAccount?: boolean;
 };
 
 function createStyles(t: AppThemeTokens, themeMode: "light" | "dark") {
-  const sexOnBg = mixHex(t.primary, t.background, themeMode === "dark" ? 0.82 : 0.88);
   const glow = mixHex(t.primary, t.background, 0.9);
   return StyleSheet.create({
     root: { gap: 20 },
@@ -95,13 +98,6 @@ function createStyles(t: AppThemeTokens, themeMode: "light" | "dark") {
     swatch: { width: 36, height: 36, borderRadius: 999 },
     swatchOn: { borderWidth: 2, borderColor: t.onSurface },
     bento: { gap: 12 },
-    bentoCard: {
-      backgroundColor: t.surfaceContainer,
-      borderRadius: 12,
-      padding: 18,
-      gap: 8
-    },
-    bentoH: { fontSize: 16, fontWeight: "800", color: t.onSurface },
     mutedSm: { fontSize: 11, color: t.onSurfaceVariant },
     fieldLbl: {
       fontSize: 10,
@@ -111,20 +107,6 @@ function createStyles(t: AppThemeTokens, themeMode: "light" | "dark") {
       color: t.onSurfaceVariant,
       marginTop: 8
     },
-    sexRow: { flexDirection: "row", gap: 8 },
-    sexBtn: {
-      flex: 1,
-      paddingVertical: 12,
-      borderRadius: 12,
-      backgroundColor: t.surfaceContainerHigh,
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: "transparent"
-    },
-    sexBtnOn: { backgroundColor: sexOnBg, borderWidth: 1 },
-    sexTxt: { fontWeight: "800", color: t.onSurfaceVariant, fontSize: 13 },
-    sexTxtOn: { color: t.primary },
-    italicSm: { fontSize: 10, color: t.onSurfaceVariant, fontStyle: "italic" },
     bentoCardHigh: {
       backgroundColor: t.surfaceContainerHigh,
       borderRadius: 12,
@@ -154,7 +136,7 @@ function createStyles(t: AppThemeTokens, themeMode: "light" | "dark") {
       borderRadius: 999,
       marginTop: 4
     },
-    statusTxt: { color: t.onPrimaryContainer, fontWeight: "800", fontSize: 11, textTransform: "uppercase" },
+    statusTxt: { color: t.primary, fontWeight: "800", fontSize: 11, textTransform: "uppercase" },
     para: { fontSize: 13, color: t.onSurfaceVariant, lineHeight: 20, marginTop: 8 },
     recalc: { paddingVertical: 14, alignItems: "center" },
     recalcTxt: { color: t.onPrimary, fontWeight: "800", fontSize: 14 },
@@ -191,7 +173,6 @@ export function StitchSettingsScreen({
   uiPaletteOrder,
   uiPalettes,
   biologicalSex,
-  setBiologicalSex,
   bmiValue,
   bmrValue,
   bmiLabel,
@@ -213,7 +194,12 @@ export function StitchSettingsScreen({
   aboutHint,
   onSignOut,
   showSignOut,
-  useCustomFonts
+  useCustomFonts,
+  onOpenPrivacyPolicy,
+  onOpenTerms,
+  onExportData,
+  onDeleteAccount,
+  showDeleteAccount
 }: Props) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme, themeMode), [theme, themeMode]);
@@ -320,28 +306,6 @@ export function StitchSettingsScreen({
         <Text style={[styles.sectionTitle, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>BMI calculator</Text>
       </View>
       <View style={styles.bento}>
-        <View style={[styles.bentoCard, { backgroundColor: ui.card }]}>
-          <Text style={[styles.bentoH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Enter body data…</Text>
-          <Text style={[styles.mutedSm, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>Used to refine your daily goals</Text>
-          <Text style={[styles.fieldLbl, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>Sex</Text>
-          <View style={styles.sexRow}>
-            <TouchableOpacity
-              style={[styles.sexBtn, { backgroundColor: ui.cardLow }, biologicalSex === "man" && [styles.sexBtnOn, { borderColor: theme.primary }]]}
-              onPress={() => setBiologicalSex("man")}
-            >
-              <Text style={[styles.sexTxt, { color: ui.muted }, biologicalSex === "man" && [styles.sexTxtOn, { color: theme.primary }]]}>Man</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.sexBtn, { backgroundColor: ui.cardLow }, biologicalSex === "woman" && [styles.sexBtnOn, { borderColor: theme.primary }]]}
-              onPress={() => setBiologicalSex("woman")}
-            >
-              <Text style={[styles.sexTxt, { color: ui.muted }, biologicalSex === "woman" && [styles.sexTxtOn, { color: theme.primary }]]}>Woman</Text>
-            </TouchableOpacity>
-          </View>
-          {biologicalSex ? null : (
-            <Text style={[styles.italicSm, { color: ui.muted }]}>Optional: choose sex for more accurate calorie estimation.</Text>
-          )}
-        </View>
         <View style={[styles.bentoCardHigh, { backgroundColor: ui.cardLow }]}>
           <View style={styles.glow} />
           <Text style={[styles.fieldLbl, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>BMI result / Status</Text>
@@ -353,6 +317,9 @@ export function StitchSettingsScreen({
           </View>
           <Text style={[styles.mutedSm, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
             BMR: {bmrValue ?? "--"} kcal/day
+          </Text>
+          <Text style={[styles.mutedSm, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+            Based on onboarding sex: {biologicalSex === "woman" ? "Woman" : biologicalSex === "man" ? "Man" : "Not set"}
           </Text>
           <View style={[styles.statusPill, { backgroundColor: mixHex(theme.primary, theme.background, 0.88) }]}>
             <Ionicons name="checkmark-circle" size={14} color={theme.onPrimaryContainer} />
@@ -433,9 +400,69 @@ export function StitchSettingsScreen({
         </Text>
       </TouchableOpacity>
 
+      <View style={styles.sectionHead}>
+        <Ionicons name="document-text-outline" size={22} color={theme.primary} />
+        <Text style={[styles.sectionTitle, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Legal & data</Text>
+      </View>
+      <View style={styles.grid2}>
+        {onOpenPrivacyPolicy ? (
+          <TouchableOpacity
+            style={[styles.tile, { backgroundColor: ui.card }]}
+            onPress={onOpenPrivacyPolicy}
+            activeOpacity={0.85}
+            delayPressIn={0}
+          >
+            <Ionicons name="shield-checkmark-outline" size={24} color={theme.primary} />
+            <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Privacy policy</Text>
+            <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+              How Inertia handles your data
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+        {onOpenTerms ? (
+          <TouchableOpacity
+            style={[styles.tile, { backgroundColor: ui.card }]}
+            onPress={onOpenTerms}
+            activeOpacity={0.85}
+            delayPressIn={0}
+          >
+            <Ionicons name="reader-outline" size={24} color={theme.primary} />
+            <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Terms of service</Text>
+            <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+              Rules for using Inertia
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
+      {onExportData ? (
+        <TouchableOpacity
+          style={[styles.tile, { backgroundColor: ui.card }]}
+          onPress={onExportData}
+          activeOpacity={0.85}
+          delayPressIn={0}
+        >
+          <Ionicons name="download-outline" size={24} color={theme.primary} />
+          <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Export my data</Text>
+          <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+            Download a copy of your meals and profile
+          </Text>
+        </TouchableOpacity>
+      ) : null}
+
       {showSignOut && onSignOut ? (
         <TouchableOpacity style={[styles.signOut, { borderColor: theme.danger }]} onPress={onSignOut} activeOpacity={0.85} delayPressIn={0}>
           <Text style={[styles.signOutTxt, { color: theme.danger }]}>Sign out</Text>
+        </TouchableOpacity>
+      ) : null}
+
+      {showDeleteAccount && onDeleteAccount ? (
+        <TouchableOpacity
+          style={[styles.signOut, { borderColor: theme.danger, backgroundColor: `${theme.danger}11` }]}
+          onPress={onDeleteAccount}
+          activeOpacity={0.85}
+          delayPressIn={0}
+        >
+          <Text style={[styles.signOutTxt, { color: theme.danger }]}>Delete account</Text>
         </TouchableOpacity>
       ) : null}
     </View>

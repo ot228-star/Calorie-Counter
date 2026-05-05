@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -38,8 +38,17 @@ export function StitchBottomNav({ active, onSelect, useCustomFonts }: Props) {
   const inactive = "rgba(148, 163, 184, 0.85)";
   const activeBg = mixHex(theme.primary, theme.background, 0.75);
 
+  // BlurView on Android repaints per-frame as content scrolls behind it which
+  // causes noticeable jitter. Use a solid tinted surface there and only enable
+  // the live blur on iOS where it is GPU-accelerated.
+  const Container: React.ComponentType<any> = Platform.OS === "ios" ? BlurView : View;
+  const containerProps =
+    Platform.OS === "ios"
+      ? ({ intensity: 55, tint: "dark" } as const)
+      : ({} as const);
+
   return (
-    <BlurView intensity={55} tint="dark" style={[styles.wrap, { paddingBottom: bottomPad }]}>
+    <Container {...containerProps} style={[styles.wrap, { paddingBottom: bottomPad }]}>
       <View style={styles.row}>
         {TABS.map((tab) => {
           const isActive = active === tab.id;
@@ -71,7 +80,7 @@ export function StitchBottomNav({ active, onSelect, useCustomFonts }: Props) {
           );
         })}
       </View>
-    </BlurView>
+    </Container>
   );
 }
 
@@ -85,7 +94,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     overflow: "hidden",
-    backgroundColor: "rgba(49, 57, 77, 0.55)",
+    backgroundColor: Platform.OS === "ios" ? "rgba(49, 57, 77, 0.55)" : "rgba(20, 26, 40, 0.96)",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -10 },
     shadowOpacity: 0.4,

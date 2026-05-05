@@ -13,7 +13,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  Image as RNImage
 } from "react-native";
 import { useFonts } from "expo-font";
 import {
@@ -75,6 +76,11 @@ import { AppThemeProvider } from "./src/theme/AppThemeContext";
 import { semanticSurfaces } from "./src/lib/themeColors";
 import { loadFavorites, saveFavorites } from "./src/lib/favoritesStorage";
 import { loadPrivacyLockEnabled, setPrivacyLockEnabled } from "./src/lib/privacyStorage";
+import { deleteCurrentAccount } from "./src/lib/accountDeletion";
+import { initializeAds } from "./src/lib/ads";
+import { AdBanner } from "./src/components/AdBanner";
+import { hasAcceptedHealthDisclaimer, setHealthDisclaimerAccepted } from "./src/lib/disclaimerStorage";
+import { HealthDisclaimerModal } from "./src/components/HealthDisclaimerModal";
 import {
   clearOnboardingDraft,
   clearOnboardingPending,
@@ -323,35 +329,34 @@ const FallbackImage = memo(function FallbackImage({
   );
   const [index, setIndex] = useState(0);
   const [allFailed, setAllFailed] = useState(false);
+  const [tryNativeImage, setTryNativeImage] = useState(false);
   const safeUris = displayUris.length > 0 ? displayUris : [];
   const current = safeUris[Math.min(index, Math.max(0, safeUris.length - 1))];
 
   useEffect(() => {
     setIndex(0);
     setAllFailed(false);
+    setTryNativeImage(false);
   }, [displayUris]);
 
   if (safeUris.length === 0 || allFailed) {
     return <View style={[style, styles.photoEmpty]} />;
   }
 
-  return (
-    <ExpoImage
-      source={{ uri: current }}
-      style={style}
-      cachePolicy="memory-disk"
-      contentFit="cover"
-      priority={priority}
-      transition={120}
-      onError={() => {
-        if (index >= safeUris.length - 1) {
-          setAllFailed(true);
-          return;
-        }
-        setIndex((prev) => Math.min(prev + 1, safeUris.length - 1));
-      }}
-    />
-  );
+  const moveToNextCandidate = () => {
+    if (index >= safeUris.length - 1) {
+      setAllFailed(true);
+      return;
+    }
+    setIndex((prev) => Math.min(prev + 1, safeUris.length - 1));
+    setTryNativeImage(false);
+  };
+
+  if (tryNativeImage) {
+    return <RNImage source={{ uri: current }} style={style} resizeMode="cover" onError={moveToNextCandidate} />;
+  }
+
+  return <ExpoImage source={{ uri: current }} style={style} cachePolicy="memory-disk" contentFit="cover" priority={priority} transition={120} onError={() => setTryNativeImage(true)} />;
 });
 
 const makeItem = (): MealItem => ({
@@ -471,6 +476,7 @@ export default function App() {
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean | null>(null);
   const [privacyLockOn, setPrivacyLockOn] = useState(false);
   const [privacyUnlocked, setPrivacyUnlocked] = useState(true);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const isExpoGo = Constants.appOwnership === "expo";
 
@@ -509,7 +515,8 @@ export default function App() {
   const font = fontsLoaded ? stitchFonts : null;
   const summary = useMemo(() => summaryFromMeals(meals, targetCalories), [meals, targetCalories]);
   const caloriesProgress = summary.targetCalories > 0 ? Math.min(summary.consumedCalories / summary.targetCalories, 1) : 0;
-  const recentMeals = meals.slice(0, 3);
+  const [showAllHistory, setShowAllHistory] = useState(false);
+  const recentMeals = showAllHistory ? meals : meals.slice(0, 3);
   const mealsLogged = meals.length;
   const avgMealCalories = mealsLogged ? Math.round(summary.consumedCalories / mealsLogged) : 0;
   const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -615,11 +622,32 @@ export default function App() {
   }, [age, heightCm, weightKg, biologicalSex, inferredGoalType, mealPlanFrequency, surveyHabits, surveyGoals]);
   /** Unified Plan catalog: cloud + local, optional cuisine filter, optional search. */
   const planFoodsForScreen = useMemo(() => {
-    const merged = Array.from(new Map([...foodResults, ...FOOD_DATABASE].map((food) => [food.name, food])).values());
+    const mergedByName = new Map<string, FoodRecord>();
+    for (const food of FOOD_DATABASE) {
+      mergedByName.set(food.name, food);
+    }
+    for (const cloudFood of foodResults) {
+      const existing = mergedByName.get(cloudFood.name);
+      if (!existing) {
+        mergedByName.set(cloudFood.name, cloudFood);
+        continue;
+      }
+      const cloudHasPhotos =
+        Boolean(cloudFood.image_url?.trim()) || (Array.isArray(cloudFood.image_urls) && cloudFood.image_urls.length > 0);
+      const existingHasPhotos =
+        Boolean(existing.image_url?.trim()) || (Array.isArray(existing.image_urls) && existing.image_urls.length > 0);
+      // Prefer cloud rows, especially when they carry curated catalog photos.
+      if (cloudHasPhotos || !existingHasPhotos) {
+        mergedByName.set(cloudFood.name, cloudFood);
+      }
+    }
+    const merged = Array.from(mergedByName.values());
+    const cloudWithPhotos = foodResults.filter((food) => getFoodPhotoCandidates(food).length > 0);
+    const catalog = foodSource === "cloud" ? cloudWithPhotos : merged;
     const base =
       selectedCuisineRegion === "global"
-        ? merged
-        : merged.filter((food) =>
+        ? catalog
+        : catalog.filter((food) =>
             cuisineRegionPresets[selectedCuisineRegion].keywords.some((keyword) =>
               food.name.toLowerCase().includes(keyword.toLowerCase())
             )
@@ -630,13 +658,20 @@ export default function App() {
     }
     const numericQuery = Number(q);
     const hasNumericQuery = !Number.isNaN(numericQuery);
+    const isShortQuery = q.length <= 1;
     return base
       .map((food) => {
+        const lowerName = food.name.toLowerCase();
+        const lowerCategory = food.category.toLowerCase();
+        const startsWord = lowerName.split(/\s+/).some((part) => part.startsWith(q));
         const text = getFoodSearchBlob(food);
         let score = 0;
-        if (food.name.toLowerCase().includes(q)) score += 5;
-        if (food.category.toLowerCase().includes(q)) score += 3;
-        if (text.includes(q)) score += 2;
+        if (lowerName.includes(q)) score += 5;
+        if (lowerCategory.includes(q)) score += 3;
+        if (startsWord) score += 3;
+        // For single-character queries, avoid broad blob matching that makes unrelated
+        // foods appear just because that character exists somewhere in descriptions.
+        if (!isShortQuery && text.includes(q)) score += 2;
         if (hasNumericQuery && Math.abs(food.calories - numericQuery) <= 20) score += 2;
         if (hasNumericQuery && Math.abs(food.protein_g - numericQuery) <= 5) score += 1;
         return { food, score };
@@ -644,7 +679,7 @@ export default function App() {
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score || a.food.name.localeCompare(b.food.name))
       .map((item) => item.food);
-  }, [foodResults, foodSearch, selectedCuisineRegion]);
+  }, [foodResults, foodSearch, selectedCuisineRegion, foodSource]);
 
   const toPositiveIntOrNull = useCallback((value: string) => {
     const n = Number(value);
@@ -696,6 +731,14 @@ export default function App() {
   const scrollBottomPad = STITCH_TAB_BAR_VISUAL + bottomSafe + 88;
   const stitchTopPad = stitchScrollPaddingTop(insets.top);
   const scrollPadTop = screen === "foodDetail" ? insets.top + 10 : stitchTopPad;
+
+  useEffect(() => {
+    void initializeAds();
+    void (async () => {
+      const accepted = await hasAcceptedHealthDisclaimer();
+      if (!accepted) setShowDisclaimer(true);
+    })();
+  }, []);
 
   useEffect(() => {
     getSession()
@@ -1113,6 +1156,18 @@ export default function App() {
       Alert.alert("Could not save username", String(error));
     }
   };
+  const handleRecalculateSuggestedCalories = async () => {
+    const suggested = calculateQuestionnaireTarget();
+    setTargetCalories(suggested);
+    try {
+      if (!AUTH_DISABLED && session?.user?.id) {
+        await persistProfile(session.user.id, inferredGoalType, suggested);
+      }
+      Alert.alert("Target updated", `Your suggested daily calories are now ${suggested} kcal.`);
+    } catch (error) {
+      Alert.alert("Could not update target", String(error));
+    }
+  };
 
   const handleNotificationsTilePress = useCallback(async () => {
     if (isExpoGo) {
@@ -1281,6 +1336,95 @@ export default function App() {
     Alert.alert("About Inertia", `Version: ${version}\n\nCalorie tracking, meal planning, and nutrition logging.`);
   }, []);
 
+  const openExternalUrl = useCallback(async (url: string, errorTitle: string) => {
+    if (!url) {
+      Alert.alert(errorTitle, "URL has not been configured.");
+      return;
+    }
+    try {
+      const can = await Linking.canOpenURL(url);
+      if (!can) {
+        Alert.alert(errorTitle, "Could not open the link in this device.");
+        return;
+      }
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert(errorTitle, "Could not open the link.");
+    }
+  }, []);
+
+  const handleOpenPrivacyPolicy = useCallback(() => {
+    const extra = (Constants.expoConfig?.extra ?? {}) as { EXPO_PUBLIC_PRIVACY_POLICY_URL?: string };
+    void openExternalUrl(extra.EXPO_PUBLIC_PRIVACY_POLICY_URL ?? "", "Privacy policy unavailable");
+  }, [openExternalUrl]);
+
+  const handleOpenTerms = useCallback(() => {
+    const extra = (Constants.expoConfig?.extra ?? {}) as { EXPO_PUBLIC_TERMS_URL?: string };
+    void openExternalUrl(extra.EXPO_PUBLIC_TERMS_URL ?? "", "Terms unavailable");
+  }, [openExternalUrl]);
+
+  const handleExportData = useCallback(async () => {
+    try {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        appVersion: Constants.expoConfig?.version ?? null,
+        userId: session?.user?.id ?? null,
+        nickname,
+        biologicalSex,
+        targetCalories,
+        meals
+      };
+      const json = JSON.stringify(payload, null, 2);
+      await Share.share({
+        title: "Inertia data export",
+        message: json
+      });
+      await trackEvent("data_export_requested", { mealCount: meals.length });
+    } catch (error) {
+      Alert.alert("Export failed", String(error));
+    }
+  }, [biologicalSex, meals, nickname, session?.user?.id, targetCalories]);
+
+  const handleDeleteAccount = useCallback(() => {
+    if (AUTH_DISABLED) {
+      Alert.alert("Not available", "Account deletion is disabled in dev preview mode.");
+      return;
+    }
+    Alert.alert(
+      "Delete account?",
+      "This permanently deletes your Inertia account, meals, photos, and profile. This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            void (async () => {
+              try {
+                const { data } = await authClient.auth.getSession();
+                const token = data.session?.access_token;
+                if (!token) {
+                  Alert.alert("Not signed in", "Sign in again to delete your account.");
+                  return;
+                }
+                await deleteCurrentAccount(token);
+                await trackEvent("account_deleted", {});
+                await authClient.auth.signOut();
+                setMeals([]);
+                setOnboardingStep(0);
+                setPrivacyUnlocked(true);
+                setScreen("dashboard");
+                Alert.alert("Account deleted", "Your account and data have been removed.");
+              } catch (error) {
+                Alert.alert("Could not delete account", error instanceof Error ? error.message : String(error));
+              }
+            })();
+          }
+        }
+      ]
+    );
+  }, []);
+
   const saveCurrentMeal = async (source: Meal["source"], requestId?: string) => {
     const cleanItems = mealItems.filter((item) => item.name.trim().length > 0);
     if (!cleanItems.length) {
@@ -1304,10 +1448,12 @@ export default function App() {
           editedItemCount: cleanItems.length
         });
       }
+      let savedMeal: Meal = meal;
       if (!AUTH_DISABLED) {
-        await saveMeal(meal, requestId);
+        const dbId = await saveMeal(meal, requestId);
+        if (dbId) savedMeal = { ...meal, id: dbId };
       }
-      setMeals((prev) => [meal, ...prev]);
+      setMeals((prev) => [savedMeal, ...prev]);
       setMealItems([makeItem()]);
       setEstimate(null);
       setEstimatedOriginalItems([]);
@@ -1374,23 +1520,28 @@ export default function App() {
     );
   };
 
-  const getPortionValue = (foodName: string): number => {
-    const raw = foodPortions[foodName];
+  // Keep a ref of latest portions so memoized callbacks below stay stable
+  // and don't force every food row to re-render on each portion change.
+  const foodPortionsRef = useRef(foodPortions);
+  foodPortionsRef.current = foodPortions;
+
+  const getPortionValue = useCallback((foodName: string): number => {
+    const raw = foodPortionsRef.current[foodName];
     const parsed = Number(raw);
     if (!raw || Number.isNaN(parsed)) return 1;
     return Math.min(20, Math.max(0.25, parsed));
-  };
+  }, []);
 
-  const setPortionValue = (foodName: string, value: string) => {
+  const setPortionValue = useCallback((foodName: string, value: string) => {
     setFoodPortions((prev) => ({ ...prev, [foodName]: value }));
-  };
+  }, []);
 
-  const adjustPortionValue = (foodName: string, delta: number) => {
+  const adjustPortionValue = useCallback((foodName: string, delta: number) => {
     const next = Math.min(20, Math.max(0.25, getPortionValue(foodName) + delta));
     setFoodPortions((prev) => ({ ...prev, [foodName]: String(Number(next.toFixed(2))) }));
-  };
+  }, [getPortionValue]);
 
-  const addFoodToMeal = (food: FoodRecord, portions = 1) => {
+  const addFoodToMeal = useCallback((food: FoodRecord, portions = 1) => {
     const clamped = Math.min(20, Math.max(0.25, portions));
     const newItem: MealItem = {
       id: createId(),
@@ -1404,7 +1555,7 @@ export default function App() {
     };
     setMealItems((prev) => [...prev, newItem]);
     setScreen("manual");
-  };
+  }, []);
 
   const toggleFavouriteFood = useCallback((foodName: string) => {
     setFavouriteFoodNames((prev) => (prev.includes(foodName) ? prev.filter((n) => n !== foodName) : [...prev, foodName]));
@@ -1438,6 +1589,67 @@ export default function App() {
     });
     setScreen("foodDetail");
   };
+
+  // Stable wrappers passed to the memoized food plan rows so typing in search,
+  // adjusting portions, or other unrelated state changes don't force every row
+  // to re-render.
+  const openFoodDetailRef = useRef(openFoodDetail);
+  openFoodDetailRef.current = openFoodDetail;
+
+  const onSelectCuisineRegion = useCallback((id: string) => {
+    setSelectedCuisineRegion(id as CuisineRegionId);
+  }, []);
+
+  const renderFoodPlanThumb = useCallback(
+    (food: FoodRecord) => (
+      <FallbackImage
+        uris={getFoodPhotoCandidates(food)}
+        style={{ width: "100%", height: "100%" }}
+        urlMaxWidth={560}
+        priority="low"
+      />
+    ),
+    []
+  );
+
+  const onOpenFoodPlanDetail = useCallback((food: FoodRecord) => {
+    openFoodDetailRef.current(food, "foodPlan");
+  }, []);
+
+  const onAddFoodPlanItem = useCallback(
+    (food: FoodRecord) => {
+      addFoodToMeal(food, getPortionValue(food.name));
+    },
+    [addFoodToMeal, getPortionValue]
+  );
+
+  const getPortionValueForName = useCallback((name: string) => {
+    return foodPortionsRef.current[name] ?? "1";
+  }, []);
+
+  // Auto-pagination wiring for the food plan list. The screen registers its
+  // `loadMore` here on mount; the main ScrollView below calls it whenever the
+  // user scrolls within ~600px of the bottom. We throttle invocations so that
+  // photos load in small batches rather than all at once.
+  const foodPlanLoadMoreRef = useRef<(() => void) | null>(null);
+  const lastLoadMoreAtRef = useRef(0);
+  const registerFoodPlanLoadMore = useCallback((cb: (() => void) | null) => {
+    foodPlanLoadMoreRef.current = cb;
+  }, []);
+  const onMainScroll = useCallback(
+    (e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
+      const cb = foodPlanLoadMoreRef.current;
+      if (!cb) return;
+      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+      const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+      if (distanceFromBottom > 600) return;
+      const now = Date.now();
+      if (now - lastLoadMoreAtRef.current < 250) return;
+      lastLoadMoreAtRef.current = now;
+      cb();
+    },
+    []
+  );
 
   const selectGoal = (goal: string) => {
     setSurveyGoals([goal]);
@@ -1556,9 +1768,6 @@ export default function App() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          decelerationRate="normal"
-          scrollEventThrottle={16}
-          disableIntervalMomentum
           bounces={Platform.OS === "ios"}
           overScrollMode="never"
         >
@@ -1922,10 +2131,10 @@ export default function App() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         overScrollMode="never"
-        decelerationRate="normal"
-        scrollEventThrottle={16}
-        disableIntervalMomentum
         bounces={Platform.OS === "ios"}
+        removeClippedSubviews={Platform.OS === "android"}
+        onScroll={onMainScroll}
+        scrollEventThrottle={64}
       >
       {screen === "dashboard" && (
         <StitchDashboard
@@ -1943,8 +2152,19 @@ export default function App() {
             mealType: meal.mealType,
             source: meal.source,
             itemCount: meal.items.length,
-            calories: meal.items.reduce((sum, i) => sum + i.calories, 0)
+            calories: meal.items.reduce((sum, i) => sum + i.calories, 0),
+            itemsLabel: meal.items.map((i) => i.name).filter(Boolean).join(", "),
+            eatenAtLabel: (() => {
+              try {
+                return new Date(meal.eatenAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+              } catch {
+                return undefined;
+              }
+            })()
           }))}
+          totalMealCount={meals.length}
+          showAllHistory={showAllHistory}
+          onToggleHistory={() => setShowAllHistory((v) => !v)}
           dateLabel={stitchDateLabel}
           useCustomFonts={Boolean(font)}
           onQuickLog={() => setScreen("manual")}
@@ -1952,15 +2172,26 @@ export default function App() {
             setMealType("breakfast");
             setScreen("manual");
           }}
-          onDeleteMeal={async (mealId) => {
-            try {
-              if (!AUTH_DISABLED) {
-                await deleteMealById(mealId);
+          onDeleteMeal={(mealId) => {
+            Alert.alert("Delete meal?", "This will permanently remove this meal from your log.", [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: () => {
+                  void (async () => {
+                    try {
+                      if (!AUTH_DISABLED) {
+                        await deleteMealById(mealId);
+                      }
+                      setMeals((prev) => prev.filter((m) => m.id !== mealId));
+                    } catch (error) {
+                      Alert.alert("Could not delete meal", error instanceof Error ? error.message : String(error));
+                    }
+                  })();
+                }
               }
-              setMeals((prev) => prev.filter((m) => m.id !== mealId));
-            } catch {
-              Alert.alert("Could not delete meal.");
-            }
+            ]);
           }}
         />
       )}
@@ -2003,23 +2234,17 @@ export default function App() {
           regionOrder={cuisineRegionOrder}
           regionLabels={cuisineRegionLabels}
           selectedRegion={selectedCuisineRegion}
-          onSelectRegion={(id) => setSelectedCuisineRegion(id as CuisineRegionId)}
+          onSelectRegion={onSelectCuisineRegion}
           foods={planFoodsForScreen}
           useCustomFonts={Boolean(font)}
           getPlanTagline={getFoodPlanTagline}
-          renderFoodThumb={(food) => (
-            <FallbackImage
-              uris={getFoodPhotoCandidates(food)}
-              style={{ width: "100%", height: "100%" }}
-              urlMaxWidth={560}
-              priority="low"
-            />
-          )}
-          onOpenDetail={(food) => openFoodDetail(food, "foodPlan")}
-          onAdd={(food) => addFoodToMeal(food, getPortionValue(food.name))}
+          renderFoodThumb={renderFoodPlanThumb}
+          onOpenDetail={onOpenFoodPlanDetail}
+          onAdd={onAddFoodPlanItem}
           onAdjustPortion={adjustPortionValue}
-          portionValue={(name) => foodPortions[name] ?? "1"}
+          portionValue={getPortionValueForName}
           onPortionChange={setPortionValue}
+          registerLoadMore={registerFoodPlanLoadMore}
         />
       )}
 
@@ -2083,7 +2308,6 @@ export default function App() {
           uiPaletteOrder={uiPaletteOrder}
           uiPalettes={uiPalettes}
           biologicalSex={biologicalSex}
-          setBiologicalSex={setBiologicalSex}
           bmiValue={bmiValue}
           bmrValue={bmrValue}
           bmiLabel={bmiLabel}
@@ -2102,13 +2326,15 @@ export default function App() {
           shareHint="Share Inertia with friends"
           rateHint="Rate Inertia in Google Play"
           aboutHint="View app version and product info"
-          onRecalculateCalories={() => {
-            const suggested = calculateQuestionnaireTarget();
-            setTargetCalories(suggested);
-          }}
+          onRecalculateCalories={() => void handleRecalculateSuggestedCalories()}
           onSignOut={() => void handleSignOut()}
           showSignOut={!AUTH_DISABLED}
           useCustomFonts={Boolean(font)}
+          onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+          onOpenTerms={handleOpenTerms}
+          onExportData={() => void handleExportData()}
+          onDeleteAccount={handleDeleteAccount}
+          showDeleteAccount={!AUTH_DISABLED && Boolean(session?.user?.id)}
         />
       )}
 
@@ -2133,7 +2359,19 @@ export default function App() {
       )}
       </ScrollView>
 
+      <AdBanner />
       <StitchBottomNav active={stitchNavActive} onSelect={onStitchNav} useCustomFonts={Boolean(font)} />
+      <HealthDisclaimerModal
+        visible={showDisclaimer}
+        onAccept={() => {
+          void (async () => {
+            await setHealthDisclaimerAccepted();
+            setShowDisclaimer(false);
+          })();
+        }}
+        onOpenPrivacy={handleOpenPrivacyPolicy}
+        onOpenTerms={handleOpenTerms}
+      />
     </View>
     </AppThemeProvider>
   );

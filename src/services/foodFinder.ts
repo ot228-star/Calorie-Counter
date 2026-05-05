@@ -61,7 +61,7 @@ export const searchFoods = async (query: string): Promise<SearchResult> => {
   }
 
   try {
-    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/foods?select=${FOODS_SELECT}&order=name.asc&limit=80`;
+    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/foods?select=${FOODS_SELECT}&order=name.asc&limit=40`;
     const queryPart = q ? `&name=ilike.*${encodeURIComponent(q)}*` : "";
     const response = await fetch(`${endpoint}${queryPart}`, {
       method: "GET",

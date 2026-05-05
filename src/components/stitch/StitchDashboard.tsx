@@ -13,6 +13,8 @@ type MealRow = {
   source: string;
   itemCount: number;
   calories: number;
+  itemsLabel?: string;
+  eatenAtLabel?: string;
 };
 
 type Props = {
@@ -26,6 +28,9 @@ type Props = {
   fatG: number;
   avgMealCalories: number;
   recentMeals: MealRow[];
+  totalMealCount: number;
+  showAllHistory: boolean;
+  onToggleHistory: () => void;
   dateLabel: string;
   useCustomFonts?: boolean;
   onQuickLog: () => void;
@@ -215,6 +220,9 @@ export function StitchDashboard({
   fatG,
   avgMealCalories,
   recentMeals,
+  totalMealCount,
+  showAllHistory,
+  onToggleHistory,
   dateLabel,
   useCustomFonts,
   onQuickLog,
@@ -290,7 +298,11 @@ export function StitchDashboard({
         <View style={styles.sectionMeta}>
           <Text style={[styles.mutedSm, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>Avg {avgMealCalories} kcal</Text>
           <View style={styles.dot} />
-          <Text style={[styles.link, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>View History</Text>
+          <TouchableOpacity onPress={onToggleHistory} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} activeOpacity={0.7} delayPressIn={0}>
+            <Text style={[styles.link, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>
+              {showAllHistory ? "Show less" : `View history${totalMealCount > 0 ? ` (${totalMealCount})` : ""}`}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -316,8 +328,15 @@ export function StitchDashboard({
               <View style={styles.mealLeft}>
                 <Text style={[styles.mealTitle, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>
                   {m.mealType[0].toUpperCase() + m.mealType.slice(1)} • {m.source}
+                  {m.eatenAtLabel ? ` • ${m.eatenAtLabel}` : ""}
                 </Text>
-                <Text style={[styles.mealSub, useCustomFonts && { fontFamily: stitchFonts.body }]}>{m.itemCount} item(s)</Text>
+                {m.itemsLabel ? (
+                  <Text style={[styles.mealSub, useCustomFonts && { fontFamily: stitchFonts.body }]} numberOfLines={2}>
+                    {m.itemsLabel}
+                  </Text>
+                ) : (
+                  <Text style={[styles.mealSub, useCustomFonts && { fontFamily: stitchFonts.body }]}>{m.itemCount} item(s)</Text>
+                )}
               </View>
               <View style={styles.mealRight}>
                 <Text style={[styles.kcal, useCustomFonts && { fontFamily: stitchFonts.display }]}>{m.calories}</Text>

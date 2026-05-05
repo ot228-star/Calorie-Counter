@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import type { FoodRecord } from "../../data/foodDatabase";
@@ -29,6 +29,12 @@ type Props = {
   onAdjustPortion: (foodName: string, delta: number) => void;
   portionValue: (foodName: string) => string;
   onPortionChange: (foodName: string, v: string) => void;
+  /**
+   * Called once on mount with a `loadMore` callback. The parent scroll view
+   * invokes this callback when the user nears the bottom, so the user never
+   * has to tap a "Load more" button.
+   */
+  registerLoadMore?: (cb: (() => void) | null) => void;
 };
 
 function createStyles(t: AppThemeTokens) {
@@ -180,7 +186,7 @@ type RowProps = {
   onPortionChange: (foodName: string, v: string) => void;
 };
 
-function FoodPlanRow({
+const FoodPlanRow = memo(function FoodPlanRow({
   food,
   styles,
   theme,
@@ -291,7 +297,7 @@ function FoodPlanRow({
       </View>
     </View>
   );
-}
+});
 
 export function StitchFoodPlanScreen({
   foodSearch,
@@ -310,19 +316,38 @@ export function StitchFoodPlanScreen({
   onAdd,
   onAdjustPortion,
   portionValue,
-  onPortionChange
+  onPortionChange,
+  registerLoadMore
 }: Props) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const grad = [theme.primary, theme.primaryContainer] as const;
+  const grad = useMemo(() => [theme.primary, theme.primaryContainer] as const, [theme.primary, theme.primaryContainer]);
   const ph = `${theme.mutedText}73`;
 
   const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
+  const totalRef = React.useRef(foods.length);
+  totalRef.current = foods.length;
+  const displayCountRef = React.useRef(displayCount);
+  displayCountRef.current = displayCount;
 
   // Reset display count when region or search changes
   useEffect(() => {
     setDisplayCount(INITIAL_DISPLAY_COUNT);
   }, [selectedRegion, foodSearch]);
+
+  // Expose a stable loadMore callback to the parent scroll container so it can
+  // trigger pagination as the user nears the bottom of the page. We grow the
+  // window in small steps (LOAD_MORE_COUNT) so we never schedule decoding for
+  // every photo at once.
+  useEffect(() => {
+    if (!registerLoadMore) return;
+    const loadMore = () => {
+      if (displayCountRef.current >= totalRef.current) return;
+      setDisplayCount((prev) => Math.min(totalRef.current, prev + LOAD_MORE_COUNT));
+    };
+    registerLoadMore(loadMore);
+    return () => registerLoadMore(null);
+  }, [registerLoadMore]);
 
   const visibleFoods = useMemo(() => foods.slice(0, displayCount), [foods, displayCount]);
   const hasMore = foods.length > displayCount;
@@ -408,16 +433,11 @@ export function StitchFoodPlanScreen({
         ))}
 
         {hasMore && (
-          <TouchableOpacity
-            style={styles.loadMoreBtn}
-            onPress={() => setDisplayCount((prev) => prev + LOAD_MORE_COUNT)}
-            activeOpacity={0.85}
-            delayPressIn={0}
-          >
+          <View style={styles.loadMoreBtn}>
             <Text style={[styles.loadMoreTxt, useCustomFonts && { fontFamily: stitchFonts.bodySemibold }]}>
-              Load More ({remaining} remaining)
+              Loading more… ({remaining} remaining)
             </Text>
-          </TouchableOpacity>
+          </View>
         )}
 
         {!foodLoading && foods.length > 0 && (

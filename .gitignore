@@ -24,3 +24,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# EAS / store credentials
+app/play-service-account.json
+app/google-services.json
+app/GoogleService-Info.plist
+app/credentials.json
+*.keystore
+*.p8
+*.p12
+*.mobileprovision

@@ -7,7 +7,9 @@ type AnalyticsEventName =
   | "camera_estimate_requested"
   | "estimate_received"
   | "estimate_edited"
-  | "meal_saved";
+  | "meal_saved"
+  | "data_export_requested"
+  | "account_deleted";
 
 export const trackEvent = async (eventName: AnalyticsEventName, props: Record<string, unknown> = {}) => {
   const { url, anonKey } = getSupabaseConfig();

@@ -6,11 +6,13 @@ export function resizeRemotePhotoUrl(uri: string, maxWidth: number): string {
   if (!uri) return uri;
   try {
     if (uri.includes("images.unsplash.com")) {
-      if (/[?&]w=\d+/.test(uri)) {
-        return uri.replace(/([?&]w=)\d+/, `$1${maxWidth}`);
-      }
-      const sep = uri.includes("?") ? "&" : "?";
-      return `${uri}${sep}w=${maxWidth}`;
+      const parsed = new URL(uri);
+      parsed.searchParams.set("w", String(maxWidth));
+      // Force a widely supported raster format for device compatibility.
+      parsed.searchParams.set("fm", "jpg");
+      // Keep quality explicit and predictable across vendors/CDN negotiation.
+      if (!parsed.searchParams.has("q")) parsed.searchParams.set("q", "80");
+      return parsed.toString();
     }
     if (uri.includes("picsum.photos/")) {
       const m = uri.match(/picsum\.photos\/(\d+)\/(\d+)/);

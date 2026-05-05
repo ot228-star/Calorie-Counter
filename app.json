@@ -1,0 +1,86 @@
+{
+  "expo": {
+    "name": "Inertia",
+    "slug": "calorie-counter",
+    "scheme": "caloriecounter",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "icon": "./assets/logo-calorie-counter.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/logo-calorie-counter.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a1628"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "com.ot228star.caloriecounter",
+      "buildNumber": "1",
+      "supportsTablet": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "NSCameraUsageDescription": "Inertia uses the camera to take photos of meals so it can estimate their nutrition.",
+        "NSPhotoLibraryUsageDescription": "Inertia accesses photos so you can pick existing meal images to log.",
+        "NSPhotoLibraryAddUsageDescription": "Inertia saves meal photos you capture so you can review them later.",
+        "NSFaceIDUsageDescription": "Inertia uses Face ID to lock your nutrition data when biometric privacy lock is enabled.",
+        "NSUserTrackingUsageDescription": "Inertia asks for permission to deliver more relevant ads. Declining still shows non-personalized ads.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.ot228star.caloriecounter",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo-calorie-counter.png",
+        "backgroundColor": "#0a1628"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "POST_NOTIFICATIONS",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "VIBRATE",
+        "INTERNET",
+        "com.google.android.gms.permission.AD_ID"
+      ],
+      "blockedPermissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Inertia uses the camera to take photos of meals so it can estimate their nutrition."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Inertia accesses photos so you can pick existing meal images to log.",
+          "cameraPermission": "Inertia uses the camera to take photos of meals so it can estimate their nutrition."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo-calorie-counter.png",
+          "color": "#0a1628"
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Inertia uses Face ID to lock your nutrition data when biometric privacy lock is enabled."
+        }
+      ]
+    ]
+  }
+}
