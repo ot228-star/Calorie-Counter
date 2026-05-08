@@ -49,9 +49,3 @@ export function AdBanner({ style }: Props) {
     </View>
   );
 }
-
-// Used by analytics/UI gates.
-export function isAdsConfigured(): boolean {
-  const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, string | undefined>;
-  return Boolean(extra.EXPO_PUBLIC_ADMOB_BANNER_ANDROID || extra.EXPO_PUBLIC_ADMOB_BANNER_IOS);
-}
