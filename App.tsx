@@ -731,7 +731,7 @@ export default function App() {
   const bottomSafe = Math.max(insets.bottom, 6);
   const scrollBottomPad = STITCH_TAB_BAR_VISUAL + bottomSafe + 88;
   const stitchTopPad = stitchScrollPaddingTop(insets.top);
-  const scrollPadTop = screen === "foodDetail" ? insets.top + 10 : stitchTopPad;
+  const scrollPadTop = screen === "foodDetail" ? insets.top + 10 : screen === "foodPlan" ? 8 : stitchTopPad;
   const transitionKey = `${screen}:${screen === "foodPlan" ? selectedCuisineRegion : ""}`;
 
   useEffect(() => {
@@ -1625,22 +1625,27 @@ export default function App() {
   // photos load in small batches rather than all at once.
   const foodPlanLoadMoreRef = useRef<(() => void) | null>(null);
   const lastLoadMoreAtRef = useRef(0);
+  const nearBottomRef = useRef(false);
   const registerFoodPlanLoadMore = useCallback((cb: (() => void) | null) => {
     foodPlanLoadMoreRef.current = cb;
   }, []);
+  const triggerFoodPlanLoadMore = useCallback(() => {
+    const cb = foodPlanLoadMoreRef.current;
+    if (!cb) return;
+    const now = Date.now();
+    if (now - lastLoadMoreAtRef.current < 250) return;
+    lastLoadMoreAtRef.current = now;
+    cb();
+  }, []);
   const onMainScroll = useCallback(
     (e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
-      const cb = foodPlanLoadMoreRef.current;
-      if (!cb) return;
       const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
       const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
-      if (distanceFromBottom > 600) return;
-      const now = Date.now();
-      if (now - lastLoadMoreAtRef.current < 250) return;
-      lastLoadMoreAtRef.current = now;
-      cb();
+      nearBottomRef.current = distanceFromBottom <= 600;
+      if (!nearBottomRef.current) return;
+      triggerFoodPlanLoadMore();
     },
-    []
+    [triggerFoodPlanLoadMore]
   );
 
   const selectGoal = (goal: string) => {
@@ -2126,6 +2131,11 @@ export default function App() {
         bounces={Platform.OS === "ios"}
         removeClippedSubviews={Platform.OS === "android"}
         onScroll={onMainScroll}
+        onScrollEndDrag={onMainScroll}
+        onMomentumScrollEnd={onMainScroll}
+        onContentSizeChange={() => {
+          if (screen === "foodPlan" && nearBottomRef.current) triggerFoodPlanLoadMore();
+        }}
         scrollEventThrottle={64}
       >
       <Animated.View style={{ opacity: mainContentOpacity, transform: [{ translateY: mainContentTranslate }] }}>
@@ -2222,7 +2232,6 @@ export default function App() {
         <StitchFoodPlanScreen
           foodSearch={foodSearch}
           onSearchChange={setFoodSearch}
-          foodSource={foodSource}
           foodLoading={foodLoading}
           regionOrder={cuisineRegionOrder}
           regionLabels={cuisineRegionLabels}

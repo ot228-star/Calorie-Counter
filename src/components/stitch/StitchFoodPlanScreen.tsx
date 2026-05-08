@@ -11,11 +11,12 @@ import { Ionicons } from "@expo/vector-icons";
 
 const INITIAL_DISPLAY_COUNT = 10;
 const LOAD_MORE_COUNT = 10;
+const MAX_MOUNTED_ROWS = 24;
+const ROW_HEIGHT_ESTIMATE = 262;
 
 type Props = {
   foodSearch: string;
   onSearchChange: (q: string) => void;
-  foodSource: "cloud";
   foodLoading: boolean;
   regionOrder: string[];
   regionLabels: Record<string, string>;
@@ -66,19 +67,7 @@ function createStyles(t: AppThemeTokens) {
     chipOn: { backgroundColor: t.primary },
     chipTxt: { color: t.onSurfaceVariant, fontWeight: "700", fontSize: 12 },
     chipTxtOn: { color: t.onPrimary },
-    sourceRow: {
-      flexDirection: "row",
-      backgroundColor: t.surfaceLow,
-      padding: 3,
-      borderRadius: 999,
-      alignSelf: "flex-start",
-      gap: 3
-    },
-    sourcePill: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
-    sourcePillOn: { backgroundColor: t.primaryContainer },
-    sourceTxt: { color: t.onSurfaceVariant, fontSize: 11, fontWeight: "700" },
-    sourceTxtOn: { color: t.onPrimaryContainer },
-    hint: { fontSize: 10, color: t.onSurfaceVariant, opacity: 0.85 },
+    topSpacer: { width: "100%" },
     muted: { color: t.onSurfaceVariant, fontSize: 13 },
     card: {
       backgroundColor: t.surfaceContainer,
@@ -303,7 +292,6 @@ const FoodPlanRow = memo(function FoodPlanRow({
 export function StitchFoodPlanScreen({
   foodSearch,
   onSearchChange,
-  foodSource,
   foodLoading,
   regionOrder,
   regionLabels,
@@ -372,6 +360,9 @@ export function StitchFoodPlanScreen({
   }, [registerLoadMore]);
 
   const visibleFoods = useMemo(() => foods.slice(0, displayCount), [foods, displayCount]);
+  const mountedStartIndex = Math.max(0, visibleFoods.length - MAX_MOUNTED_ROWS);
+  const mountedFoods = useMemo(() => visibleFoods.slice(mountedStartIndex), [visibleFoods, mountedStartIndex]);
+  const topSpacerHeight = mountedStartIndex * ROW_HEIGHT_ESTIMATE;
   const hasMore = foods.length > displayCount;
   const remaining = foods.length - displayCount;
 
@@ -426,20 +417,14 @@ export function StitchFoodPlanScreen({
         })}
       </ScrollView>
 
-      <View style={styles.sourceRow}>
-        <View style={[styles.sourcePill, foodSource === "cloud" && styles.sourcePillOn]}>
-          <Text style={[styles.sourceTxt, foodSource === "cloud" && styles.sourceTxtOn]}>Cloud</Text>
-        </View>
-      </View>
-      <Text style={[styles.hint, useCustomFonts && { fontFamily: stitchFonts.body }]}>Photos only when listed in your Supabase catalog.</Text>
-
       {foodLoading ? <Text style={[styles.muted, useCustomFonts && { fontFamily: stitchFonts.body }]}>Searching…</Text> : null}
       {!foodLoading && foods.length === 0 ? (
         <Text style={[styles.muted, useCustomFonts && { fontFamily: stitchFonts.body }]}>No foods match.</Text>
       ) : null}
 
       <Animated.View style={{ gap: 10, opacity: listOpacity, transform: [{ translateY: listTranslate }] }}>
-        {visibleFoods.map((food) => (
+        {topSpacerHeight > 0 ? <View style={[styles.topSpacer, { height: topSpacerHeight }]} /> : null}
+        {mountedFoods.map((food) => (
           <FoodPlanRow
             key={`${food.category}-${food.name}`}
             food={food}
@@ -467,7 +452,7 @@ export function StitchFoodPlanScreen({
 
         {!foodLoading && foods.length > 0 && (
           <Text style={[styles.countHint, useCustomFonts && { fontFamily: stitchFonts.body }]}>
-            Showing {visibleFoods.length} of {foods.length} foods
+            Showing {displayCount} of {foods.length} foods
           </Text>
         )}
       </Animated.View>
