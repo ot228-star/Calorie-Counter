@@ -33,7 +33,7 @@ async function importAdsModule(): Promise<AdsModule | null> {
   if (isExpoGo()) return null;
   if (cached !== undefined) return cached;
   try {
-    // @ts-expect-error - optional dependency, only resolved in builds that include the plugin
+    // @ts-ignore optional dependency loaded only in plugin-enabled native builds
     cached = (await import("react-native-google-mobile-ads")) as AdsModule;
     return cached;
   } catch {

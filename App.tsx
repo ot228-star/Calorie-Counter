@@ -52,7 +52,7 @@ import {
   startOAuth
 } from "./src/services/auth";
 import { trackEvent } from "./src/services/analytics";
-import { type FoodRecord } from "./src/data/foodDatabase";
+import { FOOD_DATABASE, type FoodRecord } from "./src/data/foodDatabase";
 import { getFoodDetail, getFoodPhotoCandidates, getFoodPlanTagline, getFoodSearchBlob } from "./src/data/foodDetails";
 import { searchFoods } from "./src/services/foodFinder";
 import { mapPhotoUrisForMaxWidth } from "./src/lib/photoUrls";
