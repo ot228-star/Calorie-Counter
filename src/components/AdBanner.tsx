@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import Constants from "expo-constants";
 import { adsAvailable, getBannerAdUnitId, initializeAds } from "../lib/ads";
 
 /**
@@ -21,8 +20,8 @@ export function AdBanner({ style }: Props) {
     void (async () => {
       await initializeAds();
       try {
-        // @ts-ignore optional dependency loaded only in plugin-enabled native builds
-        const mod = (await import("react-native-google-mobile-ads")) as unknown as {
+        const importOptional = new Function("m", "return import(m)") as (m: string) => Promise<unknown>;
+        const mod = (await importOptional("react-native-google-mobile-ads")) as {
           BannerAd: React.ComponentType<{ unitId: string; size: string }>;
           BannerAdSize: Record<string, string>;
         };
