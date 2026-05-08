@@ -453,10 +453,9 @@ async function main() {
   const retryMeals = new Set(existingFixList.failedMeals);
   const mealsNeedingImages = allMeals.filter((meal) => !findExistingMealFile(slugify(meal)));
   const targetMeals = Array.from(new Set([...mealsNeedingImages, ...retryMeals]));
-  let meals = MAX_MEALS > 0 ? targetMeals.slice(0, MAX_MEALS) : targetMeals;
-  if (ONLY_MEALS.length > 0) {
-    const wanted = new Set(ONLY_MEALS.map((m) => m.toLowerCase()));
-    meals = targetMeals.filter((meal) => wanted.has(meal.toLowerCase()));
+  let meals = ONLY_MEALS.length > 0 ? Array.from(new Set(ONLY_MEALS)) : targetMeals;
+  if (MAX_MEALS > 0) {
+    meals = meals.slice(0, MAX_MEALS);
   }
 
   let browser = await chromium.launch({ headless: HEADLESS });

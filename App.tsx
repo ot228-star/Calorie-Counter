@@ -52,7 +52,7 @@ import {
   startOAuth
 } from "./src/services/auth";
 import { trackEvent } from "./src/services/analytics";
-import { FOOD_DATABASE, type FoodRecord } from "./src/data/foodDatabase";
+import { type FoodRecord } from "./src/data/foodDatabase";
 import { getFoodDetail, getFoodPhotoCandidates, getFoodPlanTagline, getFoodSearchBlob } from "./src/data/foodDetails";
 import { searchFoods } from "./src/services/foodFinder";
 import { mapPhotoUrisForMaxWidth } from "./src/lib/photoUrls";
@@ -472,7 +472,7 @@ export default function App() {
   const [foodSearch, setFoodSearch] = useState("");
   const [foodPortions, setFoodPortions] = useState<Record<string, string>>({});
   const [foodResults, setFoodResults] = useState<FoodRecord[]>([]);
-  const [foodSource, setFoodSource] = useState<"cloud" | "local">("local");
+  const [foodSource, setFoodSource] = useState<"cloud">("cloud");
   const [foodLoading, setFoodLoading] = useState(false);
   const [favouriteFoodNames, setFavouriteFoodNames] = useState<string[]>([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean | null>(null);
@@ -621,7 +621,7 @@ export default function App() {
       calorieAdjustment
     });
   }, [age, heightCm, weightKg, biologicalSex, inferredGoalType, mealPlanFrequency, surveyHabits, surveyGoals]);
-  /** Unified Plan catalog: cloud + local, optional cuisine filter, optional search. */
+  /** Unified Plan catalog from cloud Supabase rows only. */
   const planFoodsForScreen = useMemo(() => {
     const mergedByName = new Map<string, FoodRecord>();
     for (const food of FOOD_DATABASE) {
@@ -1556,13 +1556,10 @@ export default function App() {
     setFavouriteFoodNames((prev) => (prev.includes(foodName) ? prev.filter((n) => n !== foodName) : [...prev, foodName]));
   }, []);
 
-  const favouriteFoods = useMemo(
-    () =>
-      favouriteFoodNames
-        .map((name) => FOOD_DATABASE.find((f) => f.name === name))
-        .filter((f): f is FoodRecord => Boolean(f)),
-    [favouriteFoodNames]
-  );
+  const favouriteFoods = useMemo(() => {
+    const byName = new Map(foodResults.map((food) => [food.name, food]));
+    return favouriteFoodNames.map((name) => byName.get(name)).filter((f): f is FoodRecord => Boolean(f));
+  }, [favouriteFoodNames, foodResults]);
 
   const openFoodDetail = (food: FoodRecord, backScreen: DetailBackScreen) => {
     const detail = getFoodDetail(food);

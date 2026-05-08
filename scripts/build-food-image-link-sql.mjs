@@ -68,7 +68,7 @@ function main() {
 
   const bySlug = new Map();
   for (const f of localFiles) {
-    const slug = f.replace(/\.[^.]+$/, "");
+    const slug = f.replace(/\.[^.]+$/, "").replace(/\.compressed$/i, "");
     if (!bySlug.has(slug)) bySlug.set(slug, f);
   }
 
@@ -120,8 +120,22 @@ function main() {
   }
   lines.push("commit;");
   lines.push("");
-  lines.push("-- Missing meals (no local downloaded image found):");
-  for (const m of missing) lines.push(`-- ${m}`);
+  if (missing.length > 0) {
+    lines.push("-- Delete meals that do not have a crawler-meals image.");
+    lines.push("delete from public.foods");
+    lines.push("where name in (");
+    missing.forEach((m, index) => {
+      const suffix = index === missing.length - 1 ? "" : ",";
+      lines.push(`  ${sqlStr(m)}${suffix}`);
+    });
+    lines.push(");");
+    lines.push("");
+  }
+  lines.push("-- Enforce exact crawler-backed catalog size.");
+  lines.push(
+    `do $$ begin if (select count(*) from public.foods) <> ${updates.length} then raise exception 'Expected ${updates.length} foods after image sync'; end if; end $$;`,
+  );
+  lines.push("");
 
   fs.mkdirSync(path.dirname(OUT_SQL), { recursive: true });
   fs.writeFileSync(OUT_SQL, lines.join("\n"), "utf8");

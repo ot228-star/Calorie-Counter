@@ -1,5 +1,7 @@
 /**
- * Builds supabase/seed/food_catalog_seed.sql from bundled app food data + pinned/maps.
+ * Builds supabase/seed/food_catalog_seed.sql from bundled app food data +
+ * supabase/seed/food_image_urls_batch_*.sql (Supabase Storage URLs only).
+ *
  * Run from repo root: node scripts/build-food-catalog-seed.mjs
  */
 import fs from "fs";
@@ -8,35 +10,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
-const APP_DATA = path.join(ROOT, "app", "src", "data");
-
-function extractBraceContent(source, marker) {
-  const start = source.indexOf(marker);
-  if (start === -1) return "";
-  const open = source.indexOf("{", start);
-  if (open === -1) return "";
-  let depth = 0;
-  for (let i = open; i < source.length; i += 1) {
-    const c = source[i];
-    if (c === "{") depth += 1;
-    if (c === "}") {
-      depth -= 1;
-      if (depth === 0) return source.slice(open + 1, i);
-    }
-  }
-  return "";
-}
-
-function parseStringRecord(inner) {
-  const out = {};
-  const re = /(?:^|\n)\s*(?:"([^"]+)"|([a-zA-Z_][a-zA-Z0-9_]*))\s*:\s*"(https:[^"]+)"/gm;
-  let m;
-  while ((m = re.exec(inner))) {
-    const key = (m[1] || m[2]).trim();
-    out[key] = m[3];
-  }
-  return out;
-}
+const APP_DATA = path.join(ROOT, "src", "data");
 
 const FOOD_ROW_RE =
   /\{\s*name:\s*"([^"]+)",\s*category:\s*"([^"]+)",\s*calories:\s*([0-9.]+),\s*protein_g:\s*([0-9.]+),\s*carbs_g:\s*([0-9.]+),\s*fat_g:\s*([0-9.]+)\s*\}/g;
@@ -70,21 +44,36 @@ function slugify(name) {
   return base || "food";
 }
 
+function isSupabaseStoragePublicUrl(url) {
+  return typeof url === "string" && url.includes(".supabase.co/storage/v1/object/public/");
+}
+
+/** Name → URL from supabase/seed/food_image_urls_batch_*.sql (later files override earlier if duplicate). */
+function loadMealBatchPhotoMap() {
+  const seedDir = path.join(ROOT, "supabase", "seed");
+  if (!fs.existsSync(seedDir)) return new Map();
+  const files = fs
+    .readdirSync(seedDir)
+    .filter((f) => /^food_image_urls_batch_\d+\.sql$/.test(f))
+    .sort();
+  const map = new Map();
+  const tupleRe = /\(\s*'((?:[^']|'')+)'\s*,\s*'(https:[^']+)'\s*\)/g;
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(seedDir, file), "utf8");
+    let m;
+    while ((m = tupleRe.exec(content))) {
+      const name = m[1].replace(/''/g, "'");
+      map.set(name, m[2]);
+    }
+  }
+  return map;
+}
+
 function main() {
   const baseSrc = fs.readFileSync(path.join(APP_DATA, "foodDatabase.ts"), "utf8");
   const extraSrc = fs.readFileSync(path.join(APP_DATA, "extraFoods.ts"), "utf8");
-  const detailsSrc = fs.readFileSync(path.join(APP_DATA, "foodDetails.ts"), "utf8");
-  const foodiesSrc = fs.readFileSync(path.join(APP_DATA, "foodiesfeedPhotoMap.ts"), "utf8");
-  const foodComSrc = fs.readFileSync(path.join(APP_DATA, "foodComPhotoMap.ts"), "utf8");
 
-  const pinnedInner = extractBraceContent(detailsSrc, "const PINNED_PHOTO_BY_FOOD");
-  const pinned = parseStringRecord(pinnedInner);
-
-  const ffInner = extractBraceContent(foodiesSrc, "export const FOODIESFEED_PHOTO_BY_FOOD");
-  const foodies = parseStringRecord(ffInner);
-
-  const fcInner = extractBraceContent(foodComSrc, "export const FOOD_COM_PHOTO_BY_FOOD");
-  const foodCom = parseStringRecord(fcInner);
+  const mealBatch = loadMealBatchPhotoMap();
 
   const byName = new Map();
   for (const r of parseFoodRows(baseSrc)) byName.set(r.name, r);
@@ -94,19 +83,13 @@ function main() {
   const values = [];
 
   for (const food of byName.values()) {
-    const pin = pinned[food.name];
-    const ff = foodies[food.name];
-    const fc = foodCom[food.name];
+    const rawBatch = mealBatch.get(food.name);
+    const imageUrl = rawBatch && isSupabaseStoragePublicUrl(rawBatch) ? rawBatch : null;
 
-    let imageUrl = pin || ff || fc || null;
-    const alternates = [];
-    if (pin) {
-      if (ff && ff !== pin) alternates.push(ff);
-      if (fc && fc !== pin && fc !== ff) alternates.push(fc);
-    } else if (ff) {
-      if (fc && fc !== ff) alternates.push(fc);
-    } else if (fc) {
-      /* only fc */
+    if (rawBatch && !imageUrl) {
+      console.error(
+        `[catalog:seed] Skip non-Supabase batch URL for "${food.name}" — use a meals bucket URL or remove the row from batch SQL.`,
+      );
     }
 
     let baseSlug = slugify(food.name);
@@ -118,34 +101,27 @@ function main() {
     }
     usedSlugs.set(slug, food.name);
 
-    const imageUrlsJson = JSON.stringify(alternates);
-    const photoSource = pin ? "pinned_unsplash" : ff ? "foodiesfeed" : fc ? "food_com" : null;
-    const attribution =
-      pin
-        ? "Unsplash (pinned in app; comply with https://unsplash.com/api-guidelines)"
-        : ff
-          ? "Foodiesfeed / CDN (see foodiesfeedPhotoMap)"
-          : fc
-            ? "Food.com (see foodComPhotoMap)"
-            : null;
-
+    const photoSource = imageUrl ? "supabase-storage" : null;
+    const attribution = imageUrl ? "supabase meals bucket" : null;
     const status = imageUrl ? "approved" : "pending";
 
     values.push(
       `(${sqlStr(food.name)}, ${sqlStr(food.category)}, ${food.calories}, ${food.protein_g}, ${food.carbs_g}, ${food.fat_g}, ${
         imageUrl ? sqlStr(imageUrl) : "null"
-      }, '${imageUrlsJson.replace(/'/g, "''")}'::jsonb, ${photoSource ? sqlStr(photoSource) : "null"}, ${
+      }, '[]'::jsonb, ${photoSource ? sqlStr(photoSource) : "null"}, ${
         attribution ? sqlStr(attribution) : "null"
       }, ${sqlStr(slug)}, ${sqlStr(status)})`,
     );
   }
 
-  const header = `-- Generated by scripts/build-food-catalog-seed.mjs — re-run after changing foodDatabase / maps.
+  const header = `-- Generated by scripts/build-food-catalog-seed.mjs — re-run after changing foodDatabase / batch SQL.
+-- image_url: Supabase Storage (public Meals bucket) only, from food_image_urls_batch_*.sql.
+-- image_urls: always empty (no fallback CDNs).
 -- Apply after migrations 001–003. Run in SQL editor or: psql $DATABASE_URL -f supabase/seed/food_catalog_seed.sql
 
 `;
 
-  const body = `insert into public.foods (
+  const body = `insert into public.foods as f (
   name, category, calories, protein_g, carbs_g, fat_g,
   image_url, image_urls, photo_source, photo_attribution, slug, image_review_status
 ) values

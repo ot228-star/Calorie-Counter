@@ -199,7 +199,6 @@ export const CRAWLER_MEALS = [
   "Palak Paneer",
   "Pancakes",
   "Paneer Tikka Bowl",
-  "Papaya",
   "Pasta (cooked)",
   "Pasta Primavera",
   "Peanut Butter",

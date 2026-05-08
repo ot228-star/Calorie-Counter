@@ -2,9 +2,9 @@
 -- Project ref: qgnzcqwonmlijdvnbqjd
 -- Bucket: meals
 -- Prefix: (none)
--- Local images dir: C:\Users\dat\Downloads\downloads\crawler-meals
--- Matched images: 327
--- Missing images: 18
+-- Local images dir: C:\Users\dat\Calorie-Counter\downloads\crawler-meals
+-- Matched images: 329
+-- Missing images: 0
 
 begin;
 
@@ -29,7 +29,7 @@ where name = 'Apple';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/banana.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/banana.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -47,7 +47,7 @@ where name = 'Orange';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/strawberry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/strawberry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -56,7 +56,7 @@ where name = 'Strawberry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/blueberry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/blueberry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -65,7 +65,7 @@ where name = 'Blueberry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pineapple.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pineapple.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -74,7 +74,7 @@ where name = 'Pineapple';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mango.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mango.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -83,7 +83,7 @@ where name = 'Mango';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/watermelon.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/watermelon.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -92,7 +92,7 @@ where name = 'Watermelon';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/avocado.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/avocado.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -101,7 +101,7 @@ where name = 'Avocado';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pear.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pear.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -110,7 +110,7 @@ where name = 'Pear';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kiwi.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kiwi.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -119,7 +119,7 @@ where name = 'Kiwi';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/plum.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/plum.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -128,7 +128,7 @@ where name = 'Plum';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/guava.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/guava.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -137,7 +137,7 @@ where name = 'Guava';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/dates.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/dates.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -146,7 +146,7 @@ where name = 'Dates';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/raisins.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/raisins.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -155,7 +155,7 @@ where name = 'Raisins';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lemon.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lemon.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -164,7 +164,7 @@ where name = 'Lemon';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lime.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lime.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -173,7 +173,7 @@ where name = 'Lime';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/white-rice-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/white-rice-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -182,7 +182,7 @@ where name = 'White Rice (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/brown-rice-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/brown-rice-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -191,7 +191,7 @@ where name = 'Brown Rice (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -200,7 +200,7 @@ where name = 'Quinoa (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/oats-dry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/oats-dry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -209,7 +209,7 @@ where name = 'Oats (dry)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/whole-wheat-bread.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/whole-wheat-bread.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -218,7 +218,7 @@ where name = 'Whole Wheat Bread';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/white-bread.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/white-bread.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -227,7 +227,7 @@ where name = 'White Bread';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pasta-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pasta-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -236,7 +236,7 @@ where name = 'Pasta (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/couscous-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/couscous-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -245,7 +245,7 @@ where name = 'Couscous (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/corn-tortilla.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/corn-tortilla.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -272,7 +272,7 @@ where name = 'Sweet Potato';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/potato-boiled.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/potato-boiled.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -281,7 +281,7 @@ where name = 'Potato (boiled)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mashed-potato.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mashed-potato.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -290,7 +290,7 @@ where name = 'Mashed Potato';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/french-fries.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/french-fries.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -299,7 +299,7 @@ where name = 'French Fries';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/popcorn-air-popped.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/popcorn-air-popped.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -308,7 +308,7 @@ where name = 'Popcorn (air-popped)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-breast-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-breast-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -317,7 +317,7 @@ where name = 'Chicken Breast (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-thigh-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-thigh-cooked.compressed.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -326,7 +326,7 @@ where name = 'Chicken Thigh (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-breast-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-breast-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -335,7 +335,7 @@ where name = 'Turkey Breast (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lean-beef-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lean-beef-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -344,7 +344,7 @@ where name = 'Lean Beef (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ground-beef-90-10-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ground-beef-90-10-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -362,7 +362,7 @@ where name = 'Pork Loin (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -371,7 +371,7 @@ where name = 'Salmon (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-water.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-water.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -380,7 +380,7 @@ where name = 'Tuna (water)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tilapia-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tilapia-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -389,7 +389,7 @@ where name = 'Tilapia (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/shrimp-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/shrimp-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -407,7 +407,7 @@ where name = 'Egg (whole)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/egg-white.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/egg-white.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -416,7 +416,7 @@ where name = 'Egg White';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-firm.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-firm.compressed.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -425,7 +425,7 @@ where name = 'Tofu (firm)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tempeh.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tempeh.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -434,7 +434,7 @@ where name = 'Tempeh';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentils-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentils-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -443,7 +443,7 @@ where name = 'Lentils (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chickpeas-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chickpeas-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -452,7 +452,7 @@ where name = 'Chickpeas (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/black-beans-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/black-beans-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -461,7 +461,7 @@ where name = 'Black Beans (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kidney-beans-cooked.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kidney-beans-cooked.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -470,7 +470,7 @@ where name = 'Kidney Beans (cooked)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peanut-butter.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peanut-butter.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -479,7 +479,7 @@ where name = 'Peanut Butter';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/almonds.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/almonds.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -488,7 +488,7 @@ where name = 'Almonds';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/milk-whole.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/milk-whole.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -506,7 +506,7 @@ where name = 'Milk (2%)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/skim-milk.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/skim-milk.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -515,7 +515,7 @@ where name = 'Skim Milk';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-yogurt-plain.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-yogurt-plain.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -524,7 +524,7 @@ where name = 'Greek Yogurt (plain)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/yogurt-plain.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/yogurt-plain.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -533,7 +533,7 @@ where name = 'Yogurt (plain)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cheddar-cheese.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cheddar-cheese.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -542,7 +542,7 @@ where name = 'Cheddar Cheese';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mozzarella.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mozzarella.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -551,7 +551,7 @@ where name = 'Mozzarella';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/broccoli.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/broccoli.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -560,7 +560,7 @@ where name = 'Broccoli';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/spinach.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/spinach.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -569,7 +569,7 @@ where name = 'Spinach';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kale.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kale.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -578,7 +578,7 @@ where name = 'Kale';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/carrot.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/carrot.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -587,7 +587,7 @@ where name = 'Carrot';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cucumber.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cucumber.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -596,7 +596,7 @@ where name = 'Cucumber';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tomato.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tomato.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -605,7 +605,7 @@ where name = 'Tomato';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/bell-pepper.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/bell-pepper.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -614,7 +614,7 @@ where name = 'Bell Pepper';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/onion.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/onion.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -623,7 +623,7 @@ where name = 'Onion';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mushroom.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mushroom.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -632,7 +632,7 @@ where name = 'Mushroom';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cauliflower.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cauliflower.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -641,7 +641,7 @@ where name = 'Cauliflower';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/zucchini.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/zucchini.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -650,7 +650,7 @@ where name = 'Zucchini';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cabbage.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cabbage.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -659,7 +659,7 @@ where name = 'Cabbage';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/green-beans.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/green-beans.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -668,7 +668,7 @@ where name = 'Green Beans';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peas.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peas.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -677,7 +677,7 @@ where name = 'Peas';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/olive-oil.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/olive-oil.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -686,7 +686,7 @@ where name = 'Olive Oil';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/canola-oil.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/canola-oil.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -695,7 +695,7 @@ where name = 'Canola Oil';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/coconut-oil.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/coconut-oil.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -704,7 +704,7 @@ where name = 'Coconut Oil';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mayonnaise.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mayonnaise.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -713,7 +713,7 @@ where name = 'Mayonnaise';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/walnuts.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/walnuts.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -722,7 +722,7 @@ where name = 'Walnuts';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cashews.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cashews.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -740,7 +740,7 @@ where name = 'Pistachios';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sunflower-seeds.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sunflower-seeds.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -749,7 +749,7 @@ where name = 'Sunflower Seeds';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chia-seeds.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chia-seeds.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -758,7 +758,7 @@ where name = 'Chia Seeds';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/flax-seeds.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/flax-seeds.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -767,7 +767,7 @@ where name = 'Flax Seeds';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -776,7 +776,7 @@ where name = 'Chicken Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-stew.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-stew.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -785,7 +785,7 @@ where name = 'Beef Stew';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/hamburger.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/hamburger.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -794,7 +794,7 @@ where name = 'Hamburger';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/hot-dog.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/hot-dog.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -803,7 +803,7 @@ where name = 'Hot Dog';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -812,7 +812,7 @@ where name = 'Fried Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-nuggets.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-nuggets.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -821,7 +821,7 @@ where name = 'Chicken Nuggets';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sushi-mixed.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sushi-mixed.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -830,7 +830,7 @@ where name = 'Sushi (mixed)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ramen-prepared.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ramen-prepared.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -839,7 +839,7 @@ where name = 'Ramen (prepared)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/taco-beef.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/taco-beef.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -848,7 +848,7 @@ where name = 'Taco Beef';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/burrito-bean.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/burrito-bean.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -857,7 +857,16 @@ where name = 'Burrito Bean';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pancakes.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mac-and-cheese.webp',
+  image_urls = '[]'::jsonb,
+  photo_source = 'supabase-storage',
+  photo_attribution = 'supabase meals upload',
+  image_review_status = 'approved'
+where name = 'Mac and Cheese';
+
+update public.foods
+set
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pancakes.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -866,7 +875,7 @@ where name = 'Pancakes';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/waffles.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/waffles.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -875,7 +884,7 @@ where name = 'Waffles';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/omelette.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/omelette.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -884,7 +893,7 @@ where name = 'Omelette';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/rice-with-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/rice-with-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -893,7 +902,7 @@ where name = 'Rice with Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-rice-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-rice-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -920,7 +929,7 @@ where name = 'Beef Biryani';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-curry-with-rice.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-curry-with-rice.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -929,7 +938,7 @@ where name = 'Chicken Curry with Rice';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/butter-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/butter-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -938,7 +947,7 @@ where name = 'Butter Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tikka-masala.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tikka-masala.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -947,7 +956,7 @@ where name = 'Tikka Masala';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-rice-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-rice-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -956,7 +965,7 @@ where name = 'Fried Rice (chicken)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-rice-vegetable.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-rice-vegetable.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -965,7 +974,7 @@ where name = 'Fried Rice (vegetable)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/spaghetti-bolognese.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/spaghetti-bolognese.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -974,7 +983,7 @@ where name = 'Spaghetti Bolognese';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lasagna.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lasagna.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -983,7 +992,7 @@ where name = 'Lasagna';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-alfredo-pasta.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-alfredo-pasta.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -992,7 +1001,7 @@ where name = 'Chicken Alfredo Pasta';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-chicken-wrap.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-chicken-wrap.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1001,7 +1010,7 @@ where name = 'Grilled Chicken Wrap';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-shawarma-wrap.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-shawarma-wrap.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1010,7 +1019,7 @@ where name = 'Chicken Shawarma Wrap';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/falafel-wrap.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/falafel-wrap.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1019,7 +1028,7 @@ where name = 'Falafel Wrap';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/caesar-salad-with-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/caesar-salad-with-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1028,7 +1037,7 @@ where name = 'Caesar Salad with Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1037,7 +1046,7 @@ where name = 'Greek Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-salad-sandwich.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-salad-sandwich.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1046,7 +1055,7 @@ where name = 'Chicken Salad Sandwich';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/club-sandwich.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/club-sandwich.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1055,7 +1064,7 @@ where name = 'Club Sandwich';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-burger.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-burger.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1064,7 +1073,7 @@ where name = 'Chicken Burger';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cheeseburger.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cheeseburger.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1073,7 +1082,7 @@ where name = 'Cheeseburger';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-taco.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-taco.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1082,7 +1091,7 @@ where name = 'Beef Taco';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-quesadilla.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-quesadilla.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1091,7 +1100,7 @@ where name = 'Chicken Quesadilla';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sushi-roll-salmon.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sushi-roll-salmon.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1100,7 +1109,7 @@ where name = 'Sushi Roll (salmon)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sushi-roll-avocado.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sushi-roll-avocado.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1109,7 +1118,7 @@ where name = 'Sushi Roll (avocado)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pad-thai.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pad-thai.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1118,7 +1127,7 @@ where name = 'Pad Thai';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pho-beef.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pho-beef.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1127,7 +1136,7 @@ where name = 'Pho (beef)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-dumplings.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-dumplings.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1145,7 +1154,7 @@ where name = 'Beef Meatballs with Sauce';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentil-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentil-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1154,7 +1163,7 @@ where name = 'Lentil Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tomato-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tomato-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1163,7 +1172,7 @@ where name = 'Tomato Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-noodle-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-noodle-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1172,7 +1181,7 @@ where name = 'Chicken Noodle Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mashed-potatoes-with-gravy.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mashed-potatoes-with-gravy.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1181,7 +1190,7 @@ where name = 'Mashed Potatoes with Gravy';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/roast-chicken-with-potatoes.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/roast-chicken-with-potatoes.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1190,7 +1199,7 @@ where name = 'Roast Chicken with Potatoes';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-with-rice.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-with-rice.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1199,7 +1208,7 @@ where name = 'Salmon with Rice';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/teriyaki-chicken-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/teriyaki-chicken-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1208,7 +1217,7 @@ where name = 'Teriyaki Chicken Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/poke-bowl-salmon.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/poke-bowl-salmon.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1217,7 +1226,7 @@ where name = 'Poke Bowl (salmon)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/poke-bowl-tuna.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/poke-bowl-tuna.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1226,7 +1235,7 @@ where name = 'Poke Bowl (tuna)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-kebab.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-kebab.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1235,7 +1244,7 @@ where name = 'Chicken Kebab';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/scrambled-eggs-with-toast.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/scrambled-eggs-with-toast.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1244,7 +1253,7 @@ where name = 'Scrambled Eggs with Toast';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/breakfast-burrito.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/breakfast-burrito.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1253,7 +1262,7 @@ where name = 'Breakfast Burrito';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/oatmeal-with-banana.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/oatmeal-with-banana.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1262,7 +1271,7 @@ where name = 'Oatmeal with Banana';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/yogurt-with-granola.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/yogurt-with-granola.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1271,7 +1280,7 @@ where name = 'Yogurt with Granola';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-egg-sandwich.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fried-egg-sandwich.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1280,7 +1289,7 @@ where name = 'Fried Egg Sandwich';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sugar.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sugar.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1289,7 +1298,7 @@ where name = 'Sugar';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/honey.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/honey.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1298,7 +1307,7 @@ where name = 'Honey';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/jam.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/jam.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1307,7 +1316,7 @@ where name = 'Jam';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/dark-chocolate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/dark-chocolate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1316,7 +1325,7 @@ where name = 'Dark Chocolate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/milk-chocolate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/milk-chocolate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1325,7 +1334,7 @@ where name = 'Milk Chocolate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/granola.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/granola.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1334,7 +1343,7 @@ where name = 'Granola';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/protein-powder.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/protein-powder.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1343,7 +1352,7 @@ where name = 'Protein Powder';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/toasted-sandwich.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/toasted-sandwich.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1352,7 +1361,7 @@ where name = 'Toasted Sandwich';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/croissant.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/croissant.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1361,7 +1370,7 @@ where name = 'Croissant';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/bagel.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/bagel.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1370,7 +1379,7 @@ where name = 'Bagel';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/muffin.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/muffin.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1379,7 +1388,7 @@ where name = 'Muffin';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ice-cream-vanilla.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ice-cream-vanilla.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1388,7 +1397,7 @@ where name = 'Ice Cream (vanilla)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/potato-chips.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/potato-chips.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1397,7 +1406,7 @@ where name = 'Potato Chips';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pretzels.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pretzels.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1415,7 +1424,7 @@ where name = 'Crackers';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/granola-bar.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/granola-bar.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1424,7 +1433,7 @@ where name = 'Granola Bar';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/energy-bar.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/energy-bar.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1433,7 +1442,7 @@ where name = 'Energy Bar';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peanut-butter-jelly-sandwich.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peanut-butter-jelly-sandwich.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1442,7 +1451,7 @@ where name = 'Peanut Butter Jelly Sandwich';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chocolate-milk.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chocolate-milk.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1451,7 +1460,7 @@ where name = 'Chocolate Milk';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/milkshake-vanilla.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/milkshake-vanilla.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1460,7 +1469,7 @@ where name = 'Milkshake (vanilla)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/smoothie-fruit.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/smoothie-fruit.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1469,7 +1478,7 @@ where name = 'Smoothie (fruit)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/shakshuka.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/shakshuka.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1478,7 +1487,7 @@ where name = 'Shakshuka';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-tandoori.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-tandoori.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1487,7 +1496,7 @@ where name = 'Chicken Tandoori';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/palak-paneer.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/palak-paneer.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1496,7 +1505,7 @@ where name = 'Palak Paneer';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chana-masala.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chana-masala.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1505,7 +1514,7 @@ where name = 'Chana Masala';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/dal-tadka.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/dal-tadka.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1514,7 +1523,7 @@ where name = 'Dal Tadka';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-souvlaki.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-souvlaki.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1523,7 +1532,7 @@ where name = 'Chicken Souvlaki';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-shawarma-plate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-shawarma-plate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1532,7 +1541,7 @@ where name = 'Beef Shawarma Plate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/falafel-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/falafel-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1541,7 +1550,7 @@ where name = 'Falafel Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-caesar-wrap.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-caesar-wrap.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1550,7 +1559,7 @@ where name = 'Chicken Caesar Wrap';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-sandwich.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-sandwich.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1559,7 +1568,7 @@ where name = 'Turkey Sandwich';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-salad-sandwich.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-salad-sandwich.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1568,7 +1577,16 @@ where name = 'Tuna Salad Sandwich';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-fajitas.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/avocado-toast.webp',
+  image_urls = '[]'::jsonb,
+  photo_source = 'supabase-storage',
+  photo_attribution = 'supabase meals upload',
+  image_review_status = 'approved'
+where name = 'Avocado Toast';
+
+update public.foods
+set
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-fajitas.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1577,7 +1595,7 @@ where name = 'Chicken Fajitas';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-fajitas.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-fajitas.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1586,7 +1604,7 @@ where name = 'Beef Fajitas';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-enchiladas.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-enchiladas.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1604,7 +1622,7 @@ where name = 'Beef Enchiladas';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pozole.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pozole.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1613,7 +1631,7 @@ where name = 'Pozole';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-tortilla-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-tortilla-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1622,7 +1640,7 @@ where name = 'Chicken Tortilla Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/bibimbap.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/bibimbap.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1631,7 +1649,7 @@ where name = 'Bibimbap';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/korean-bbq-beef.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/korean-bbq-beef.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1640,7 +1658,7 @@ where name = 'Korean BBQ Beef';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kimchi-fried-rice.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kimchi-fried-rice.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1649,7 +1667,7 @@ where name = 'Kimchi Fried Rice';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/miso-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/miso-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1658,7 +1676,7 @@ where name = 'Miso Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-teriyaki.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-teriyaki.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1676,7 +1694,7 @@ where name = 'Beef Bulgogi Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/general-tso-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/general-tso-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1685,7 +1703,7 @@ where name = 'General Tso Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/orange-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/orange-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1694,7 +1712,7 @@ where name = 'Orange Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kung-pao-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kung-pao-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1703,7 +1721,7 @@ where name = 'Kung Pao Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sweet-and-sour-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/sweet-and-sour-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1712,7 +1730,7 @@ where name = 'Sweet and Sour Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-satay.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-satay.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1721,7 +1739,7 @@ where name = 'Chicken Satay';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-rendang.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-rendang.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1730,7 +1748,7 @@ where name = 'Beef Rendang';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tom-yum-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tom-yum-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1739,7 +1757,7 @@ where name = 'Tom Yum Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/green-curry-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/green-curry-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1748,7 +1766,7 @@ where name = 'Green Curry Chicken';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/red-curry-tofu.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/red-curry-tofu.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1757,7 +1775,7 @@ where name = 'Red Curry Tofu';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pasta-primavera.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pasta-primavera.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1766,7 +1784,7 @@ where name = 'Pasta Primavera';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/minestrone-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/minestrone-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1775,7 +1793,7 @@ where name = 'Minestrone Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/risotto.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/risotto.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1784,7 +1802,7 @@ where name = 'Risotto';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-parmesan.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-parmesan.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1793,7 +1811,7 @@ where name = 'Chicken Parmesan';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/eggplant-parmesan.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/eggplant-parmesan.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1802,7 +1820,7 @@ where name = 'Eggplant Parmesan';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/margherita-pizza.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/margherita-pizza.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1811,7 +1829,7 @@ where name = 'Margherita Pizza';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pepperoni-pizza.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pepperoni-pizza.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1820,7 +1838,7 @@ where name = 'Pepperoni Pizza';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pesto-pasta.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/pesto-pasta.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1829,7 +1847,7 @@ where name = 'Pesto Pasta';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-noodle-stir-fry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-noodle-stir-fry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1838,7 +1856,7 @@ where name = 'Chicken Noodle Stir Fry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-stir-fry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-stir-fry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1847,7 +1865,7 @@ where name = 'Vegetable Stir Fry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-stir-fry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-stir-fry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1856,7 +1874,7 @@ where name = 'Tofu Stir Fry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-pot-pie.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-pot-pie.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1865,7 +1883,7 @@ where name = 'Chicken Pot Pie';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-chili.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-chili.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1874,7 +1892,7 @@ where name = 'Turkey Chili';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-burrito-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-burrito-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1883,7 +1901,7 @@ where name = 'Chicken Burrito Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/steak-burrito-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/steak-burrito-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1892,7 +1910,7 @@ where name = 'Steak Burrito Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/shrimp-burrito-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/shrimp-burrito-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1901,7 +1919,7 @@ where name = 'Shrimp Burrito Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-gyro.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-gyro.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1910,7 +1928,7 @@ where name = 'Chicken Gyro';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lamb-gyro.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lamb-gyro.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1919,7 +1937,7 @@ where name = 'Lamb Gyro';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-kofta.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-kofta.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1928,7 +1946,7 @@ where name = 'Beef Kofta';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-katsu.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-katsu.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1937,7 +1955,7 @@ where name = 'Chicken Katsu';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tonkatsu.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tonkatsu.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1946,7 +1964,7 @@ where name = 'Tonkatsu';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-yakisoba.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-yakisoba.compressed.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1964,7 +1982,7 @@ where name = 'Beef Udon';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-nigiri.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-nigiri.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1973,7 +1991,7 @@ where name = 'Salmon Nigiri';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-nigiri.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-nigiri.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1982,7 +2000,7 @@ where name = 'Tuna Nigiri';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-congee.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-congee.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -1991,7 +2009,7 @@ where name = 'Chicken Congee';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/porridge-oatmeal-milk.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/porridge-oatmeal-milk.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2000,7 +2018,7 @@ where name = 'Porridge (oatmeal milk)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-yogurt-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-yogurt-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2009,7 +2027,7 @@ where name = 'Greek Yogurt Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fruit-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fruit-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2018,7 +2036,7 @@ where name = 'Fruit Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-quinoa-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-quinoa-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2027,7 +2045,7 @@ where name = 'Chicken and Quinoa Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-and-quinoa-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-and-quinoa-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2036,7 +2054,7 @@ where name = 'Tofu and Quinoa Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/poke-bowl-chicken.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/poke-bowl-chicken.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2045,7 +2063,7 @@ where name = 'Poke Bowl (chicken)';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-caesar-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-caesar-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2054,7 +2072,7 @@ where name = 'Chicken Caesar Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2063,7 +2081,7 @@ where name = 'Quinoa Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tabbouleh.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tabbouleh.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2072,7 +2090,7 @@ where name = 'Tabbouleh';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fattoush.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/fattoush.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2081,7 +2099,7 @@ where name = 'Fattoush';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-pita-pocket.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-pita-pocket.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2090,7 +2108,7 @@ where name = 'Chicken Pita Pocket';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-omelette.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-omelette.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2099,7 +2117,7 @@ where name = 'Vegetable Omelette';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/egg-and-avocado-toast.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/egg-and-avocado-toast.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2108,7 +2126,7 @@ where name = 'Egg and Avocado Toast';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/protein-pancakes.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/protein-pancakes.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2117,7 +2135,7 @@ where name = 'Protein Pancakes';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/banana-smoothie.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/banana-smoothie.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2126,7 +2144,7 @@ where name = 'Banana Smoothie';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/berry-smoothie.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/berry-smoothie.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2135,7 +2153,7 @@ where name = 'Berry Smoothie';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/green-smoothie.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/green-smoothie.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2144,7 +2162,7 @@ where name = 'Green Smoothie';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/iced-latte.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/iced-latte.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2153,7 +2171,7 @@ where name = 'Iced Latte';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cappuccino.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cappuccino.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2162,7 +2180,7 @@ where name = 'Cappuccino';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mocha.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mocha.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2171,7 +2189,7 @@ where name = 'Mocha';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/matcha-latte.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/matcha-latte.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2180,7 +2198,7 @@ where name = 'Matcha Latte';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/acai-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/acai-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2189,7 +2207,7 @@ where name = 'Acai Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-pasta-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-pasta-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2198,7 +2216,7 @@ where name = 'Chicken Pasta Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-pasta-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-pasta-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2207,7 +2225,7 @@ where name = 'Tuna Pasta Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cobb-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cobb-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2216,7 +2234,7 @@ where name = 'Cobb Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-veggie-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-veggie-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2225,7 +2243,7 @@ where name = 'Chicken and Veggie Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-salmon-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-salmon-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2234,7 +2252,7 @@ where name = 'Mediterranean Salmon Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-chicken-power-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-chicken-power-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2243,7 +2261,7 @@ where name = 'Grilled Chicken Power Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-quinoa-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-quinoa-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2252,7 +2270,7 @@ where name = 'Turkey Quinoa Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentil-buddha-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentil-buddha-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2270,7 +2288,7 @@ where name = 'Roasted Veggie Grain Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-buddha-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-buddha-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2279,7 +2297,7 @@ where name = 'Tofu Buddha Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chickpea-shawarma-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chickpea-shawarma-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2288,7 +2306,7 @@ where name = 'Chickpea Shawarma Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-shrimp-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-shrimp-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2297,7 +2315,7 @@ where name = 'Grilled Shrimp Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-taco-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-taco-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2306,7 +2324,7 @@ where name = 'Chicken Taco Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/black-bean-burrito-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/black-bean-burrito-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2315,7 +2333,7 @@ where name = 'Black Bean Burrito Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-chickpea-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-chickpea-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2324,7 +2342,7 @@ where name = 'Mediterranean Chickpea Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-nicoise-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-nicoise-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2333,7 +2351,7 @@ where name = 'Tuna Nicoise Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-caesar-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-caesar-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2342,7 +2360,7 @@ where name = 'Salmon Caesar Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kale-chicken-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kale-chicken-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2351,7 +2369,7 @@ where name = 'Kale Chicken Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-tabbouleh.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-tabbouleh.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2360,7 +2378,7 @@ where name = 'Quinoa Tabbouleh';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-chicken-pita.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-chicken-pita.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2369,7 +2387,7 @@ where name = 'Greek Chicken Pita';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/veggie-hummus-wrap.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/veggie-hummus-wrap.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2378,7 +2396,7 @@ where name = 'Veggie Hummus Wrap';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-avocado-wrap.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/turkey-avocado-wrap.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2387,7 +2405,7 @@ where name = 'Turkey Avocado Wrap';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-avocado-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-avocado-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2396,7 +2414,7 @@ where name = 'Salmon Avocado Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-poke-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-poke-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2405,7 +2423,7 @@ where name = 'Tofu Poke Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/edamame-sushi-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/edamame-sushi-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2414,7 +2432,7 @@ where name = 'Edamame Sushi Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-soba-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-soba-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2423,7 +2441,7 @@ where name = 'Chicken Soba Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/miso-salmon-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/miso-salmon-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2432,7 +2450,7 @@ where name = 'Miso Salmon Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/thai-peanut-chicken-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/thai-peanut-chicken-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2441,7 +2459,7 @@ where name = 'Thai Peanut Chicken Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/teriyaki-tofu-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/teriyaki-tofu-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2450,7 +2468,7 @@ where name = 'Teriyaki Tofu Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-pho-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-pho-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2459,7 +2477,7 @@ where name = 'Vegetable Pho Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-udon-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-udon-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2468,7 +2486,7 @@ where name = 'Chicken Udon Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-miso-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-miso-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2486,7 +2504,7 @@ where name = 'Sardine Rice Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kimchi-tofu-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/kimchi-tofu-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2495,7 +2513,7 @@ where name = 'Kimchi Tofu Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/paneer-tikka-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/paneer-tikka-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2504,7 +2522,7 @@ where name = 'Paneer Tikka Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/rajma-rice-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/rajma-rice-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2513,7 +2531,7 @@ where name = 'Rajma Rice Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lemon-herb-chicken-plate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lemon-herb-chicken-plate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2522,7 +2540,7 @@ where name = 'Lemon Herb Chicken Plate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/baked-cod-plate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/baked-cod-plate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2531,7 +2549,7 @@ where name = 'Baked Cod Plate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/roasted-turkey-plate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/roasted-turkey-plate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2549,7 +2567,7 @@ where name = 'Turkey Meatball Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-meatball-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-meatball-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2558,7 +2576,7 @@ where name = 'Chicken Meatball Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/baked-falafel-plate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/baked-falafel-plate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2567,7 +2585,7 @@ where name = 'Baked Falafel Plate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/hummus-power-plate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/hummus-power-plate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2576,7 +2594,7 @@ where name = 'Hummus Power Plate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-lentil-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-lentil-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2585,7 +2603,7 @@ where name = 'Chicken Lentil Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-lentil-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegetable-lentil-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2594,7 +2612,7 @@ where name = 'Vegetable Lentil Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tomato-basil-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tomato-basil-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2603,7 +2621,7 @@ where name = 'Tomato Basil Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mushroom-barley-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mushroom-barley-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2612,7 +2630,7 @@ where name = 'Mushroom Barley Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/butternut-squash-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/butternut-squash-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2621,7 +2639,7 @@ where name = 'Butternut Squash Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/overnight-oats-with-chia.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/overnight-oats-with-chia.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2630,7 +2648,7 @@ where name = 'Overnight Oats with Chia';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/protein-yogurt-parfait.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/protein-yogurt-parfait.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2639,7 +2657,7 @@ where name = 'Protein Yogurt Parfait';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/egg-white-scramble-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/egg-white-scramble-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2648,7 +2666,7 @@ where name = 'Egg White Scramble Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/smoked-salmon-toast.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/smoked-salmon-toast.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2657,7 +2675,7 @@ where name = 'Smoked Salmon Toast';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peanut-butter-oatmeal-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/peanut-butter-oatmeal-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2666,7 +2684,7 @@ where name = 'Peanut Butter Oatmeal Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/berry-chia-pudding.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/berry-chia-pudding.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2675,7 +2693,7 @@ where name = 'Berry Chia Pudding';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tropical-smoothie-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tropical-smoothie-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2684,7 +2702,7 @@ where name = 'Tropical Smoothie Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/matcha-yogurt-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/matcha-yogurt-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2693,7 +2711,7 @@ where name = 'Matcha Yogurt Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-broccoli-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-and-broccoli-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2702,7 +2720,7 @@ where name = 'Chicken and Broccoli Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-and-asparagus-plate.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/salmon-and-asparagus-plate.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2711,7 +2729,7 @@ where name = 'Salmon and Asparagus Plate';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-and-white-bean-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tuna-and-white-bean-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2720,7 +2738,7 @@ where name = 'Tuna and White Bean Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-veggie-noodle-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-veggie-noodle-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2738,7 +2756,7 @@ where name = 'Cottage Cheese Fruit Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-tuna-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-tuna-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2747,7 +2765,7 @@ where name = 'Mediterranean Tuna Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/roasted-chickpea-snack-bowl.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/roasted-chickpea-snack-bowl.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2756,7 +2774,7 @@ where name = 'Roasted Chickpea Snack Bowl';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/broccoli-cheddar-soup-light.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/broccoli-cheddar-soup-light.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2765,7 +2783,7 @@ where name = 'Broccoli Cheddar Soup Light';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/homemade-chicken-noodle-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/homemade-chicken-noodle-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2774,7 +2792,7 @@ where name = 'Homemade Chicken Noodle Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-and-broccoli-stir-fry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/beef-and-broccoli-stir-fry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2783,7 +2801,7 @@ where name = 'Beef and Broccoli Stir Fry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-chickpea-stew.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-chickpea-stew.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2792,7 +2810,7 @@ where name = 'Mediterranean Chickpea Stew';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-grilled-salmon.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-grilled-salmon.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2801,7 +2819,7 @@ where name = 'Mediterranean Grilled Salmon';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/healthy-turkey-chili.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/healthy-turkey-chili.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2810,7 +2828,7 @@ where name = 'Healthy Turkey Chili';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/simple-oven-baked-sea-bass.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/simple-oven-baked-sea-bass.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2819,7 +2837,7 @@ where name = 'Simple Oven-Baked Sea Bass';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/broccoli-garlic-pasta.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/broccoli-garlic-pasta.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2828,7 +2846,7 @@ where name = 'Broccoli Garlic Pasta';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegan-pancakes.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/vegan-pancakes.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2837,7 +2855,7 @@ where name = 'Vegan Pancakes';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-tikka-masala-light.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/chicken-tikka-masala-light.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2846,7 +2864,7 @@ where name = 'Chicken Tikka Masala Light';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/spinach-shakshuka.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/spinach-shakshuka.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2855,7 +2873,7 @@ where name = 'Spinach Shakshuka';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-shrimp-skewers.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/grilled-shrimp-skewers.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2864,7 +2882,7 @@ where name = 'Grilled Shrimp Skewers';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentil-tomato-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/lentil-tomato-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2873,7 +2891,7 @@ where name = 'Lentil Tomato Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-veggie-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/quinoa-veggie-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2891,7 +2909,7 @@ where name = 'Baked Lemon Herb Cod';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-veggie-stir-fry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/tofu-veggie-stir-fry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2900,7 +2918,7 @@ where name = 'Tofu Veggie Stir-Fry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-yogurt-fruit-parfait.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/greek-yogurt-fruit-parfait.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2909,7 +2927,7 @@ where name = 'Greek Yogurt Fruit Parfait';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/air-fryer-salmon-bites.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/air-fryer-salmon-bites.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2918,7 +2936,7 @@ where name = 'Air Fryer Salmon Bites';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/instant-pot-chicken-soup.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/instant-pot-chicken-soup.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2927,7 +2945,7 @@ where name = 'Instant Pot Chicken Soup';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ground-turkey-lettuce-wraps.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/ground-turkey-lettuce-wraps.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2936,7 +2954,7 @@ where name = 'Ground Turkey Lettuce Wraps';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cauliflower-chickpea-curry.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/cauliflower-chickpea-curry.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2945,7 +2963,7 @@ where name = 'Cauliflower Chickpea Curry';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-tuna-salad.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/mediterranean-tuna-salad.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2954,7 +2972,7 @@ where name = 'Mediterranean Tuna Salad';
 
 update public.foods
 set
-  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/stuffed-zucchini-boats.jpg',
+  image_url = 'https://qgnzcqwonmlijdvnbqjd.supabase.co/storage/v1/object/public/meals/stuffed-zucchini-boats.webp',
   image_urls = '[]'::jsonb,
   photo_source = 'supabase-storage',
   photo_attribution = 'supabase meals upload',
@@ -2963,22 +2981,5 @@ where name = 'Stuffed Zucchini Boats';
 
 commit;
 
--- Missing meals (no local downloaded image found):
--- Grapes
--- Peach
--- Papaya
--- Cottage Cheese
--- Parmesan
--- Butter
--- Asparagus
--- Pizza Cheese
--- Mac and Cheese
--- Noodles with Chicken
--- Beef Burrito
--- Steak with Rice
--- Hummus with Pita
--- Avocado Toast
--- Vegetable Pizza
--- Beef Chili
--- Spinach Berry Salad
--- Stuffed Bell Pepper
+-- Enforce exact crawler-backed catalog size.
+do $$ begin if (select count(*) from public.foods) <> 329 then raise exception 'Expected 329 foods after image sync'; end if; end $$;

@@ -15,7 +15,7 @@ const LOAD_MORE_COUNT = 10;
 type Props = {
   foodSearch: string;
   onSearchChange: (q: string) => void;
-  foodSource: "cloud" | "local";
+  foodSource: "cloud";
   foodLoading: boolean;
   regionOrder: string[];
   regionLabels: Record<string, string>;
@@ -429,9 +429,6 @@ export function StitchFoodPlanScreen({
       <View style={styles.sourceRow}>
         <View style={[styles.sourcePill, foodSource === "cloud" && styles.sourcePillOn]}>
           <Text style={[styles.sourceTxt, foodSource === "cloud" && styles.sourceTxtOn]}>Cloud</Text>
-        </View>
-        <View style={[styles.sourcePill, foodSource === "local" && styles.sourcePillOn]}>
-          <Text style={[styles.sourceTxt, foodSource === "local" && styles.sourceTxtOn]}>Local</Text>
         </View>
       </View>
       <Text style={[styles.hint, useCustomFonts && { fontFamily: stitchFonts.body }]}>Photos only when listed in your Supabase catalog.</Text>

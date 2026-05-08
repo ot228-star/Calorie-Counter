@@ -1,9 +1,9 @@
-import { FOOD_DATABASE, type FoodImageReviewStatus, type FoodRecord } from "../data/foodDatabase";
+import { type FoodImageReviewStatus, type FoodRecord } from "../data/foodDatabase";
 import { getSupabaseConfig } from "../lib/env";
 
 type SearchResult = {
   foods: FoodRecord[];
-  source: "cloud" | "local";
+  source: "cloud";
 };
 
 const FOODS_SELECT =
@@ -46,18 +46,12 @@ export function normalizeFoodRow(raw: Record<string, unknown>): FoodRecord {
   };
 }
 
-const localSearch = (query: string): FoodRecord[] => {
-  const q = query.trim().toLowerCase();
-  if (!q) return FOOD_DATABASE.slice(0, 40);
-  return FOOD_DATABASE.filter((food) => food.name.toLowerCase().includes(q)).slice(0, 80);
-};
-
 export const searchFoods = async (query: string): Promise<SearchResult> => {
   const { url, anonKey } = getSupabaseConfig();
   const q = query.trim();
 
   if (!url || !anonKey) {
-    return { foods: localSearch(query), source: "local" };
+    return { foods: [], source: "cloud" };
   }
 
   try {
@@ -72,14 +66,11 @@ export const searchFoods = async (query: string): Promise<SearchResult> => {
     });
     if (!response.ok) throw new Error("Cloud search request failed");
     const raw = await response.text();
-    if (!raw.trim()) return { foods: localSearch(query), source: "local" };
+    if (!raw.trim()) return { foods: [], source: "cloud" };
     const data = JSON.parse(raw) as Record<string, unknown>[];
-    if (Array.isArray(data) && data.length > 0) {
-      return { foods: data.map(normalizeFoodRow), source: "cloud" };
-    }
-    // Gracefully fallback if table is empty or not seeded yet.
-    return { foods: localSearch(query), source: "local" };
+    if (Array.isArray(data) && data.length > 0) return { foods: data.map(normalizeFoodRow), source: "cloud" };
+    return { foods: [], source: "cloud" };
   } catch {
-    return { foods: localSearch(query), source: "local" };
+    return { foods: [], source: "cloud" };
   }
 };
