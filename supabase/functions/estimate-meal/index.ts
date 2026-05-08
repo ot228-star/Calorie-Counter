@@ -10,6 +10,8 @@ type DetectedItem = {
   fat_g: number;
 };
 
+const mealTypes = new Set(["breakfast", "lunch", "dinner", "snack"]);
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
@@ -28,11 +30,31 @@ Deno.serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.toLowerCase().startsWith("bearer ")) {
+      return new Response(JSON.stringify({ error: "Missing bearer token." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
     const body = await req.json();
     const { imageUrl, mealType, eatenAt } = body;
 
     if (!imageUrl || !mealType || !eatenAt) {
       return new Response(JSON.stringify({ error: "Missing required fields." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+    if (
+      typeof imageUrl !== "string" ||
+      imageUrl.length > 2048 ||
+      typeof mealType !== "string" ||
+      !mealTypes.has(mealType) ||
+      typeof eatenAt !== "string" ||
+      Number.isNaN(Date.parse(eatenAt))
+    ) {
+      return new Response(JSON.stringify({ error: "Invalid request payload." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
@@ -43,6 +65,16 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       { global: { headers: { Authorization: authHeader } } }
     );
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid session." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
 
     // Placeholder estimate behavior for MVP. Replace with provider call when keys are configured.
     const detectedItems: DetectedItem[] = fallbackEstimate(mealType);

@@ -40,11 +40,18 @@ const requestJson = async <T>(url: string, init: RequestInit): Promise<T> => {
 export const estimateMealFromImage = async (imageUrl: string, mealType: Meal["mealType"]): Promise<EstimateResult> => {
   assertSupabaseConfigured();
   const { url: supabaseUrl, anonKey } = getSupabaseConfig();
+  const {
+    data: { session }
+  } = await authClient.auth.getSession();
+  const accessToken = session?.access_token;
+  if (!accessToken) throw new Error("Sign in again before estimating a meal.");
+
   const response = await fetch(`${supabaseUrl.replace(/\/$/, "")}/functions/v1/estimate-meal`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${anonKey}`,
+      apikey: anonKey,
+      Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify({
       imageUrl,

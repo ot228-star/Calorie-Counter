@@ -59,20 +59,17 @@ Deno.serve(async (req) => {
     // Best-effort cleanup of user-owned rows. `on delete cascade` should handle most,
     // but we do an explicit pass to be defensive.
     const tables = [
-      "estimation_corrections",
       "estimation_requests",
-      "meal_items",
       "meals",
       "analytics_events",
-      "profiles"
     ];
     for (const table of tables) {
-      // meal_items is reachable via meals.user_id; the cascade handles it.
-      if (table === "meal_items" || table === "estimation_corrections") continue;
-      await admin.from(table).delete().eq("user_id", userId);
+      const { error } = await admin.from(table).delete().eq("user_id", userId);
+      if (error) throw error;
     }
     // profiles row is keyed by id, not user_id
-    await admin.from("profiles").delete().eq("id", userId);
+    const { error: profileError } = await admin.from("profiles").delete().eq("id", userId);
+    if (profileError) throw profileError;
 
     // Best-effort: remove user-uploaded images if a `meal-images` bucket exists.
     try {

@@ -40,7 +40,7 @@ export async function deleteCurrentAccount(accessToken: string): Promise<void> {
           message = text;
         }
       }
-    } catch (_) {
+    } catch {
       // ignore parse errors
     }
     throw new Error(message);

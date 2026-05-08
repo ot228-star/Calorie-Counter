@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 const path = require("path");
 
 try {
   // Repo root .env (Expo CLI cwd is usually `app/`, so default .env there misses parent)
   require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
-} catch (_) {}
+} catch {}
 try {
   require("dotenv").config({ path: path.join(__dirname, ".env") });
-} catch (_) {}
+} catch {}
 
 const appJson = require("./app.json");
 

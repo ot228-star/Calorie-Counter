@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Haptics from "expo-haptics";
 import type { FoodRecord } from "../../data/foodDatabase";
 import type { AppThemeTokens } from "../../theme/AppThemeContext";
 import { useAppTheme } from "../../theme/AppThemeContext";
@@ -325,6 +326,8 @@ export function StitchFoodPlanScreen({
   const ph = `${theme.mutedText}73`;
 
   const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
+  const listOpacity = useMemo(() => new Animated.Value(1), []);
+  const listTranslate = useMemo(() => new Animated.Value(0), []);
   const totalRef = React.useRef(foods.length);
   totalRef.current = foods.length;
   const displayCountRef = React.useRef(displayCount);
@@ -334,6 +337,25 @@ export function StitchFoodPlanScreen({
   useEffect(() => {
     setDisplayCount(INITIAL_DISPLAY_COUNT);
   }, [selectedRegion, foodSearch]);
+
+  useEffect(() => {
+    listOpacity.setValue(0.96);
+    listTranslate.setValue(7);
+    Animated.parallel([
+      Animated.timing(listOpacity, {
+        toValue: 1,
+        duration: 130,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true
+      }),
+      Animated.timing(listTranslate, {
+        toValue: 0,
+        duration: 130,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true
+      })
+    ]).start();
+  }, [listOpacity, listTranslate, selectedRegion]);
 
   // Expose a stable loadMore callback to the parent scroll container so it can
   // trigger pagination as the user nears the bottom of the page. We grow the
@@ -382,18 +404,24 @@ export function StitchFoodPlanScreen({
       >
         {regionOrder.map((id) => {
           const active = selectedRegion === id;
+          const handleSelectRegion = () => {
+            if (!active) {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
+                // Ignore unsupported/disabled haptics.
+              });
+            }
+            onSelectRegion(id);
+          };
           return (
-            <TouchableOpacity
+            <Pressable
               key={id}
-              style={[styles.chip, active && styles.chipOn]}
-              onPress={() => onSelectRegion(id)}
-              activeOpacity={0.85}
-              delayPressIn={0}
+              style={({ pressed }) => [styles.chip, active && styles.chipOn, pressed && { transform: [{ scale: 0.97 }] }]}
+              onPress={handleSelectRegion}
             >
               <Text style={[styles.chipTxt, active && styles.chipTxtOn, useCustomFonts && { fontFamily: stitchFonts.body }]}>
                 {regionLabels[id]}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </ScrollView>
@@ -413,7 +441,7 @@ export function StitchFoodPlanScreen({
         <Text style={[styles.muted, useCustomFonts && { fontFamily: stitchFonts.body }]}>No foods match.</Text>
       ) : null}
 
-      <View style={{ gap: 10 }}>
+      <Animated.View style={{ gap: 10, opacity: listOpacity, transform: [{ translateY: listTranslate }] }}>
         {visibleFoods.map((food) => (
           <FoodPlanRow
             key={`${food.category}-${food.name}`}
@@ -445,7 +473,7 @@ export function StitchFoodPlanScreen({
             Showing {visibleFoods.length} of {foods.length} foods
           </Text>
         )}
-      </View>
+      </Animated.View>
     </View>
   );
 }

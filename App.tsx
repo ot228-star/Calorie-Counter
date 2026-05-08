@@ -29,7 +29,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Provider, Session } from "@supabase/supabase-js";
 import * as AuthSession from "expo-auth-session";
-import * as ImagePicker from "expo-image-picker";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
 import * as LocalAuthentication from "expo-local-authentication";
@@ -422,8 +421,11 @@ const STITCH_TAB_BAR_VISUAL = 72;
 export default function App() {
   const previousUserIdRef = useRef<string | null>(null);
   const previousOnboardingStepRef = useRef<OnboardingStep>(0);
+  const previousTransitionKeyRef = useRef<string>("dashboard");
   const onboardingStepOpacity = useRef(new Animated.Value(1)).current;
   const onboardingStepTranslate = useRef(new Animated.Value(0)).current;
+  const mainContentOpacity = useRef(new Animated.Value(1)).current;
+  const mainContentTranslate = useRef(new Animated.Value(0)).current;
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
@@ -520,7 +522,6 @@ export default function App() {
   const mealsLogged = meals.length;
   const avgMealCalories = mealsLogged ? Math.round(summary.consumedCalories / mealsLogged) : 0;
   const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const toggleTheme = () => setThemeMode((prev) => (prev === "light" ? "dark" : "light"));
   /** Shown in main header only after user enters a nickname during onboarding. */
   const headerBrandTitle = nickname.trim();
   const inferredGoalType = useMemo(() => inferGoalTypeFromSelections(surveyGoals), [surveyGoals]);
@@ -731,6 +732,7 @@ export default function App() {
   const scrollBottomPad = STITCH_TAB_BAR_VISUAL + bottomSafe + 88;
   const stitchTopPad = stitchScrollPaddingTop(insets.top);
   const scrollPadTop = screen === "foodDetail" ? insets.top + 10 : stitchTopPad;
+  const transitionKey = `${screen}:${screen === "foodPlan" ? selectedCuisineRegion : ""}`;
 
   useEffect(() => {
     void initializeAds();
@@ -967,6 +969,27 @@ export default function App() {
     };
   }, [foodSearch]);
 
+  useEffect(() => {
+    if (transitionKey === previousTransitionKeyRef.current) return;
+    previousTransitionKeyRef.current = transitionKey;
+    mainContentOpacity.setValue(0.96);
+    mainContentTranslate.setValue(8);
+    Animated.parallel([
+      Animated.timing(mainContentOpacity, {
+        toValue: 1,
+        duration: 140,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true
+      }),
+      Animated.timing(mainContentTranslate, {
+        toValue: 0,
+        duration: 140,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true
+      })
+    ]).start();
+  }, [mainContentOpacity, mainContentTranslate, transitionKey]);
+
   const handleEmailAuth = async () => {
     setAuthError(null);
     setAuthInfo(null);
@@ -1050,7 +1073,6 @@ export default function App() {
     setAuthBusy(true);
     try {
       const redirectTo = makeOAuthRedirectUri();
-      console.log("OAuth redirect URI:", redirectTo);
       const { data, error } = await startOAuth(provider, redirectTo);
       if (error) throw error;
       if (!data?.url) throw new Error("Could not start OAuth.");
@@ -1082,10 +1104,6 @@ export default function App() {
         });
         if (setSessionError) throw setSessionError;
       } else {
-        console.warn(
-          "OAuth callback could not be parsed (no code or access_token). URL shape:",
-          result.url.split("#")[0]?.slice(0, 120)
-        );
         throw new Error(
           "OAuth callback missing access token and code. Add this redirect URL in Supabase Auth → URL Configuration, then retry."
         );
@@ -1342,11 +1360,6 @@ export default function App() {
       return;
     }
     try {
-      const can = await Linking.canOpenURL(url);
-      if (!can) {
-        Alert.alert(errorTitle, "Could not open the link in this device.");
-        return;
-      }
       await Linking.openURL(url);
     } catch {
       Alert.alert(errorTitle, "Could not open the link.");
@@ -1468,24 +1481,6 @@ export default function App() {
     }
   };
 
-  const openPhotoPicker = async () => {
-    const permissions = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permissions.granted) {
-      Alert.alert("Camera permission is required.");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"],
-      quality: 0.7
-    });
-
-    if (result.canceled) return;
-    const uri = result.assets[0].uri;
-    setPhotoUri(uri);
-    setScreen("camera");
-  };
-
   const requestEstimate = async () => {
     if (!photoUri) return;
     try {
@@ -1506,7 +1501,7 @@ export default function App() {
           : `${msg}\n\nYou can still log meals manually.`
       );
       setScreen("manual");
-      console.error(error);
+      if (__DEV__) console.error(error);
     }
   };
 
@@ -2090,7 +2085,7 @@ export default function App() {
         setScreen("manual");
         return;
       case "camera":
-        Alert.alert("Camera Feature Coming Soon", "Camera Feature Coming Soon");
+        Alert.alert("Coming soon", "Camera feature is coming soon.");
         return;
       case "settings":
         setScreen("settings");
@@ -2136,6 +2131,7 @@ export default function App() {
         onScroll={onMainScroll}
         scrollEventThrottle={64}
       >
+      <Animated.View style={{ opacity: mainContentOpacity, transform: [{ translateY: mainContentTranslate }] }}>
       {screen === "dashboard" && (
         <StitchDashboard
           remainingCalories={summary.remainingCalories}
@@ -2357,6 +2353,7 @@ export default function App() {
           }
         />
       )}
+      </Animated.View>
       </ScrollView>
 
       <AdBanner />

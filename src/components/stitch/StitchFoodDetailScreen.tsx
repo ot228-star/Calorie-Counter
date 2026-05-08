@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import type { AppThemeTokens } from "../../theme/AppThemeContext";
@@ -26,6 +26,55 @@ type Props = {
   onLogToDay?: (servings: number) => void;
   useCustomFonts?: boolean;
 };
+
+function SmoothValueText({
+  value,
+  style
+}: {
+  value: string;
+  style?: object;
+}) {
+  const [displayValue, setDisplayValue] = useState(value);
+  const opacity = useRef(new Animated.Value(1)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (value === displayValue) return;
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 70,
+        useNativeDriver: true
+      }),
+      Animated.timing(translateY, {
+        toValue: 4,
+        duration: 70,
+        useNativeDriver: true
+      })
+    ]).start(() => {
+      setDisplayValue(value);
+      translateY.setValue(-4);
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 120,
+          useNativeDriver: true
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 120,
+          useNativeDriver: true
+        })
+      ]).start();
+    });
+  }, [displayValue, opacity, translateY, value]);
+
+  return (
+    <Animated.Text style={[style, { opacity, transform: [{ translateY }] }]}>
+      {displayValue}
+    </Animated.Text>
+  );
+}
 
 function createStyles(t: AppThemeTokens) {
   const cardBg = t.surfaceContainerHigh;
@@ -298,7 +347,7 @@ export function StitchFoodDetailScreen({
           </View>
         </View>
         <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
-          <Text style={[styles.energyBig, useCustomFonts && { fontFamily: stitchFonts.display }]}>{cal}</Text>
+          <SmoothValueText value={String(cal)} style={[styles.energyBig, useCustomFonts && { fontFamily: stitchFonts.display }]} />
           <Text style={styles.energyKcal}>kcal</Text>
         </View>
       </View>
@@ -311,7 +360,7 @@ export function StitchFoodDetailScreen({
         ].map((macro) => (
           <View key={macro.label} style={styles.macroCard}>
             <Text style={styles.macroLbl}>{macro.label}</Text>
-            <Text style={[styles.macroVal, useCustomFonts && { fontFamily: stitchFonts.display }]}>{macro.value}g</Text>
+            <SmoothValueText value={`${macro.value}g`} style={[styles.macroVal, useCustomFonts && { fontFamily: stitchFonts.display }]} />
             <View style={styles.macroBarTrack}>
               <View style={[styles.macroBarFill, { width: `${Math.min(100, (macro.value / maxMacro) * 100)}%`, backgroundColor: macro.color }]} />
             </View>
@@ -328,7 +377,7 @@ export function StitchFoodDetailScreen({
           <Ionicons name="remove" size={22} color={theme.onSurface} />
         </TouchableOpacity>
         <View style={styles.stepMid}>
-          <Text style={[styles.stepNum, useCustomFonts && { fontFamily: stitchFonts.display }]}>{servings.toFixed(1)}</Text>
+          <SmoothValueText value={servings.toFixed(1)} style={[styles.stepNum, useCustomFonts && { fontFamily: stitchFonts.display }]} />
           <Text style={styles.stepLbl}>Servings</Text>
         </View>
         <TouchableOpacity style={[styles.stepBtn, { backgroundColor: `${theme.primary}28` }]} onPress={() => adjustServings(0.5)} activeOpacity={0.8} delayPressIn={0}>

@@ -21,14 +21,14 @@ export function AdBanner({ style }: Props) {
     void (async () => {
       await initializeAds();
       try {
-        // @ts-ignore - optional dependency, resolved only in builds with the AdMob plugin
+        // @ts-expect-error - optional dependency, resolved only in builds with the AdMob plugin
         const mod = (await import("react-native-google-mobile-ads")) as unknown as {
           BannerAd: React.ComponentType<{ unitId: string; size: string }>;
           BannerAdSize: Record<string, string>;
         };
         if (cancelled) return;
         setBannerEl({ default: mod.BannerAd, BannerAdSize: mod.BannerAdSize });
-      } catch (_) {
+      } catch {
         // SDK not present in this build
       }
     })();

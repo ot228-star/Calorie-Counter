@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import type { AppThemeTokens } from "../../theme/AppThemeContext";
 import { useAppTheme } from "../../theme/AppThemeContext";
@@ -51,7 +52,7 @@ type Props = {
   showDeleteAccount?: boolean;
 };
 
-function createStyles(t: AppThemeTokens, themeMode: "light" | "dark") {
+function createStyles(t: AppThemeTokens) {
   const glow = mixHex(t.primary, t.background, 0.9);
   return StyleSheet.create({
     root: { gap: 20 },
@@ -202,8 +203,13 @@ export function StitchSettingsScreen({
   showDeleteAccount
 }: Props) {
   const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme, themeMode), [theme, themeMode]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const grad = [theme.primary, theme.primaryContainer] as const;
+  const pulse = () => {
+    void Haptics.selectionAsync().catch(() => {
+      // Ignore unsupported/disabled haptics.
+    });
+  };
 
   const ui = {
     cardLow: theme.cardBackground,
@@ -234,7 +240,10 @@ export function StitchSettingsScreen({
         <View style={styles.saveRow}>
           <TouchableOpacity
             style={[styles.saveBtn, { borderColor: theme.primary, backgroundColor: `${theme.primary}22` }]}
-            onPress={onSaveNickname}
+            onPress={() => {
+              pulse();
+              onSaveNickname();
+            }}
             activeOpacity={0.85}
             delayPressIn={0}
           >
@@ -277,7 +286,10 @@ export function StitchSettingsScreen({
                 <TouchableOpacity
                   key={id}
                   style={[styles.swatch, { backgroundColor: c }, on && styles.swatchOn]}
-                  onPress={() => setAccentId(id)}
+                  onPress={() => {
+                    if (!on) pulse();
+                    setAccentId(id);
+                  }}
                 />
               );
             })}
@@ -291,7 +303,15 @@ export function StitchSettingsScreen({
               const on = id === uiPaletteId;
               const swatch = themeMode === "dark" ? uiPalettes[id].dark.background : uiPalettes[id].light.background;
               return (
-                <TouchableOpacity key={id} onPress={() => setUiPaletteId(id)} style={styles.paletteBtn} activeOpacity={0.85}>
+                <TouchableOpacity
+                  key={id}
+                  onPress={() => {
+                    if (!on) pulse();
+                    setUiPaletteId(id);
+                  }}
+                  style={styles.paletteBtn}
+                  activeOpacity={0.85}
+                >
                   <View style={[styles.swatch, { backgroundColor: swatch }, on && styles.swatchOn]} />
                   <Text style={[styles.mutedSm, { color: on ? theme.primary : ui.muted }]}>{uiPalettes[id].label}</Text>
                 </TouchableOpacity>
@@ -328,7 +348,15 @@ export function StitchSettingsScreen({
           <Text style={[styles.para, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
             Your BMI informs calorie suggestions alongside your goals.
           </Text>
-          <TouchableOpacity onPress={onRecalculateCalories} activeOpacity={0.92} delayPressIn={0} style={{ borderRadius: 999, overflow: "hidden", marginTop: 12 }}>
+          <TouchableOpacity
+            onPress={() => {
+              pulse();
+              onRecalculateCalories();
+            }}
+            activeOpacity={0.92}
+            delayPressIn={0}
+            style={{ borderRadius: 999, overflow: "hidden", marginTop: 12 }}
+          >
             <LinearGradient colors={grad} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.recalc}>
               <Text style={[styles.recalcTxt, useCustomFonts && { fontFamily: stitchFonts.display }]}>
                 Recalculate suggested calories
@@ -341,7 +369,10 @@ export function StitchSettingsScreen({
       <View style={styles.grid2}>
         <TouchableOpacity
           style={[styles.tile, { backgroundColor: ui.card }]}
-          onPress={onOpenNotifications}
+          onPress={() => {
+            pulse();
+            onOpenNotifications();
+          }}
           activeOpacity={0.85}
           delayPressIn={0}
         >
@@ -351,7 +382,15 @@ export function StitchSettingsScreen({
             {notificationsHint ?? "Manage reminders and push permissions"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenPrivacy} activeOpacity={0.85} delayPressIn={0}>
+        <TouchableOpacity
+          style={[styles.tile, { backgroundColor: ui.card }]}
+          onPress={() => {
+            pulse();
+            onOpenPrivacy();
+          }}
+          activeOpacity={0.85}
+          delayPressIn={0}
+        >
           <Ionicons name="lock-closed-outline" size={24} color={theme.primary} />
           <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Privacy</Text>
           <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
@@ -359,7 +398,15 @@ export function StitchSettingsScreen({
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenSupport} activeOpacity={0.85} delayPressIn={0}>
+      <TouchableOpacity
+        style={[styles.tile, { backgroundColor: ui.card }]}
+        onPress={() => {
+          pulse();
+          onOpenSupport();
+        }}
+        activeOpacity={0.85}
+        delayPressIn={0}
+      >
         <Ionicons name="mail-outline" size={24} color={theme.primary} />
         <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Support</Text>
         <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
@@ -369,7 +416,10 @@ export function StitchSettingsScreen({
       <View style={styles.grid2}>
         <TouchableOpacity
           style={[styles.tile, { backgroundColor: ui.card }]}
-          onPress={onShareApp}
+          onPress={() => {
+            pulse();
+            onShareApp();
+          }}
           activeOpacity={0.85}
           delayPressIn={0}
         >
@@ -381,7 +431,10 @@ export function StitchSettingsScreen({
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tile, { backgroundColor: ui.card }]}
-          onPress={onRateApp}
+          onPress={() => {
+            pulse();
+            onRateApp();
+          }}
           activeOpacity={0.85}
           delayPressIn={0}
         >
@@ -392,7 +445,15 @@ export function StitchSettingsScreen({
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={[styles.tile, { backgroundColor: ui.card }]} onPress={onOpenAbout} activeOpacity={0.85} delayPressIn={0}>
+      <TouchableOpacity
+        style={[styles.tile, { backgroundColor: ui.card }]}
+        onPress={() => {
+          pulse();
+          onOpenAbout();
+        }}
+        activeOpacity={0.85}
+        delayPressIn={0}
+      >
         <Ionicons name="information-circle-outline" size={24} color={theme.primary} />
         <Text style={[styles.tileH, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>About</Text>
         <Text style={[styles.tileP, { color: ui.muted }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
@@ -408,7 +469,10 @@ export function StitchSettingsScreen({
         {onOpenPrivacyPolicy ? (
           <TouchableOpacity
             style={[styles.tile, { backgroundColor: ui.card }]}
-            onPress={onOpenPrivacyPolicy}
+            onPress={() => {
+              pulse();
+              onOpenPrivacyPolicy();
+            }}
             activeOpacity={0.85}
             delayPressIn={0}
           >
@@ -422,7 +486,10 @@ export function StitchSettingsScreen({
         {onOpenTerms ? (
           <TouchableOpacity
             style={[styles.tile, { backgroundColor: ui.card }]}
-            onPress={onOpenTerms}
+            onPress={() => {
+              pulse();
+              onOpenTerms();
+            }}
             activeOpacity={0.85}
             delayPressIn={0}
           >
@@ -437,7 +504,10 @@ export function StitchSettingsScreen({
       {onExportData ? (
         <TouchableOpacity
           style={[styles.tile, { backgroundColor: ui.card }]}
-          onPress={onExportData}
+          onPress={() => {
+            pulse();
+            onExportData();
+          }}
           activeOpacity={0.85}
           delayPressIn={0}
         >
@@ -450,7 +520,15 @@ export function StitchSettingsScreen({
       ) : null}
 
       {showSignOut && onSignOut ? (
-        <TouchableOpacity style={[styles.signOut, { borderColor: theme.danger }]} onPress={onSignOut} activeOpacity={0.85} delayPressIn={0}>
+        <TouchableOpacity
+          style={[styles.signOut, { borderColor: theme.danger }]}
+          onPress={() => {
+            pulse();
+            onSignOut();
+          }}
+          activeOpacity={0.85}
+          delayPressIn={0}
+        >
           <Text style={[styles.signOutTxt, { color: theme.danger }]}>Sign out</Text>
         </TouchableOpacity>
       ) : null}
@@ -458,7 +536,10 @@ export function StitchSettingsScreen({
       {showDeleteAccount && onDeleteAccount ? (
         <TouchableOpacity
           style={[styles.signOut, { borderColor: theme.danger, backgroundColor: `${theme.danger}11` }]}
-          onPress={onDeleteAccount}
+          onPress={() => {
+            pulse();
+            onDeleteAccount();
+          }}
           activeOpacity={0.85}
           delayPressIn={0}
         >

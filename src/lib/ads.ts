@@ -33,7 +33,7 @@ async function importAdsModule(): Promise<AdsModule | null> {
   if (isExpoGo()) return null;
   if (cached !== undefined) return cached;
   try {
-    // @ts-ignore - optional dependency, only resolved in builds that include the plugin
+    // @ts-expect-error - optional dependency, only resolved in builds that include the plugin
     cached = (await import("react-native-google-mobile-ads")) as AdsModule;
     return cached;
   } catch {
@@ -78,7 +78,7 @@ export async function initializeAds(): Promise<void> {
       try {
         const ttAny = ads as unknown as { requestTrackingPermission?: () => Promise<unknown> };
         await ttAny.requestTrackingPermission?.();
-      } catch (_) {
+      } catch {
         // user can decline - fine, we fall back to non-personalized ads
       }
     }
