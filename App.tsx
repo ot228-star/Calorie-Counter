@@ -84,6 +84,7 @@ import { loadFavorites, saveFavorites } from "./src/lib/favoritesStorage";
 import { loadPrivacyLockEnabled, setPrivacyLockEnabled } from "./src/lib/privacyStorage";
 import { deleteCurrentAccount } from "./src/lib/accountDeletion";
 import { initializeAds } from "./src/lib/ads";
+import { permissionRationale } from "./src/lib/permissionRationale";
 import { AdBanner } from "./src/components/AdBanner";
 import { hasAcceptedHealthDisclaimer, setHealthDisclaimerAccepted } from "./src/lib/disclaimerStorage";
 import { HealthDisclaimerModal } from "./src/components/HealthDisclaimerModal";
@@ -1159,31 +1160,38 @@ export default function App() {
         current.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED;
       if (alreadyEnabled) {
         setNotificationsEnabled(true);
-        Alert.alert("Notifications", "Notifications are enabled.");
+        Alert.alert("Notifications", `${permissionRationale.notifications}\n\nNotifications are enabled on this device.`);
         return;
       }
 
-      const requested = await Notifications.requestPermissionsAsync();
-      const granted =
-        requested.granted ||
-        requested.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
-        requested.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED;
-      setNotificationsEnabled(granted);
+      const runRequest = async () => {
+        const requested = await Notifications.requestPermissionsAsync();
+        const granted =
+          requested.granted ||
+          requested.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
+          requested.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED;
+        setNotificationsEnabled(granted);
 
-      if (granted) {
-        if (Platform.OS === "android") {
-          await Notifications.setNotificationChannelAsync("default", {
-            name: "default",
-            importance: Notifications.AndroidImportance.DEFAULT
-          });
+        if (granted) {
+          if (Platform.OS === "android") {
+            await Notifications.setNotificationChannelAsync("default", {
+              name: "default",
+              importance: Notifications.AndroidImportance.DEFAULT
+            });
+          }
+          Alert.alert("Notifications enabled", "You will now receive reminders and nudges.");
+          return;
         }
-        Alert.alert("Notifications enabled", "You will now receive reminders and nudges.");
-        return;
-      }
 
-      Alert.alert("Notifications disabled", "Enable notifications in system settings if you want reminders.", [
+        Alert.alert("Notifications disabled", "Enable notifications in system settings if you want reminders.", [
+          { text: "Not now", style: "cancel" },
+          { text: "Open settings", onPress: () => void Linking.openSettings() }
+        ]);
+      };
+
+      Alert.alert("Notifications", permissionRationale.notifications, [
         { text: "Not now", style: "cancel" },
-        { text: "Open settings", onPress: () => void Linking.openSettings() }
+        { text: "Continue", onPress: () => void runRequest() }
       ]);
     } catch {
       Alert.alert("Notifications error", "Could not check notification permissions.");
@@ -1191,9 +1199,10 @@ export default function App() {
   }, [isExpoGo]);
 
   const handlePrivacyTilePress = useCallback(() => {
+    const lockLine = privacyLockOn ? "Biometric app lock is enabled." : "Biometric app lock is disabled.";
     Alert.alert(
       "Privacy controls",
-      privacyLockOn ? "Biometric app lock is enabled." : "Biometric app lock is disabled.",
+      `${lockLine}\n\n${permissionRationale.biometrics}`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -2035,7 +2044,10 @@ export default function App() {
         setScreen("manual");
         return;
       case "camera":
-        Alert.alert("Coming soon", "Camera feature is coming soon.");
+        Alert.alert(
+          "Camera (coming soon)",
+          `${permissionRationale.camera}\n\n${permissionRationale.photoLibrary}\n\nThe in-app capture flow is not available in this build yet; manual logging still works.`
+        );
         return;
       case "settings":
         setScreen("settings");

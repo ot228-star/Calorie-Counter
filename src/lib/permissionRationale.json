@@ -1,0 +1,10 @@
+{
+  "camera": "Inertia uses the camera so you can photograph a meal, send it for an AI-assisted calorie estimate, and review the result before saving it to your log.",
+  "photoLibrary": "Inertia reads your library only when you choose a photo, so you can attach an existing meal picture to log or send for the same AI-assisted estimate.",
+  "biometrics": "Inertia uses Face ID or Touch ID when you turn on the optional app lock in Settings, so your meal log and targets stay private on this device.",
+  "notifications": "Inertia can send reminders and light nudges about your daily logging when you opt in from Settings—nothing is sent until you allow notifications.",
+  "appTracking": "This allows the ad SDK to use the device advertising identifier for more relevant ads and basic measurement. You can decline; ads may still appear in a non-personalized form.",
+  "internet": "Used to sign in, sync meals and profile with our servers, run meal estimates, load food images, and show ads when enabled.",
+  "vibrate": "Short vibration for light feedback on some taps (no personal data).",
+  "adIdAndroid": "When ads are enabled, Android may expose an advertising ID so ad networks can measure delivery and relevance, similar to the iOS tracking prompt."
+}

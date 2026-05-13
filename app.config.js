@@ -8,6 +8,8 @@ try {
   require("dotenv").config({ path: path.join(__dirname, ".env") });
 } catch {}
 
+const pr = require("./src/lib/permissionRationale.json");
+
 const baseExpoConfig = {
   name: "Inertia",
   slug: "calorie-counter",
@@ -31,16 +33,11 @@ const baseExpoConfig = {
       usesNonExemptEncryption: false
     },
     infoPlist: {
-      NSCameraUsageDescription:
-        "Inertia uses the camera to take photos of meals so it can estimate their nutrition.",
-      NSPhotoLibraryUsageDescription:
-        "Inertia accesses photos so you can pick existing meal images to log.",
-      NSPhotoLibraryAddUsageDescription:
-        "Inertia saves meal photos you capture so you can review them later.",
-      NSFaceIDUsageDescription:
-        "Inertia uses Face ID to lock your nutrition data when biometric privacy lock is enabled.",
-      NSUserTrackingUsageDescription:
-        "Inertia asks for permission to deliver more relevant ads. Declining still shows non-personalized ads.",
+      NSCameraUsageDescription: pr.camera,
+      NSPhotoLibraryUsageDescription: pr.photoLibrary,
+      NSFaceIDUsageDescription: pr.biometrics,
+      NSUserNotificationsUsageDescription: pr.notifications,
+      NSUserTrackingUsageDescription: pr.appTracking,
       ITSAppUsesNonExemptEncryption: false
     }
   },
@@ -72,15 +69,15 @@ const baseExpoConfig = {
     [
       "expo-camera",
       {
-        cameraPermission: "Inertia uses the camera to take photos of meals so it can estimate their nutrition.",
+        cameraPermission: pr.camera,
         recordAudioAndroid: false
       }
     ],
     [
       "expo-image-picker",
       {
-        photosPermission: "Inertia accesses photos so you can pick existing meal images to log.",
-        cameraPermission: "Inertia uses the camera to take photos of meals so it can estimate their nutrition."
+        photosPermission: pr.photoLibrary,
+        cameraPermission: pr.camera
       }
     ],
     [
@@ -93,7 +90,7 @@ const baseExpoConfig = {
     [
       "expo-local-authentication",
       {
-        faceIDPermission: "Inertia uses Face ID to lock your nutrition data when biometric privacy lock is enabled."
+        faceIDPermission: pr.biometrics
       }
     ]
   ]
@@ -114,8 +111,7 @@ const adMobPlugin =
           {
             androidAppId: admobAndroidId,
             iosAppId: admobIosId,
-            userTrackingUsageDescription:
-              "Inertia asks for permission to deliver more relevant ads. Declining still shows non-personalized ads.",
+            userTrackingUsageDescription: pr.appTracking,
             skAdNetworkItems: []
           }
         ]

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,6 +7,7 @@ import type { AppThemeTokens } from "../../theme/AppThemeContext";
 import { useAppTheme } from "../../theme/AppThemeContext";
 import { mixHex } from "../../lib/themeColors";
 import { stitchFonts } from "../../theme/stitch";
+import { permissionExplainItems } from "../../lib/permissionRationale";
 
 type AccentId = "blue" | "emerald" | "violet" | "rose" | "orange";
 type UiPaletteId = "midnight" | "forest" | "ocean" | "graphite" | "sunrise";
@@ -204,6 +205,15 @@ export function StitchSettingsScreen({
 }: Props) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const permissionRows = useMemo(
+    () =>
+      permissionExplainItems.filter((row) => {
+        if (row.id === "adIdAndroid" && Platform.OS !== "android") return false;
+        if (row.id === "appTracking" && Platform.OS !== "ios") return false;
+        return true;
+      }),
+    []
+  );
   const grad = [theme.primary, theme.primaryContainer] as const;
   const pulse = () => {
     void Haptics.selectionAsync().catch(() => {
@@ -398,6 +408,23 @@ export function StitchSettingsScreen({
           </Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.sectionHead}>
+        <Ionicons name="eye-outline" size={22} color={theme.primary} />
+        <Text style={[styles.sectionTitle, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.display }]}>Permissions</Text>
+      </View>
+      <View style={[styles.cardLow, { backgroundColor: ui.cardLow }]}>
+        <Text style={[styles.muted, { color: ui.muted, marginBottom: 8 }, useCustomFonts && { fontFamily: stitchFonts.body }]}>
+          Inertia only uses the items below for the reasons shown. System prompts may use the same wording.
+        </Text>
+        {permissionRows.map((row, index) => (
+          <View key={row.id} style={{ gap: 4, paddingTop: index === 0 ? 0 : 12, borderTopWidth: index === 0 ? 0 : 1, borderTopColor: `${ui.muted}22` }}>
+            <Text style={[styles.label, { color: ui.text }, useCustomFonts && { fontFamily: stitchFonts.body }]}>{row.title}</Text>
+            <Text style={[styles.para, { color: ui.muted, marginTop: 0 }, useCustomFonts && { fontFamily: stitchFonts.body }]}>{row.body}</Text>
+          </View>
+        ))}
+      </View>
+
       <TouchableOpacity
         style={[styles.tile, { backgroundColor: ui.card }]}
         onPress={() => {
