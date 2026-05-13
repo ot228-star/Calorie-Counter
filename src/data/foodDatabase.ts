@@ -1,3 +1,5 @@
+import type { CuisineRegionTag } from "./cuisineRegions";
+import { attachCatalogCuisineRegions } from "./foodCuisineRegistry";
 import { EXTRA_FOODS } from "./extraFoods";
 
 export type FoodImageReviewStatus = "pending" | "approved" | "rejected";
@@ -16,6 +18,8 @@ export type FoodRecord = {
   photo_attribution?: string | null;
   slug?: string | null;
   image_review_status?: FoodImageReviewStatus | null;
+  /** Curated world-region tags for Plan filters; omitted on raw staples. */
+  cuisine_regions?: readonly CuisineRegionTag[];
 };
 
 // Values are approximate per 100g edible portion.
@@ -191,4 +195,4 @@ const BASE_FOODS: FoodRecord[] = [
   { name: "Smoothie (fruit)", category: "Other", calories: 95, protein_g: 1.7, carbs_g: 21.5, fat_g: 0.8 }
 ];
 
-export const FOOD_DATABASE: FoodRecord[] = [...BASE_FOODS, ...EXTRA_FOODS];
+export const FOOD_DATABASE: FoodRecord[] = [...BASE_FOODS, ...EXTRA_FOODS].map(attachCatalogCuisineRegions);

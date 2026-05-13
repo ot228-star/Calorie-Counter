@@ -53,6 +53,13 @@ import {
 } from "./src/services/auth";
 import { trackEvent } from "./src/services/analytics";
 import { FOOD_DATABASE, type FoodRecord } from "./src/data/foodDatabase";
+import {
+  type CuisineRegionId,
+  cuisineRegionLabels,
+  cuisineRegionOrder,
+  inferCuisineRegion
+} from "./src/data/cuisineRegions";
+import { attachCatalogCuisineRegions, foodMatchesRegionSelection } from "./src/data/foodCuisineRegistry";
 import { getFoodDetail, getFoodPhotoCandidates, getFoodPlanTagline, getFoodSearchBlob } from "./src/data/foodDetails";
 import { searchFoods } from "./src/services/foodFinder";
 import { mapPhotoUrisForMaxWidth } from "./src/lib/photoUrls";
@@ -100,7 +107,6 @@ type ThemeMode = "light" | "dark";
 type OnboardingStep = 0 | 1 | 2 | 3 | 4;
 type AccentPresetId = "blue" | "emerald" | "violet" | "rose" | "orange";
 type UiPaletteId = "midnight" | "forest" | "ocean" | "graphite" | "sunrise";
-type CuisineRegionId = "global" | "northAmerican" | "mediterranean" | "southAsian" | "eastAsian" | "latinAmerican" | "middleEastern";
 type BiologicalSex = "man" | "woman";
 type DetailBackScreen = "foodPlan" | "favourites";
 type DetailContent = {
@@ -219,65 +225,12 @@ const uiPalettes: Record<
   }
 };
 const uiPaletteOrder: UiPaletteId[] = ["midnight", "forest", "ocean", "graphite", "sunrise"];
-const cuisineRegionPresets: Record<CuisineRegionId, { label: string; keywords: string[] }> = {
-  global: {
-    label: "Global mix",
-    keywords: ["rice", "chicken", "salmon", "oatmeal", "wrap", "soup"]
-  },
-  northAmerican: {
-    label: "North American",
-    keywords: ["hamburger", "cheeseburger", "hot dog", "mac and cheese", "club sandwich", "pancakes", "waffles"]
-  },
-  mediterranean: {
-    label: "Mediterranean",
-    keywords: ["greek salad", "hummus", "pita", "chicken kebab", "falafel", "olive oil"]
-  },
-  southAsian: {
-    label: "South Asian",
-    keywords: ["biryani", "butter chicken", "tikka masala", "curry", "lentil"]
-  },
-  eastAsian: {
-    label: "East Asian",
-    keywords: ["ramen", "sushi", "pad thai", "pho", "dumplings", "teriyaki", "fried rice", "poke"]
-  },
-  latinAmerican: {
-    label: "Latin American",
-    keywords: ["taco", "burrito", "quesadilla", "corn tortilla", "beans"]
-  },
-  middleEastern: {
-    label: "Middle Eastern",
-    keywords: ["shawarma", "falafel", "hummus", "kebab", "pita"]
-  }
-};
-const cuisineRegionOrder: CuisineRegionId[] = [
-  "global",
-  "northAmerican",
-  "mediterranean",
-  "southAsian",
-  "eastAsian",
-  "latinAmerican",
-  "middleEastern"
-];
-const cuisineRegionLabels: Record<string, string> = Object.fromEntries(
-  cuisineRegionOrder.map((id) => [id, cuisineRegionPresets[id].label])
-);
 
 const inferGoalTypeFromSelections = (goals: string[]): "lose" | "maintain" | "gain" => {
   const normalized = goals.map((g) => g.toLowerCase());
   if (normalized.some((g) => g.includes("lose"))) return "lose";
   if (normalized.some((g) => g.includes("gain"))) return "gain";
   return "maintain";
-};
-
-const inferCuisineRegion = (): CuisineRegionId => {
-  const locale = Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase();
-  if (/(in|pk|bd|lk|np)/.test(locale)) return "southAsian";
-  if (/(jp|kr|cn|tw|vn|th|ph|sg|my)/.test(locale)) return "eastAsian";
-  if (/(mx|ar|br|cl|co|pe)/.test(locale)) return "latinAmerican";
-  if (/(tr|ae|sa|eg|jo|lb|iq|ir|il)/.test(locale)) return "middleEastern";
-  if (/(it|es|gr|fr|pt)/.test(locale)) return "mediterranean";
-  if (/(us|ca)/.test(locale)) return "northAmerican";
-  return "global";
 };
 
 const createId = (): string => {
@@ -472,7 +425,6 @@ export default function App() {
   const [foodSearch, setFoodSearch] = useState("");
   const [foodPortions, setFoodPortions] = useState<Record<string, string>>({});
   const [foodResults, setFoodResults] = useState<FoodRecord[]>([]);
-  const [foodSource, setFoodSource] = useState<"cloud">("cloud");
   const [foodLoading, setFoodLoading] = useState(false);
   const [favouriteFoodNames, setFavouriteFoodNames] = useState<string[]>([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean | null>(null);
@@ -621,7 +573,7 @@ export default function App() {
       calorieAdjustment
     });
   }, [age, heightCm, weightKg, biologicalSex, inferredGoalType, mealPlanFrequency, surveyHabits, surveyGoals]);
-  /** Unified Plan catalog from cloud Supabase rows only. */
+  /** Unified Plan catalog: bundled foods merged with Supabase rows (photo-aware preference on name collisions). */
   const planFoodsForScreen = useMemo(() => {
     const mergedByName = new Map<string, FoodRecord>();
     for (const food of FOOD_DATABASE) {
@@ -642,17 +594,14 @@ export default function App() {
         mergedByName.set(cloudFood.name, cloudFood);
       }
     }
-    const merged = Array.from(mergedByName.values());
-    const cloudWithPhotos = foodResults.filter((food) => getFoodPhotoCandidates(food).length > 0);
-    const catalog = foodSource === "cloud" ? cloudWithPhotos : merged;
+    const merged = Array.from(mergedByName.values()).map(attachCatalogCuisineRegions);
+    // Always use the merged catalog (bundled + cloud). Do not restrict to `cloudWithPhotos` — that
+    // hid hundreds of valid foods that simply lack image URLs yet.
+    const catalog = merged;
     const base =
       selectedCuisineRegion === "global"
         ? catalog
-        : catalog.filter((food) =>
-            cuisineRegionPresets[selectedCuisineRegion].keywords.some((keyword) =>
-              food.name.toLowerCase().includes(keyword.toLowerCase())
-            )
-          );
+        : catalog.filter((food) => foodMatchesRegionSelection(food, selectedCuisineRegion));
     const q = foodSearch.trim().toLowerCase();
     if (!q) {
       return [...base].sort((a, b) => a.name.localeCompare(b.name));
@@ -680,7 +629,7 @@ export default function App() {
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score || a.food.name.localeCompare(b.food.name))
       .map((item) => item.food);
-  }, [foodResults, foodSearch, selectedCuisineRegion, foodSource]);
+  }, [foodResults, foodSearch, selectedCuisineRegion]);
 
   const toPositiveIntOrNull = useCallback((value: string) => {
     const n = Number(value);
@@ -960,7 +909,6 @@ export default function App() {
       const result = await searchFoods(foodSearch);
       if (!active) return;
       setFoodResults(result.foods);
-      setFoodSource(result.source);
       setFoodLoading(false);
     }, 180);
     return () => {
@@ -2129,7 +2077,7 @@ export default function App() {
         keyboardDismissMode="on-drag"
         overScrollMode="never"
         bounces={Platform.OS === "ios"}
-        removeClippedSubviews={Platform.OS === "android"}
+        removeClippedSubviews={screen !== "foodPlan" && Platform.OS === "android"}
         onScroll={onMainScroll}
         onScrollEndDrag={onMainScroll}
         onMomentumScrollEnd={onMainScroll}

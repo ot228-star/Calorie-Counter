@@ -11,8 +11,6 @@ import { Ionicons } from "@expo/vector-icons";
 
 const INITIAL_DISPLAY_COUNT = 10;
 const LOAD_MORE_COUNT = 10;
-const MAX_MOUNTED_ROWS = 24;
-const ROW_HEIGHT_ESTIMATE = 262;
 
 type Props = {
   foodSearch: string;
@@ -67,7 +65,6 @@ function createStyles(t: AppThemeTokens) {
     chipOn: { backgroundColor: t.primary },
     chipTxt: { color: t.onSurfaceVariant, fontWeight: "700", fontSize: 12 },
     chipTxtOn: { color: t.onPrimary },
-    topSpacer: { width: "100%" },
     muted: { color: t.onSurfaceVariant, fontSize: 13 },
     card: {
       backgroundColor: t.surfaceContainer,
@@ -321,10 +318,10 @@ export function StitchFoodPlanScreen({
   const displayCountRef = React.useRef(displayCount);
   displayCountRef.current = displayCount;
 
-  // Reset display count when region or search changes
+  // Reset pagination when chips/search change or the filtered list size changes (fixes "Showing 10 of 1").
   useEffect(() => {
-    setDisplayCount(INITIAL_DISPLAY_COUNT);
-  }, [selectedRegion, foodSearch]);
+    setDisplayCount(foods.length === 0 ? INITIAL_DISPLAY_COUNT : Math.min(INITIAL_DISPLAY_COUNT, foods.length));
+  }, [selectedRegion, foodSearch, foods.length]);
 
   useEffect(() => {
     listOpacity.setValue(0.96);
@@ -359,12 +356,10 @@ export function StitchFoodPlanScreen({
     return () => registerLoadMore(null);
   }, [registerLoadMore]);
 
-  const visibleFoods = useMemo(() => foods.slice(0, displayCount), [foods, displayCount]);
-  const mountedStartIndex = Math.max(0, visibleFoods.length - MAX_MOUNTED_ROWS);
-  const mountedFoods = useMemo(() => visibleFoods.slice(mountedStartIndex), [visibleFoods, mountedStartIndex]);
-  const topSpacerHeight = mountedStartIndex * ROW_HEIGHT_ESTIMATE;
-  const hasMore = foods.length > displayCount;
-  const remaining = foods.length - displayCount;
+  const shown = Math.min(displayCount, foods.length);
+  const visibleFoods = useMemo(() => foods.slice(0, shown), [foods, shown]);
+  const hasMore = foods.length > shown;
+  const remaining = foods.length - shown;
 
   return (
     <View style={styles.root}>
@@ -423,8 +418,7 @@ export function StitchFoodPlanScreen({
       ) : null}
 
       <Animated.View style={{ gap: 10, opacity: listOpacity, transform: [{ translateY: listTranslate }] }}>
-        {topSpacerHeight > 0 ? <View style={[styles.topSpacer, { height: topSpacerHeight }]} /> : null}
-        {mountedFoods.map((food) => (
+        {visibleFoods.map((food) => (
           <FoodPlanRow
             key={`${food.category}-${food.name}`}
             food={food}
@@ -452,7 +446,7 @@ export function StitchFoodPlanScreen({
 
         {!foodLoading && foods.length > 0 && (
           <Text style={[styles.countHint, useCustomFonts && { fontFamily: stitchFonts.body }]}>
-            Showing {displayCount} of {foods.length} foods
+            Showing {shown} of {foods.length} foods
           </Text>
         )}
       </Animated.View>

@@ -1,4 +1,5 @@
 import { type FoodImageReviewStatus, type FoodRecord } from "../data/foodDatabase";
+import { parseCuisineRegionTags } from "../data/cuisineRegions";
 import { getSupabaseConfig } from "../lib/env";
 
 type SearchResult = {
@@ -6,6 +7,8 @@ type SearchResult = {
   source: "cloud";
 };
 
+// Omit `cuisine_regions` until migration `005_food_cuisine_regions.sql` is applied — requesting an
+// unknown column makes the whole foods query fail and empties the Plan catalog.
 const FOODS_SELECT =
   "name,category,calories,protein_g,carbs_g,fat_g,image_url,image_urls,photo_source,photo_attribution,slug,image_review_status";
 
@@ -29,6 +32,16 @@ export function normalizeFoodRow(raw: Record<string, unknown>): FoodRecord {
   const image_review_status: FoodImageReviewStatus | undefined =
     st === "pending" || st === "approved" || st === "rejected" ? st : undefined;
 
+  let cuisineRaw: unknown = raw.cuisine_regions;
+  if (typeof cuisineRaw === "string" && cuisineRaw.trim()) {
+    try {
+      cuisineRaw = JSON.parse(cuisineRaw) as unknown;
+    } catch {
+      cuisineRaw = undefined;
+    }
+  }
+  const cuisine_regions = parseCuisineRegionTags(cuisineRaw);
+
   return {
     name: String(raw.name),
     category: String(raw.category),
@@ -43,6 +56,7 @@ export function normalizeFoodRow(raw: Record<string, unknown>): FoodRecord {
       raw.photo_attribution != null && String(raw.photo_attribution) ? String(raw.photo_attribution) : undefined,
     slug: raw.slug != null && String(raw.slug) ? String(raw.slug) : undefined,
     image_review_status,
+    cuisine_regions
   };
 }
 
