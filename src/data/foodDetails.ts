@@ -152,40 +152,22 @@ const appendCandidate = (list: string[], value: string) => {
   if (!list.includes(trimmed)) list.push(trimmed);
 };
 
+const SUPABASE_STORAGE_PATTERN = /^https:\/\/[^/]+\/storage\/v1\/object\/public\//i;
+
+const isSupabaseStorageUrl = (url: string): boolean => SUPABASE_STORAGE_PATTERN.test(url);
+
 const appendSupabaseUrlVariants = (list: string[], url: string) => {
   const objectMatch = url.match(/^(https:\/\/[^/]+)\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/i);
   if (objectMatch) {
     const [, host, bucket, objectPath] = objectMatch;
-    const bucketLower = bucket.toLowerCase();
     const configuredHost = getSupabaseConfig().url.trim().replace(/\/$/, "");
     const hosts = configuredHost && configuredHost !== host ? [host, configuredHost] : [host];
-    const bucketAliases = Array.from(new Set([bucket, bucketLower]));
     for (const h of hosts) {
-      for (const b of bucketAliases) {
-        appendCandidate(list, `${h}/storage/v1/object/public/${b}/${objectPath}`);
-        appendCandidate(list, `${h}/storage/v1/render/image/public/${b}/${objectPath}`);
-      }
+      appendCandidate(list, `${h}/storage/v1/object/public/${bucket}/${objectPath}`);
     }
     return;
   }
-
-  const renderMatch = url.match(/^(https:\/\/[^/]+)\/storage\/v1\/render\/image\/public\/([^/]+)\/(.+)$/i);
-  if (renderMatch) {
-    const [, host, bucket, objectPath] = renderMatch;
-    const bucketLower = bucket.toLowerCase();
-    const configuredHost = getSupabaseConfig().url.trim().replace(/\/$/, "");
-    const hosts = configuredHost && configuredHost !== host ? [host, configuredHost] : [host];
-    const bucketAliases = Array.from(new Set([bucket, bucketLower]));
-    for (const h of hosts) {
-      for (const b of bucketAliases) {
-        appendCandidate(list, `${h}/storage/v1/render/image/public/${b}/${objectPath}`);
-        appendCandidate(list, `${h}/storage/v1/object/public/${b}/${objectPath}`);
-      }
-    }
-    return;
-  }
-
-  appendCandidate(list, url);
+  // Non-Supabase URLs are ignored.
 };
 
 const taglineFromNamePattern = (food: FoodRecord): string | null => {
@@ -240,10 +222,10 @@ export const getFoodPhotoCandidates = (food: FoodRecord): string[] => {
   const rejected = food.image_review_status === "rejected";
   if (!rejected) {
     const primary = food.image_url?.trim();
-    if (primary) appendSupabaseUrlVariants(candidates, primary);
+    if (primary && isSupabaseStorageUrl(primary)) appendSupabaseUrlVariants(candidates, primary);
     for (const u of food.image_urls ?? []) {
       const t = typeof u === "string" ? u.trim() : "";
-      if (t.length > 0) appendSupabaseUrlVariants(candidates, t);
+      if (t.length > 0 && isSupabaseStorageUrl(t)) appendSupabaseUrlVariants(candidates, t);
     }
   }
   return candidates;

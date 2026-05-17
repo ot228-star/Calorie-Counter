@@ -1,30 +1,10 @@
 /**
- * Same remote image, smaller file/decode cost for list thumbnails vs detail hero.
- * Unsplash: adjust w= query. picsum: path segments are width/height.
+ * All food images are served from Supabase Storage.
+ * Width resizing is handled via the Supabase Image Transformation API
+ * (/storage/v1/render/image/public/) when needed in the future.
+ * For now, pass URIs through unchanged.
  */
-export function resizeRemotePhotoUrl(uri: string, maxWidth: number): string {
-  if (!uri) return uri;
-  try {
-    if (uri.includes("images.unsplash.com")) {
-      const parsed = new URL(uri);
-      parsed.searchParams.set("w", String(maxWidth));
-      // Force a widely supported raster format for device compatibility.
-      parsed.searchParams.set("fm", "jpg");
-      // Keep quality explicit and predictable across vendors/CDN negotiation.
-      if (!parsed.searchParams.has("q")) parsed.searchParams.set("q", "80");
-      return parsed.toString();
-    }
-    if (uri.includes("picsum.photos/")) {
-      const m = uri.match(/picsum\.photos\/(\d+)\/(\d+)/);
-      if (m) {
-        const w = Math.min(maxWidth, Number(m[1]));
-        const h = Math.round((Number(m[2]) / Number(m[1])) * w);
-        return uri.replace(/picsum\.photos\/\d+\/\d+/, `picsum.photos/${w}/${h}`);
-      }
-    }
-  } catch {
-    // ignore
-  }
+export function resizeRemotePhotoUrl(uri: string, _maxWidth: number): string {
   return uri;
 }
 
