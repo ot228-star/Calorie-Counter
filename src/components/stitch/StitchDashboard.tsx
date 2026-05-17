@@ -277,8 +277,8 @@ export function StitchDashboard({
           <Text style={[styles.caption, useCustomFonts && { fontFamily: stitchFonts.body }]}>Daily Breakdown</Text>
           <View style={styles.gapY}>
             <Row styles={styles} icon="flag-outline" label="Goal" value={String(targetCalories)} accent />
-            <Row styles={styles} icon="restaurant-outline" label="Food" value={String(consumedCalories)} accent />
-            <Row styles={styles} icon="cube-outline" label="Meals" value={String(mealsLogged)} />
+            <Row styles={styles} icon="nutrition-outline" label="Food" value={String(consumedCalories)} accent />
+            <Row styles={styles} icon="restaurant-outline" label="Meals" value={String(mealsLogged)} />
           </View>
           <TouchableOpacity style={styles.quickLog} onPress={onQuickLog} activeOpacity={0.85} delayPressIn={0}>
             <Ionicons name="add" size={22} color={theme.primary} />
