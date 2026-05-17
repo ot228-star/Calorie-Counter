@@ -14,7 +14,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Image as RNImage
 } from "react-native";
 import { useFonts } from "expo-font";
 import {
@@ -272,44 +271,20 @@ const FallbackImage = memo(function FallbackImage({
 }: {
   uris: string[];
   style: object;
-  /** Smaller CDN width for list rows — same photo, less decode lag when supported by the URL. */
   urlMaxWidth?: number;
   priority?: "low" | "normal" | "high";
 }) {
-  const displayUris = useMemo(
-    () => (urlMaxWidth != null && uris.length > 0 ? mapPhotoUrisForMaxWidth(uris, urlMaxWidth) : uris),
-    [uris, urlMaxWidth]
-  );
-  const [index, setIndex] = useState(0);
-  const [allFailed, setAllFailed] = useState(false);
-  const [tryNativeImage, setTryNativeImage] = useState(false);
-  const safeUris = displayUris.length > 0 ? displayUris : [];
-  const current = safeUris[Math.min(index, Math.max(0, safeUris.length - 1))];
+  const sources = useMemo(() => {
+    const mapped = urlMaxWidth != null ? mapPhotoUrisForMaxWidth(uris, urlMaxWidth) : uris;
+    return mapped.map((uri) => ({ uri }));
+  }, [uris, urlMaxWidth]);
 
-  useEffect(() => {
-    setIndex(0);
-    setAllFailed(false);
-    setTryNativeImage(false);
-  }, [displayUris]);
-
-  if (safeUris.length === 0 || allFailed) {
+  if (sources.length === 0) {
     return <View style={[style, styles.photoEmpty]} />;
   }
 
-  const moveToNextCandidate = () => {
-    if (index >= safeUris.length - 1) {
-      setAllFailed(true);
-      return;
-    }
-    setIndex((prev) => Math.min(prev + 1, safeUris.length - 1));
-    setTryNativeImage(false);
-  };
-
-  if (tryNativeImage) {
-    return <RNImage source={{ uri: current }} style={style} resizeMode="cover" onError={moveToNextCandidate} />;
-  }
-
-  return <ExpoImage source={{ uri: current }} style={style} cachePolicy="memory-disk" contentFit="cover" priority={priority} transition={120} onError={() => setTryNativeImage(true)} />;
+  // expo-image tries each source in order, falling back to the next on error.
+  return <ExpoImage source={sources} style={style} cachePolicy="memory-disk" contentFit="cover" priority={priority} transition={120} />;
 });
 
 const makeItem = (): MealItem => ({
@@ -427,6 +402,7 @@ export default function App() {
   const [foodPortions, setFoodPortions] = useState<Record<string, string>>({});
   const [foodResults, setFoodResults] = useState<FoodRecord[]>([]);
   const [foodLoading, setFoodLoading] = useState(false);
+  const [foodPlanScrollY, setFoodPlanScrollY] = useState(0);
   const [favouriteFoodNames, setFavouriteFoodNames] = useState<string[]>([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean | null>(null);
   const [privacyLockOn, setPrivacyLockOn] = useState(false);
@@ -1597,12 +1573,13 @@ export default function App() {
   const onMainScroll = useCallback(
     (e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
       const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+      if (screen === "foodPlan") setFoodPlanScrollY(Math.max(0, contentOffset.y));
       const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
       nearBottomRef.current = distanceFromBottom <= 600;
       if (!nearBottomRef.current) return;
       triggerFoodPlanLoadMore();
     },
-    [triggerFoodPlanLoadMore]
+    [screen, triggerFoodPlanLoadMore]
   );
 
   const selectGoal = (goal: string) => {
@@ -2207,6 +2184,7 @@ export default function App() {
           portionValue={getPortionValueForName}
           onPortionChange={setPortionValue}
           registerLoadMore={registerFoodPlanLoadMore}
+          scrollY={foodPlanScrollY}
         />
       )}
 

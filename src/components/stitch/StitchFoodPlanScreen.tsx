@@ -11,6 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 const INITIAL_DISPLAY_COUNT = 10;
 const LOAD_MORE_COUNT = 10;
+const MAX_MOUNTED_ROWS = 24;
+const ROW_HEIGHT_ESTIMATE = 262;
 
 type Props = {
   foodSearch: string;
@@ -35,6 +37,8 @@ type Props = {
    * has to tap a "Load more" button.
    */
   registerLoadMore?: (cb: (() => void) | null) => void;
+  /** Parent scroll offset so we can mount rows around current viewport. */
+  scrollY?: number;
 };
 
 function createStyles(t: AppThemeTokens) {
@@ -65,6 +69,7 @@ function createStyles(t: AppThemeTokens) {
     chipOn: { backgroundColor: t.primary },
     chipTxt: { color: t.onSurfaceVariant, fontWeight: "700", fontSize: 12 },
     chipTxtOn: { color: t.onPrimary },
+    topSpacer: { width: "100%" },
     muted: { color: t.onSurfaceVariant, fontSize: 13 },
     card: {
       backgroundColor: t.surfaceContainer,
@@ -303,7 +308,8 @@ export function StitchFoodPlanScreen({
   onAdjustPortion,
   portionValue,
   onPortionChange,
-  registerLoadMore
+  registerLoadMore,
+  scrollY = 0
 }: Props) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -358,6 +364,17 @@ export function StitchFoodPlanScreen({
 
   const shown = Math.min(displayCount, foods.length);
   const visibleFoods = useMemo(() => foods.slice(0, shown), [foods, shown]);
+  const mountedStartIndex = useMemo(() => {
+    const estimatedTopRow = Math.max(0, Math.floor(scrollY / ROW_HEIGHT_ESTIMATE));
+    const overscanRows = 6;
+    const centeredStart = Math.max(0, estimatedTopRow - overscanRows);
+    return Math.min(Math.max(0, visibleFoods.length - MAX_MOUNTED_ROWS), centeredStart);
+  }, [scrollY, visibleFoods.length]);
+  const mountedFoods = useMemo(
+    () => visibleFoods.slice(mountedStartIndex, mountedStartIndex + MAX_MOUNTED_ROWS),
+    [visibleFoods, mountedStartIndex]
+  );
+  const topSpacerHeight = mountedStartIndex * ROW_HEIGHT_ESTIMATE;
   const hasMore = foods.length > shown;
   const remaining = foods.length - shown;
 
@@ -418,7 +435,8 @@ export function StitchFoodPlanScreen({
       ) : null}
 
       <Animated.View style={{ gap: 10, opacity: listOpacity, transform: [{ translateY: listTranslate }] }}>
-        {visibleFoods.map((food) => (
+        {topSpacerHeight > 0 ? <View style={[styles.topSpacer, { height: topSpacerHeight }]} /> : null}
+        {mountedFoods.map((food) => (
           <FoodPlanRow
             key={`${food.category}-${food.name}`}
             food={food}

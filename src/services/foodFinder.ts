@@ -69,20 +69,31 @@ export const searchFoods = async (query: string): Promise<SearchResult> => {
   }
 
   try {
-    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/foods?select=${FOODS_SELECT}&order=name.asc&limit=40`;
+    const endpointBase = `${url.replace(/\/$/, "")}/rest/v1/foods?select=${FOODS_SELECT}&order=name.asc`;
     const queryPart = q ? `&name=ilike.*${encodeURIComponent(q)}*` : "";
-    const response = await fetch(`${endpoint}${queryPart}`, {
-      method: "GET",
-      headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
-      },
-    });
-    if (!response.ok) throw new Error("Cloud search request failed");
-    const raw = await response.text();
-    if (!raw.trim()) return { foods: [], source: "cloud" };
-    const data = JSON.parse(raw) as Record<string, unknown>[];
-    if (Array.isArray(data) && data.length > 0) return { foods: data.map(normalizeFoodRow), source: "cloud" };
+    const pageSize = 500;
+    let offset = 0;
+    const rows: Record<string, unknown>[] = [];
+
+    while (true) {
+      const response = await fetch(`${endpointBase}${queryPart}&limit=${pageSize}&offset=${offset}`, {
+        method: "GET",
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+        },
+      });
+      if (!response.ok) throw new Error("Cloud search request failed");
+      const raw = await response.text();
+      if (!raw.trim()) break;
+      const page = JSON.parse(raw) as Record<string, unknown>[];
+      if (!Array.isArray(page) || page.length === 0) break;
+      rows.push(...page);
+      if (page.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    if (rows.length > 0) return { foods: rows.map(normalizeFoodRow), source: "cloud" };
     return { foods: [], source: "cloud" };
   } catch {
     return { foods: [], source: "cloud" };
